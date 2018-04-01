@@ -17,6 +17,10 @@ void error_callback(int error,const char* description) {
 	// TODO: log_error("GLFW: %s",description);
 }
 
+void key_callback(GLFWwindow* window,int key,int scancode,int action,int mods) {
+	// TODO: use input manager
+}
+
 void fb_resize(GLFWwindow* window,int width,int height) {
 	GLfloat h = (GLfloat)height/(GLfloat)width;
 	GLfloat znear = 5.0f;
@@ -63,6 +67,8 @@ int main(char** argv,int argc) {
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
+
+	glfwSetKeyCallback(window,key_callback);
 
 	/* Set up OpenGL */
 	glfwMakeContextCurrent(window);
