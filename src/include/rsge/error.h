@@ -29,7 +29,23 @@ typedef enum {
 	/**
 	 * Shader error.
 	 */
-	RSGE_ERROR_SHADER
+	RSGE_ERROR_SHADER,
+	/**
+	 * libpng library error.
+	 */
+	RSGE_ERROR_LIBPNG,
+	/**
+	 * File error.
+	 */
+	RSGE_ERROR_FILE,
+	/**
+	 * Invalid file.
+	 */
+	RSGE_ERROR_INVALID_FILE,
+	/**
+	 * OpenAL error.
+	 */
+	RSGE_ERROR_OPENAL
 } rsge_error_e;
 
 #endif

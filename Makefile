@@ -2,6 +2,7 @@ BIN=./bin
 DEPS=./deps
 SRC=./src
 
+EXAMPLES_BIN=$(BIN)/examples
 LIBRARY_BIN=$(BIN)/library
 
 GLAD_PATH=$(DEPS)/glad
@@ -11,6 +12,7 @@ GLAD_SRC=$(GLAD_PATH)/src
 
 BUILD_SRC=$(SRC)/build
 CONFIG_SRC=$(SRC)/config
+EXAMPLES_SRC=$(SRC)/examples
 INCLUDE_SRC=$(SRC)/include
 LIBRARY_SRC=$(SRC)/library
 

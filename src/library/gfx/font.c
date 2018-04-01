@@ -13,5 +13,5 @@ rsge_error_e rsge_font_fromFile(rsge_font_t* font,char* path) {
 	err = rsge_font_freetype_fromFile(font,path);
 	if(err == RSGE_ERROR_NONE) return RSGE_ERROR_NONE;
 #endif
-	return RSGE_ERROR_INVALID_FONT;
+	return RSGE_ERROR_INVALID_FILE;
 }

@@ -1,4 +1,5 @@
 #include <rsge/gfx/gl.h>
+#include <rsge/snd/init.h>
 #include <rsge/config.h>
 #include <rsge/game.h>
 
@@ -46,6 +47,15 @@ int main(char** argv,int argc) {
 		return EXIT_FAILURE;
 	}
 #endif
+
+	err = rsge_audio_init();
+	if(err != RSGE_ERROR_NONE) {
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
 
 	/* Get game information */
 	rsge_game_t gameinfo;
@@ -110,6 +120,8 @@ int main(char** argv,int argc) {
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
+
+	rsge_audio_init();
 
 #if CONFIG_USE_FREETYPE == 1
 	FT_Done_FreeType(rsge_freetype_lib);
