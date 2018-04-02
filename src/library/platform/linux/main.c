@@ -165,8 +165,10 @@ int main(char** argv,int argc) {
 	/* Create window */
 	int res_w = config_setting_get_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.width"));
 	int res_h = config_setting_get_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.height"));
+	GLFWmonitor* monitor = NULL;
+	if(config_setting_get_bool(config_lookup(&rsge_libconfig_cfg,"gfx.fullscreen"))) monitor = glfwGetPrimaryMonitor();
 	// TODO: add fullscreen
-	GLFWwindow* window = glfwCreateWindow(res_w,res_h,gameinfo.name,NULL,NULL);
+	GLFWwindow* window = glfwCreateWindow(res_w,res_h,gameinfo.name,monitor,NULL);
 	if(!window) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);

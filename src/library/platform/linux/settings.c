@@ -67,8 +67,9 @@ rsge_error_e rsge_settings_save() {
     config_setting_t* cfg_gfx_res = config_lookup(&rsge_libconfig_cfg,"gfx.res");
     config_setting_t* cfg_gfx_res_width = config_lookup(&rsge_libconfig_cfg,"gfx.res.width");
     config_setting_t* cfg_gfx_res_height = config_lookup(&rsge_libconfig_cfg,"gfx.res.height");
+    config_setting_t* cfg_gfx_fullscreen = config_lookup(&rsge_libconfig_cfg,"gfx.fullscreen");
     
-    if(!cfg_gfx || !cfg_gfx_res || !cfg_gfx_res_width || !cfg_gfx_res_height) {
+    if(!cfg_gfx || !cfg_gfx_res || !cfg_gfx_res_width || !cfg_gfx_res_height || !cfg_gfx_fullscreen) {
         err = rsge_settings_loaddefault();
         if(err != RSGE_ERROR_NONE) {
             free(dir);
