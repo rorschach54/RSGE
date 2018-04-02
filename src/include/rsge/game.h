@@ -2,6 +2,7 @@
 #define __RSGE_GAME_H_ 1
 
 #include <rsge/error.h>
+#include <rsge/input.h>
 
 /**
  * \struct rsge_game_t rsge/game.h
@@ -12,6 +13,21 @@ typedef struct {
 	 * \brief The name of the game
 	 */
 	char* name;
+	
+	/**
+	 * \brief The id of the game
+	 */
+	char* id;
+	
+	/**
+	 * \brief Input mapping size
+	 */
+	int inputMapSize;
+	
+	/**
+	 * \brief Input map
+	 */
+	rsge_inputmap_entry_t* inputMap;
 } rsge_game_t;
 
 /**

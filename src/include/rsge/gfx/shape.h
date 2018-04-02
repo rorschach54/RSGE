@@ -26,7 +26,7 @@ typedef struct {
 	/**
 	 * \brief The color value of the vertice, available when RSGE_SHAPE_VERT_FLAG_COLOR flag is set.
 	 */
-	int color[4];
+	float color[4];
 
 	/**
 	 * \brief The fog coord value of the vertice, available when RSGE_SHAPE_VERT_FLAG_FOG flag is set.
@@ -35,13 +35,14 @@ typedef struct {
 } rsge_shape_vert_t;
 
 /**
- * \fn rsge_error_e rsge_shape_render(GLenum mode,rsge_shape_vert_t* vertices,int verticeCount)
- * \brief Renders a shape.
+ * \fn rsge_error_e rsge_shape_generate(GLuint* list,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount)
+ * \brief Generates a shape.
+ * \param list A pointer to the variable to use for a display list
  * \param mode The GL rendering mode to use.
  * \param vertices An array of vertices.
  * \param verticeCount The number of vertices.
  * \return An error code.
  */
-rsge_error_e rsge_shape_render(GLenum mode,rsge_shape_vert_t* vertices,int verticeCount);
+rsge_error_e rsge_shape_generate(GLuint* list,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount);
 
 #endif

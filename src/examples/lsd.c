@@ -19,5 +19,6 @@ rsge_error_e rsge_game_update(double time) {
 
 rsge_error_e rsge_game_getinfo(rsge_game_t* gameinfo) {
 	gameinfo->name = "RSGE Example - LSD";
+	gameinfo->id = "rsge.example.lsd";
 	return RSGE_ERROR_NONE;
 }

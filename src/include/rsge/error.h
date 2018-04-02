@@ -45,7 +45,11 @@ typedef enum {
 	/**
 	 * OpenAL error.
 	 */
-	RSGE_ERROR_OPENAL
+	RSGE_ERROR_OPENAL,
+	/**
+	 * libconfig error.
+	 */
+	RSGE_ERROR_LIBCONFIG
 } rsge_error_e;
 
 #endif

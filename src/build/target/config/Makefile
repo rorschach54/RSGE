@@ -17,6 +17,7 @@ CONFIG_AUDIO_BACKEND=libaudio
 endif
 
 config:
+	@mkdir -p $(CONFIG_SRC)
 	@printf "#ifndef __RSGE_CONFIG_H_\n" > $(INCLUDE_SRC)/rsge/config.h
 	@printf "#define __RSGE_CONFIG_H_ 1\n\n" >> $(INCLUDE_SRC)/rsge/config.h
 	@printf "#define CONFIG_PLATFORM $(CONFIG_PLATFORM)\n" >> $(INCLUDE_SRC)/rsge/config.h

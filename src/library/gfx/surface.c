@@ -5,14 +5,14 @@
 rsge_error_e rsge_surface_create(rsge_surface_t* surface,size_t width,size_t height,size_t bpp) {
 	memset(surface,0,sizeof(rsge_surface_t));
 
-	/* Allocates the pixel buffer */
-	surface->buffer = malloc(width*height*bpp);
-	if(!surface->buffer) return RSGE_ERROR_MALLOC;
-
 	/* Save the width, height, and bpp */
 	surface->width = width;
 	surface->height = height;
 	surface->bpp = bpp;
+
+	/* Allocates the pixel buffer */
+	surface->buffer = malloc(width*height*bpp);
+	if(!surface->buffer) return RSGE_ERROR_MALLOC;
 	return RSGE_ERROR_NONE;
 }
 
@@ -22,7 +22,7 @@ rsge_error_e rsge_surface_destroy(rsge_surface_t* surface) {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
+rsge_error_e rsge_surface_render(rsge_surface_t* surface,GLuint* list,float sx,float sy) {
 	GLuint tex;
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1,&tex);
@@ -46,6 +46,9 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 	float h = surface->height/sy;
 
 	glEnable(GL_TEXTURE_2D);
+	*list = glGenLists(1);
+	glNewList(*list,GL_COMPILE);
+	glPushMatrix();
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(0.0f,0.0f);
@@ -62,6 +65,8 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 
 	glEnd();
 	glDeleteTextures(1,&tex);
+	glPopMatrix();
+	glEndList();
 	return RSGE_ERROR_NONE;
 }
 

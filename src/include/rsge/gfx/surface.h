@@ -1,6 +1,7 @@
 #ifndef __RSGE_GFX_SURFACE_H_
 #define __RSGE_GFX_SURFACE_H_ 1
 
+#include <rsge/gfx/gl.h>
 #include <rsge/error.h>
 #include <linmath.h>
 #include <stdint.h>
@@ -59,7 +60,7 @@ rsge_error_e rsge_surface_destroy(rsge_surface_t* surface);
  * \param sy The scale Y axis.
  * \return An error code.
  */
-rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy);
+rsge_error_e rsge_surface_render(rsge_surface_t* surface,GLuint* list,float sx,float sy);
 
 /**
  * \fn rsge_error_e rsge_surface_blit(rsge_surface_t* surface,rsge_surface_t* orig,vec2 pos)

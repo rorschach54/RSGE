@@ -9,7 +9,7 @@ rsge_error_e rsge_audio_init() {
 
 	const ALchar* defaultDeviceName = alcGetString(NULL,ALC_DEFAULT_DEVICE_SPECIFIER);
 	rsge_audio_openal_dev = alcOpenDevice(defaultDeviceName);
-	if(!rsge_audio_openal_dev) return RSGE_ERROR_OPENAL;
+	if(!rsge_audio_openal_dev) return RSGE_ERROR_NONE;
 
 	alGetError();
 
