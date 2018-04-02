@@ -106,9 +106,6 @@ void joystick_callback(int joy,int event) {
 
 void fb_resize(GLFWwindow* window,int width,int height) {
 	GLfloat h = (GLfloat)height/(GLfloat)width;
-	GLfloat znear = 5.0f;
-	GLfloat zfar = 30.0f;
-	GLfloat xmax = znear*0.5f;
 	glViewport(0,0,(GLint)width,(GLint)height);
 	
 	config_setting_set_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.width"),width);
@@ -204,7 +201,7 @@ int main(char** argv,int argc) {
 
 	/* Update game */
 	int exitStatus = EXIT_SUCCESS;
-	glfwSetTime(0.0f);
+	glfwSetTime(0.0);
 	while(!glfwWindowShouldClose(window)) {
 		err = rsge_game_update(glfwGetTime());
 		if(err != RSGE_ERROR_NONE) {
