@@ -87,6 +87,23 @@ void mouse_button_callback(GLFWwindow* window,int button,int action,int mods) {
 	}
 }
 
+void joystick_callback(int joy,int event) {
+	rsge_error_e err;
+	rsge_game_t gameinfo;
+	rsge_inputmap_joystick_t data;
+	
+	data.name = (char*)glfwGetJoystickName(joy);
+	
+	if(event == GLFW_CONNECTED) data.event = RSGE_INPUTMAP_JOYSTICK_EVENT_CONN;
+	else if(event == GLFW_DISCONNECTED) data.event = RSGE_INPUTMAP_JOYSTICK_EVENT_DISCONN;
+	else {
+		data.event = RSGE_INPUTMAP_JOYSTICK_EVENT_AXIS_BUTTON;
+		
+		data.axis = (float*)glfwGetJoystickAxes(joy,&data.axisCount);
+		data.button = (unsigned int*)glfwGetJoystickButtons(joy,&data.buttonCount);
+	}
+}
+
 void fb_resize(GLFWwindow* window,int width,int height) {
 	GLfloat h = (GLfloat)height/(GLfloat)width;
 	GLfloat znear = 5.0f;
@@ -166,6 +183,7 @@ int main(char** argv,int argc) {
 	glfwSetFramebufferSizeCallback(window,fb_resize);
 	glfwSetCursorPosCallback(window,cursor_position_callback);
 	glfwSetMouseButtonCallback(window,mouse_button_callback);
+	glfwSetJoystickCallback(joystick_callback);
 
 	/* Set up OpenGL */
 	glfwMakeContextCurrent(window);
