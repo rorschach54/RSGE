@@ -204,6 +204,7 @@ int main(char** argv,int argc) {
 
 	/* Update game */
 	int exitStatus = EXIT_SUCCESS;
+	glfwSetTime(0.0f);
 	while(!glfwWindowShouldClose(window)) {
 		err = rsge_game_update(glfwGetTime());
 		if(err != RSGE_ERROR_NONE) {
