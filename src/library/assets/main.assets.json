@@ -1,0 +1,10 @@
+[
+	{
+		"name": "fonts/thintel/thintel.ttf",
+		"path": "src/assets/fonts/thintel/thintel.ttf"
+	},
+	{
+		"name": "fonts/thintel/licence.txt",
+		"path": "src/assets/fonts/thintel/licence.txt"
+	}
+]

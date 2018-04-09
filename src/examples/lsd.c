@@ -14,6 +14,7 @@ rsge_error_e rsge_game_uninit() {
 rsge_error_e rsge_game_update(double time) {
 	glClearColor((rand() % 255)*0.01f,(rand() % 255)*0.01f,(rand() % 255)*0.01f,(rand() % 255)*0.01f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glFlush();
 	return RSGE_ERROR_NONE;
 }
 

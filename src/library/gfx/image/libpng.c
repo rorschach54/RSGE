@@ -1,36 +1,47 @@
 #include <rsge/gfx/image/libpng.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
-rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path) {
-	FILE* fp = fopen(path,"rb");
-	if(!fp) return RSGE_ERROR_FILE;
+typedef struct {
+	rsge_asset_file_t* asset;
+	uint32_t off;
+} rsge_asset_libpng_t;
 
+void rsge_image_libpng_read(png_structp png_ptr,png_bytep outBytes,png_size_t byteCountToRead) {
+	png_voidp io_ptr = png_get_io_ptr(png_ptr);
+	if(io_ptr == NULL) return;
+	rsge_asset_libpng_t* libpng_asset = (rsge_asset_libpng_t*)io_ptr;
+	for(size_t i = 0;i < byteCountToRead;i++) {
+		outBytes[i] = libpng_asset->asset->data[libpng_asset->off+i];
+		libpng_asset->off++;
+	}
+}
+
+rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_file_t* asset) {
 	char header[8];
-	fread(header,1,8,fp);
+	for(int i = 0;i < 8;i++) header[i] = asset->data[i];
 	if(png_sig_cmp(header,0,8)) {
-		fclose(fp);
 		return RSGE_ERROR_LIBPNG;
 	}
 
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
 	if(!png_ptr) {
-		fclose(fp);
 		return RSGE_ERROR_LIBPNG;
 	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 	if(!info_ptr) {
-		fclose(fp);
 		return RSGE_ERROR_LIBPNG;
 	}
 
 	if(setjmp(png_jmpbuf(png_ptr))) {
-		fclose(fp);
 		return RSGE_ERROR_LIBPNG;
 	}
 
-	png_init_io(png_ptr,fp);
+	rsge_asset_libpng_t libpng_asset;
+	libpng_asset.asset = asset;
+	libpng_asset.off = 0;
+	png_set_read_fn(png_ptr,&libpng_asset,rsge_image_libpng_read);
 	png_set_sig_bytes(png_ptr,8);
 	png_read_info(png_ptr,info_ptr);
 
@@ -43,13 +54,11 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path) {
 	png_read_update_info(png_ptr,info_ptr);
 
 	if(setjmp(png_jmpbuf(png_ptr))) {
-		fclose(fp);
 		return RSGE_ERROR_LIBPNG;
 	}
 
 	png_bytep* row_pointers = (png_bytep*)malloc(sizeof(png_bytep)*height);
 	if(!row_pointers) {
-		fclose(fp);
 		return RSGE_ERROR_MALLOC;
 	}
 
@@ -57,13 +66,11 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path) {
 		row_pointers[y] = (png_byte*)malloc(png_get_rowbytes(png_ptr,info_ptr));
 		if(!row_pointers[y]) {
 			free(row_pointers);
-			fclose(fp);
 			return RSGE_ERROR_MALLOC;
 		}
 	}
 
 	png_read_image(png_ptr,row_pointers);
-	fclose(fp);
 
 	size_t bpp = 0;
 	if(png_get_color_type(png_ptr,info_ptr) == PNG_COLOR_TYPE_RGB) bpp = 3;
@@ -82,8 +89,10 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path) {
 		png_byte* row = row_pointers[y];
 		for(int x = 0;x < width;x++) {
 			png_byte* ptr = &(row[x*bpp]);
-			size_t off = surface->bpp*((x+y)*surface->width);
-			for(size_t i = 0;i < bpp;i++) surface->buffer[off+i] = ptr[i];
+			size_t off = surface->bpp*((x*y)+surface->width);
+			for(size_t i = 0;i < bpp;i++) {
+				surface->buffer[off+i] = ptr[i]/0.01f;
+			}
 		}
 	}
 

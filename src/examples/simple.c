@@ -1,14 +1,16 @@
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/shape.h>
+#include <rsge/assets/rsge_assets.h>
+#include <rsge/assets.h>
 #include <rsge/game.h>
 
 GLuint tri;
 
 rsge_error_e rsge_game_init() {
 	glEnableClientState(GL_VERTEX_ARRAY);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glDisable(GL_CULL_FACE);
     
 	rsge_shape_generate(&tri,GL_TRIANGLES,(rsge_shape_vert_t[3]){
 		{ .flags = RSGE_SHAPE_VERT_FLAG_COLOR, .pos = { -0.6f,-0.4f,0.0f }, .color = { 1.0f,0.0f,0.0f,1.0f } },

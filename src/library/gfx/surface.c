@@ -11,7 +11,7 @@ rsge_error_e rsge_surface_create(rsge_surface_t* surface,size_t width,size_t hei
 	surface->bpp = bpp;
 
 	/* Allocates the pixel buffer */
-	surface->buffer = malloc(width*height*bpp);
+	surface->buffer = malloc(((width*height)*bpp)*sizeof(float));
 	if(!surface->buffer) return RSGE_ERROR_MALLOC;
 	return RSGE_ERROR_NONE;
 }
@@ -22,11 +22,7 @@ rsge_error_e rsge_surface_destroy(rsge_surface_t* surface) {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_surface_render(rsge_surface_t* surface,GLuint* list,float sx,float sy) {
-	GLuint tex;
-	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1,&tex);
-	glBindTexture(GL_TEXTURE_2D,tex);
+rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_ADD);
 
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -38,17 +34,14 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,GLuint* list,float sx,f
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 	glPixelStorei(GL_PACK_ALIGNMENT,1);
 
-	if(surface->bpp == 4) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGBA,GL_UNSIGNED_INT,surface->buffer);
-	else if(surface->bpp == 3) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGB,GL_UNSIGNED_INT,surface->buffer);
+	if(surface->bpp == 4) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGBA,GL_FLOAT,surface->buffer);
+	else if(surface->bpp == 3) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGB,GL_FLOAT,surface->buffer);
 	else return RSGE_ERROR_INVALID_BPP;
 
 	float w = surface->width/sx;
 	float h = surface->height/sy;
 
 	glEnable(GL_TEXTURE_2D);
-	*list = glGenLists(1);
-	glNewList(*list,GL_COMPILE);
-	glPushMatrix();
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(0.0f,0.0f);
@@ -64,17 +57,14 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,GLuint* list,float sx,f
 	glVertex2f(w,h);
 
 	glEnd();
-	glDeleteTextures(1,&tex);
-	glPopMatrix();
-	glEndList();
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_surface_blit(rsge_surface_t* surface,rsge_surface_t* orig,vec2 pos) {
 	for(size_t y = 0;y < orig->height;y++) {
 		for(size_t x = 0;x < orig->width;x++) {
-			size_t surface_off = surface->bpp*(((pos[0]+x)+(pos[1]+y))*surface->width);
-			size_t orig_off = orig->bpp*((x+y)*orig->width);
+			size_t surface_off = surface->bpp*(((pos[0]+x)*(pos[1]+y))+surface->width);
+			size_t orig_off = orig->bpp*((x*y)+orig->width);
 			if(surface->bpp == 4) {
 				if(orig->bpp == 4) {
 					surface->buffer[surface_off] = orig->buffer[orig_off];

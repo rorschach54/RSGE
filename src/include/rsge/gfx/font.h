@@ -2,6 +2,7 @@
 #define __RSGE_GFX_FONT_H_ 1
 
 #include <rsge/gfx/surface.h>
+#include <rsge/assets.h>
 #include <rsge/error.h>
 
 struct rsge_font;
@@ -34,12 +35,12 @@ typedef struct rsge_font {
 #define rsge_font_render(font,surface,text,color) font->render(font,surface,text,color)
 
 /**
- * \fn rsge_error_e rsge_font_fromFile(rsge_font_t* font,char* path)
- * \brief Loads a font from a file.
+ * \fn rsge_error_e rsge_font_fromFile(rsge_font_t* font,rsge_asset_file_t* asset)
+ * \brief Loads a font from an asset file.
  * \param font The pointer to a font.
- * \param path The path to the font file.
+ * \param asset The asset file to use.
  * \return An error code.
  */
-rsge_error_e rsge_font_fromFile(rsge_font_t* font,char* path);
+rsge_error_e rsge_font_fromFile(rsge_font_t* font,rsge_asset_file_t* asset);
 
 #endif

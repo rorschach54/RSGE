@@ -30,7 +30,7 @@ typedef struct {
 	/**
 	 * \brief The pixel buffer of the surface.
 	 */
-	int* buffer;
+	float* buffer;
 } rsge_surface_t;
 
 /**
@@ -60,7 +60,7 @@ rsge_error_e rsge_surface_destroy(rsge_surface_t* surface);
  * \param sy The scale Y axis.
  * \return An error code.
  */
-rsge_error_e rsge_surface_render(rsge_surface_t* surface,GLuint* list,float sx,float sy);
+rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy);
 
 /**
  * \fn rsge_error_e rsge_surface_blit(rsge_surface_t* surface,rsge_surface_t* orig,vec2 pos)

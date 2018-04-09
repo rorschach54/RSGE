@@ -49,7 +49,11 @@ typedef enum {
 	/**
 	 * libconfig error.
 	 */
-	RSGE_ERROR_LIBCONFIG
+	RSGE_ERROR_LIBCONFIG,
+	/**
+	 * No asset.
+	 */
+	RSGE_ERROR_NOASSET
 } rsge_error_e;
 
 #endif

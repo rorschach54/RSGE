@@ -2,6 +2,7 @@
 #define __RSGE_GFX_FONT_FREETYPE_H_ 1
 
 #include <rsge/gfx/font.h>
+#include <rsge/assets.h>
 #include <rsge/config.h>
 
 #if CONFIG_USE_FREETYPE == 1
@@ -13,7 +14,7 @@ typedef struct {
 	FT_Face face;
 } rsge_font_freetype_t;
 
-rsge_error_e rsge_font_freetype_fromFile(rsge_font_t* font,char* path);
+rsge_error_e rsge_font_freetype_fromFile(rsge_font_t* font,rsge_asset_file_t* asset);
 
 #endif
 #endif
