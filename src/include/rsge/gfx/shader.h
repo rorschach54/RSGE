@@ -2,6 +2,7 @@
 #define __RSGE_GFX_SHADER_H_ 1
 
 #include <rsge/gfx/gl.h>
+#include <rsge/assets.h>
 #include <rsge/error.h>
 
 /**
@@ -25,6 +26,16 @@ typedef struct {
 	 */
 	GLuint id;
 } rsge_shaderprg_t;
+
+/**
+ * \fn rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,rsge_asset_t* asset)
+ * \brief Creates a new shader and loads the code from the asset.
+ * \param shader The pointer to the shader.
+ * \param type The type of shader to create.
+ * \param asset The asset to load the shader from.
+ * \return An error code.
+ */
+rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,rsge_asset_t* asset);
 
 /**
  * \fn rsge_error_e rsge_shader_create(rsge_shader_t* shader,GLenum type)

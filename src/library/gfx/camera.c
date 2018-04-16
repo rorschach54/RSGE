@@ -1,9 +1,12 @@
 #include <rsge/gfx/camera.h>
 #include <math.h>
 
-vec3 rsge_camera_rot = (vec3){0.0f,0.0f,0.0f};
-vec3 rsge_camera_pos = (vec3){0.0f,0.0f,0.0f};
-float rsge_camera_col[4] = (float[4]){ 0.0f,0.0f,0.0f,1.0f };
+mat4x4 rsge_camera_m;
+mat4x4 rsge_camera_p;
+mat4x4 rsge_camera_mvp;
+vec3 rsge_camera_rot;
+vec3 rsge_camera_pos;
+float rsge_camera_col[4];
 
 rsge_error_e rsge_camera_setcolor(int color[4]) {
 	rsge_camera_col[0] = color[0]/0.01f;
@@ -43,22 +46,21 @@ rsge_error_e rsge_camera_getpos(vec3* pos) {
 rsge_error_e rsge_camera_update() {
 	glClearColor(rsge_camera_col[0],rsge_camera_col[1],rsge_camera_col[2],rsge_camera_col[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-	glRotatef(rsge_camera_rot[0],1.0f,0.0f,0.0f);
-	glRotatef(rsge_camera_rot[1],0.0f,1.0f,0.0f);
-	glTranslated(-rsge_camera_pos[0],-rsge_camera_pos[1],-rsge_camera_pos[2]);
+	//glLoadIdentity();
+	//glRotatef(rsge_camera_rot[0],1.0f,0.0f,0.0f);
+	//glRotatef(rsge_camera_rot[1],0.0f,1.0f,0.0f);
+	//glRotatef(rsge_camera_rot[2],0.0f,0.0f,1.0f);
+	//glTranslatef(-rsge_camera_pos[0],-rsge_camera_pos[1],-rsge_camera_pos[2]);
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_camera_reshape(int width,int height) {
-	GLfloat h = (GLfloat)height/(GLfloat)width;
+	GLfloat ratio = (GLfloat)height/(GLfloat)width;
 	glViewport(0,0,(GLint)width,(GLint)height);
 
-	/* Update the camera's projection */
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-1,1,-1,1,1,1);//gluPerspective(100,(GLfloat)width/(GLfloat)height,0.01,100.0);
-
-	glMatrixMode(GL_MODELVIEW);
+	/* Update the camera's mvp */
+	mat4x4_identity(rsge_camera_m);
+	mat4x4_ortho(rsge_camera_p,-ratio,-ratio,-1.0f,1.0f,1.0f,-1.0f);
+	mat4x4_mul(rsge_camera_mvp,rsge_camera_p,rsge_camera_m);
 	return RSGE_ERROR_NONE;
 }

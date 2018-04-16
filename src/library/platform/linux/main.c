@@ -21,6 +21,7 @@ config_t rsge_libconfig_cfg;
 
 void error_callback(int error,const char* description) {
 	// TODO: log_error("GLFW: %s",description);
+	fprintf(stderr,"GLFW: %s\n",description);
 }
 
 void key_callback(GLFWwindow* window,int key,int scancode,int action,int mods) {
@@ -190,9 +191,39 @@ int main(char** argv,int argc) {
 	glfwSwapInterval(1);
 
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
+	glDepthFunc(GL_LESS);
+	glDisable(GL_LIGHTING);
 
 	fb_resize(window,res_w,res_h);
+	
+	vec3 pos;
+	pos[0] = 0.0f;
+	pos[1] = 0.0f;
+	pos[2] = 0.0f;
+	err = rsge_camera_setpos(pos);
+	if(err != RSGE_ERROR_NONE) {
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		config_destroy(&rsge_libconfig_cfg);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
+	
+	vec2 rot;
+	rot[0] = 0.0f;
+	rot[1] = 0.0f;
+	err = rsge_camera_setrot(rot);
+	if(err != RSGE_ERROR_NONE) {
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		config_destroy(&rsge_libconfig_cfg);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
 
 	/* Initialize game */
 	err = rsge_game_init();
@@ -210,13 +241,15 @@ int main(char** argv,int argc) {
 	int exitStatus = EXIT_SUCCESS;
 	glfwSetTime(0.0);
 	while(!glfwWindowShouldClose(window)) {
+		int width,height;
+		glfwGetFramebufferSize(window,&width,&height);
+		rsge_camera_reshape(width,height);
 		rsge_camera_update();
 		err = rsge_game_update(glfwGetTime());
 		if(err != RSGE_ERROR_NONE) {
 			exitStatus = EXIT_FAILURE;
 			break;
 		}
-		glFlush();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

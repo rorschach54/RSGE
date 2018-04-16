@@ -14,28 +14,26 @@ var files = JSON.parse(fs.readFileSync(inpath).toString());
 /* Generate C source */
 var out = "#include <"+incprefix+name+".h>\n\n";
 
+out += "rsge_error_e "+name+"_find(rsge_assets_t* assets,rsge_asset_t* file,char* name) {\n";
 for(var i = 0;i < files.length;i++) {
-	out += "rsge_asset_t "+name+"_"+files[i]["name"].split("/").join("_").split(".").join("__").split("-").join("___")+" = {";
-	out += "\n\t.name = \""+files[i]["name"]+"\",";
 	var data = fs.readFileSync(files[i]["path"]);
-	out += "\n\t.data = (unsigned char["+data.length+"]) {";
+	
+	out += "\tif(!strcmp(name,\""+files[i]["name"]+"\")) {\n";
+	out += "\t\tfile->name = \""+files[i]["name"]+"\";\n";
+	out += "\t\tfile->size = "+data.length+";\n";
+	out += "\t\tfile->data = (unsigned char["+data.length+"]){ ";
 	for(var o = 0;o < data.length;o++) {
 		out += "0x"+Buffer.from([data[o]]).toString("hex");
 		if(o+1 < data.length) out += ",";
 	}
-	out += "},";
-	out += "\n\t.size = "+data.length;
-	out += "\n};\n";
+	out += " };\n";
+	out += "\t\treturn RSGE_ERROR_NONE;\n";
+	out += "\t}\n";
 }
+out += "\treturn RSGE_ERROR_NOASSET;\n";
+out += "}\n";
 
-out += "\nrsge_assets_t "+name+" = {\n\t.files = {";
-
-for(var i = 0;i < files.length;i++) {
-	out += "\n\t\t&"+name+"_"+files[i]["name"].split("/").join("_").split(".").join("__").split("-").join("___");
-	if(i+1 < files.length) out += ",";
-}
-
-out += "\n\t},\n\t.count = "+files.length+"\n};";
+out += "\nrsge_assets_t "+name+" = { .find = "+name+"_find };";
 fs.writeFileSync(outpath,out);
 
 /* Generate header */

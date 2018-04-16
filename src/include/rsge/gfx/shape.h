@@ -2,13 +2,9 @@
 #define __RSGE_GFX_SHAPE_H_ 1
 
 #include <rsge/gfx/gl.h>
+#include <rsge/gfx/shader.h>
 #include <rsge/error.h>
 #include <linmath.h>
-
-#define RSGE_SHAPE_VERT_FLAG_COLOR (1 << 0)
-#define RSGE_SHAPE_VERT_FLAG_FOG (1 << 1)
-
-#define RSGE_SHAPE_FLAG_MULTIDISPLLST (1 << 0)
 
 /**
  * \struct rsge_shape_vert_t rsge/gfx/shape.h
@@ -16,24 +12,14 @@
  */
 typedef struct {
 	/**
-	 * \brief Flags that enable specific parts of the vertice.
-	 */
-	uint8_t flags;
-
-	/**
 	 * \brief A 3-tuplet float that defines the position.
 	 */
-	vec3 pos;
+	float x,y,z;
 
 	/**
-	 * \brief The color value of the vertice, available when RSGE_SHAPE_VERT_FLAG_COLOR flag is set.
+	 * \brief The color value of the vertice.
 	 */
-	float color[4];
-
-	/**
-	 * \brief The fog coord value of the vertice, available when RSGE_SHAPE_VERT_FLAG_FOG flag is set.
-	 */
-	float fogCoord;
+	float r,g,b,a;
 } rsge_shape_vert_t;
 
 /**
@@ -41,25 +27,11 @@ typedef struct {
  * \brief Defines a shape.
  */
 typedef struct {
-	/**
-	 * \brief Flags.
-	 */
-	uint8_t flags;
-
-	/**
-	 * \brief The display list used.
-	 */
-	GLuint list;
 
 	/**
 	 * \brief A 3-tuplet float that defines the position.
 	 */
 	vec3 pos;
-
-	/**
-	 * \brief The GL rendering mode to use.
-	 */
-	GLenum mode;
 
 	/**
 	 * \brief An array of vertices.
@@ -70,19 +42,29 @@ typedef struct {
 	 * \brief The number of vertices.
 	 */
 	int verticeCount;
+	
+	/**
+	 * \brief Shader program.
+	 */
+	rsge_shaderprg_t shaderProg;
+	
+	GLint MVP;
+	GLint vPos;
+	GLint vCol;
+	GLint position;
+	
+	GLuint vertexBuffer;
 } rsge_shape_t;
 
 /**
- * \fn rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,uint8_t flags)
+ * \fn rsge_error_e rsge_shape_create(rsge_shape_t* shape,rsge_shape_vert_t* vertices,int verticeCount)
  * \brief Creates a new shape.
  * \param shape The pointer to the shape.
- * \param mode The GL rendering mode to use.
  * \param vertices An array of vertices.
  * \param verticeCount The number of vertices.
- * \param flags Flags.
  * \return An error code.
  */
-rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,uint8_t flags);
+rsge_error_e rsge_shape_create(rsge_shape_t* shape,rsge_shape_vert_t* vertices,int verticeCount);
 
 /**
  * \fn rsge_error_e rsge_shape_destroy(rsge_shape_t* shape)

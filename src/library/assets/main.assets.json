@@ -18,5 +18,13 @@
 	{
 		"name": "fonts/thintel/licence.txt",
 		"path": "src/assets/fonts/thintel/licence.txt"
+	},
+	{
+		"name": "shaders/shape/shader.frag",
+		"path": "src/assets/shaders/shape/shader.frag"
+	},
+	{
+		"name": "shaders/shape/shader.vert",
+		"path": "src/assets/shaders/shape/shader.vert"
 	}
 ]
