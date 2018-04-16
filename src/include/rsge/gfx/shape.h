@@ -8,6 +8,8 @@
 #define RSGE_SHAPE_VERT_FLAG_COLOR (1 << 0)
 #define RSGE_SHAPE_VERT_FLAG_FOG (1 << 1)
 
+#define RSGE_SHAPE_FLAG_MULTIDISPLLST (1 << 0)
+
 /**
  * \struct rsge_shape_vert_t rsge/gfx/shape.h
  * \brief Defines a shape vertice.
@@ -35,14 +37,67 @@ typedef struct {
 } rsge_shape_vert_t;
 
 /**
- * \fn rsge_error_e rsge_shape_generate(GLuint* list,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount)
- * \brief Generates a shape.
- * \param list A pointer to the variable to use for a display list
+ * \struct rsge_shape_t rsge/gfx/shape.h
+ * \brief Defines a shape.
+ */
+typedef struct {
+	/**
+	 * \brief Flags.
+	 */
+	uint8_t flags;
+
+	/**
+	 * \brief The display list used.
+	 */
+	GLuint list;
+
+	/**
+	 * \brief A 3-tuplet float that defines the position.
+	 */
+	vec3 pos;
+
+	/**
+	 * \brief The GL rendering mode to use.
+	 */
+	GLenum mode;
+
+	/**
+	 * \brief An array of vertices.
+	 */
+	rsge_shape_vert_t* vertices;
+
+	/**
+	 * \brief The number of vertices.
+	 */
+	int verticeCount;
+} rsge_shape_t;
+
+/**
+ * \fn rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,uint8_t flags)
+ * \brief Creates a new shape.
+ * \param shape The pointer to the shape.
  * \param mode The GL rendering mode to use.
  * \param vertices An array of vertices.
  * \param verticeCount The number of vertices.
+ * \param flags Flags.
  * \return An error code.
  */
-rsge_error_e rsge_shape_generate(GLuint* list,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount);
+rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,uint8_t flags);
+
+/**
+ * \fn rsge_error_e rsge_shape_destroy(rsge_shape_t* shape)
+ * \brief Destroyes the shape.
+ * \param shape The pointer to the shape.
+ * \return An error code.
+ */
+rsge_error_e rsge_shape_destroy(rsge_shape_t* shape);
+
+/**
+ * \fn rsge_error_e rsge_shape_render(rsge_shape_t* shape)
+ * \brief Renders the shape.
+ * \param shape The pointer to the shape.
+ * \return An error code.
+ */
+rsge_error_e rsge_shape_render(rsge_shape_t* shape);
 
 #endif

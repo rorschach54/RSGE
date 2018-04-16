@@ -24,7 +24,7 @@ endif
 endif
 
 LIBRARY_CFLAGS += $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS))
-LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) -ldl -lm -lopenal
+LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) -ldl -lm -lopenal -lGLU
 
 ifeq ($(CONFIG_LINKMODE),shared)
 LIBRARY_CFLAGS += -fpic

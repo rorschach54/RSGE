@@ -5,7 +5,7 @@
 #include <rsge/gfx/image/libpng.h>
 #endif
 
-rsge_error_e rsge_image_fromFile(rsge_surface_t* surface,rsge_asset_file_t* asset) {
+rsge_error_e rsge_image_fromFile(rsge_surface_t* surface,rsge_asset_t* asset) {
 	rsge_error_e err;
 
 #if CONFIG_USE_LIBPNG == 1

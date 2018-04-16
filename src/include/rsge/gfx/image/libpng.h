@@ -8,7 +8,7 @@
 #if CONFIG_USE_LIBPNG == 1
 #include <png.h>
 
-rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_file_t* asset);
+rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_t* asset);
 
 #endif
 #endif

@@ -14,7 +14,7 @@ typedef struct {
 	FT_Face face;
 } rsge_font_freetype_t;
 
-rsge_error_e rsge_font_freetype_fromFile(rsge_font_t* font,rsge_asset_file_t* asset);
+rsge_error_e rsge_font_freetype_fromFile(rsge_font_t* font,rsge_asset_t* asset,size_t sz);
 
 #endif
 #endif

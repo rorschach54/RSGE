@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 typedef struct {
-	rsge_asset_file_t* asset;
+	rsge_asset_t* asset;
 	uint32_t off;
 } rsge_asset_libpng_t;
 
@@ -17,7 +17,7 @@ void rsge_image_libpng_read(png_structp png_ptr,png_bytep outBytes,png_size_t by
 	}
 }
 
-rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_file_t* asset) {
+rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_t* asset) {
 	char header[8];
 	for(int i = 0;i < 8;i++) header[i] = asset->data[i];
 	if(png_sig_cmp(header,0,8)) {
@@ -79,7 +79,7 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_file_
 		free(row_pointers);
 		return RSGE_ERROR_INVALID_BPP;
 	}
-	rsge_error_e err = rsge_surface_create(surface,width,height,bpp);
+	rsge_error_e err = rsge_surface_create(surface,width,height,bpp,0);
 	if(err != RSGE_ERROR_NONE) {
 		free(row_pointers);
 		return err;
@@ -89,9 +89,9 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_file_
 		png_byte* row = row_pointers[y];
 		for(int x = 0;x < width;x++) {
 			png_byte* ptr = &(row[x*bpp]);
-			size_t off = surface->bpp*((x*y)+surface->width);
+			size_t off = surface->bpp*(x+y*surface->width);
 			for(size_t i = 0;i < bpp;i++) {
-				surface->buffer[off+i] = ptr[i]/0.01f;
+				surface->buffer[off+i] = ptr[i];
 			}
 		}
 	}

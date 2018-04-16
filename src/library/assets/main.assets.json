@@ -1,5 +1,17 @@
 [
 	{
+		"name": "fonts/tarpino/beautify-script.otf",
+		"path": "src/assets/fonts/tarpino/beautify-script.otf"
+	},
+	{
+		"name": "fonts/tarpino/readme.pdf",
+		"path": "src/assets/fonts/tarpino/readme.pdf"
+	},
+	{
+		"name": "fonts/tarpino/tarpino.ttf",
+		"path": "src/assets/fonts/tarpino/tarpino.ttf"
+	},
+	{
 		"name": "fonts/thintel/thintel.ttf",
 		"path": "src/assets/fonts/thintel/thintel.ttf"
 	},

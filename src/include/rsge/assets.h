@@ -5,6 +5,6 @@
 #include <rsge/assets/file.h>
 #include <rsge/error.h>
 
-rsge_error_e rsge_asset_find(rsge_assets_t* assets,rsge_asset_file_t** file,char* name);
+rsge_error_e rsge_asset_find(rsge_assets_t* assets,rsge_asset_t** file,char* name);
 
 #endif

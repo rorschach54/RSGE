@@ -1,70 +1,129 @@
+#include <rsge/gfx/colors.h>
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/surface.h>
 #include <stdlib.h>
 
-rsge_error_e rsge_surface_create(rsge_surface_t* surface,size_t width,size_t height,size_t bpp) {
+rsge_error_e rsge_surface_create(rsge_surface_t* surface,size_t width,size_t height,size_t bpp,uint8_t flags) {
 	memset(surface,0,sizeof(rsge_surface_t));
 
 	/* Save the width, height, and bpp */
 	surface->width = width;
 	surface->height = height;
 	surface->bpp = bpp;
+	surface->flags = flags;
 
 	/* Allocates the pixel buffer */
-	surface->buffer = malloc(((width*height)*bpp)*sizeof(float));
+	surface->buffer = malloc(((width*height)*bpp)*sizeof(unsigned char));
 	if(!surface->buffer) return RSGE_ERROR_MALLOC;
-	return RSGE_ERROR_NONE;
+	return rsge_surface_clear(surface,RSGE_COLOR_BLACK);
 }
 
 rsge_error_e rsge_surface_destroy(rsge_surface_t* surface) {
+	if(surface->texture != 0) {
+		glDeleteTextures(1,&surface->texture);
+	}
+	if(surface->list != 0) {
+		glDeleteLists(1,surface->list);
+	}
 	free(surface->buffer);
 	memset(surface,0,sizeof(rsge_surface_t));
 	return RSGE_ERROR_NONE;
 }
 
+rsge_error_e rsge_surface_resize(rsge_surface_t* surface,size_t width,size_t height,size_t bpp) {
+	if(surface->width != width || surface->height != height || surface->bpp != bpp) {
+		/* Store the new width, height, and bpp */
+		surface->width = width;
+		surface->height = height;
+		surface->bpp = bpp;
+
+		/* Free the old buffer and allocate the new buffer */
+		free(surface->buffer);
+		surface->buffer = malloc(((surface->width*surface->height)*surface->bpp)*sizeof(unsigned char));
+		if(!surface->buffer) return RSGE_ERROR_MALLOC;
+		return rsge_surface_clear(surface,RSGE_COLOR_BLACK);
+	}
+	return RSGE_ERROR_NONE;
+}
+
 rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
-	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_ADD);
+	if(surface->texture == 0) {
+		glGenTextures(1,&surface->texture);
+	}
+	glBindTexture(GL_TEXTURE_2D,surface->texture);
+	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 
-	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-	glPixelStorei(GL_PACK_ALIGNMENT,1);
+	//glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+	//glPixelStorei(GL_PACK_ALIGNMENT,1);
 
-	if(surface->bpp == 4) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGBA,GL_FLOAT,surface->buffer);
-	else if(surface->bpp == 3) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGB,GL_FLOAT,surface->buffer);
+	if(surface->bpp == 4) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGBA,GL_UNSIGNED_BYTE,surface->buffer);
+	else if(surface->bpp == 3) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGB,GL_UNSIGNED_BYTE,surface->buffer);
 	else return RSGE_ERROR_INVALID_BPP;
 
-	float w = surface->width/sx;
-	float h = surface->height/sy;
+	float w = surface->width*sx;
+	float h = surface->height*sy;
 
 	glEnable(GL_TEXTURE_2D);
-	glBegin(GL_QUADS);
+	if(surface->list == 0) {
+		if((surface->flags & RSGE_SURFACE_FLAG_MULTIDISPLLST) != RSGE_SURFACE_FLAG_MULTIDISPLLST) {
+			surface->list = glGenLists(1);
+			glNewList(surface->list,GL_COMPILE);
+		}
+		glPushMatrix();
+		glTranslatef(surface->pos[0],surface->pos[1],surface->pos[2]);
+		glBegin(GL_QUADS);
 
-	glTexCoord2f(0.0f,0.0f);
-	glVertex2f(0.0f,h);
+		glTexCoord2f(1.0f,1.0f);
+		glVertex2f(w,h);
 
-	glTexCoord2f(0.0f,1.0f);
-	glVertex2f(0.0f,0.0f);
+		glTexCoord2f(1.0f,0.0f);
+		glVertex2f(w,0.0f);
 
-	glTexCoord2f(1.0f,1.0f);
-	glVertex2f(w,0.0f);
+		glTexCoord2f(0.0f,0.0f);
+		glVertex2f(0.0f,0.0f);
 
-	glTexCoord2f(1.0f,0.0f);
-	glVertex2f(w,h);
+		glTexCoord2f(0.0f,1.0f);
+		glVertex2f(0.0f,h);
 
-	glEnd();
+		glEnd();
+		glPopMatrix();
+		if((surface->flags & RSGE_SURFACE_FLAG_MULTIDISPLLST) != RSGE_SURFACE_FLAG_MULTIDISPLLST) {
+			glEndList();
+		}
+	} else {
+		glPushMatrix();
+		glTranslatef(0.0f,0.0f,0.0f);
+		glTranslatef(surface->pos[0],surface->pos[1],surface->pos[2]);
+		glCallList(surface->list);
+		glPopMatrix();
+	}
+	return RSGE_ERROR_NONE;
+}
+
+rsge_error_e rsge_surface_clear(rsge_surface_t* surface,int color[4]) {
+	for(size_t y = 0;y < surface->height;y++) {
+		for(size_t x = 0;x < surface->width;x++) {
+			size_t off = surface->bpp*(x+y*surface->width);
+			surface->buffer[off] = color[0];
+			surface->buffer[off+1] = color[1];
+			surface->buffer[off+2] = color[2];
+			if(surface->bpp == 4) surface->buffer[off+3] = color[3];
+		}
+	}
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_surface_blit(rsge_surface_t* surface,rsge_surface_t* orig,vec2 pos) {
 	for(size_t y = 0;y < orig->height;y++) {
 		for(size_t x = 0;x < orig->width;x++) {
-			size_t surface_off = surface->bpp*(((pos[0]+x)*(pos[1]+y))+surface->width);
-			size_t orig_off = orig->bpp*((x*y)+orig->width);
+			size_t surface_off = surface->bpp*((pos[0]+x)+(pos[1]+y)*surface->width);
+			size_t orig_off = orig->bpp*(x+y*orig->width);
 			if(surface->bpp == 4) {
 				if(orig->bpp == 4) {
 					surface->buffer[surface_off] = orig->buffer[orig_off];

@@ -18,6 +18,6 @@ typedef struct {
 	 * \brief The asset's size in bytes.
 	 */
 	uint32_t size;
-} rsge_asset_file_t;
+} rsge_asset_t;
 
 #endif

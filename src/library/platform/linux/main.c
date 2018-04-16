@@ -1,3 +1,4 @@
+#include <rsge/gfx/camera.h>
 #include <rsge/gfx/gl.h>
 #include <rsge/snd/init.h>
 #include <rsge/config.h>
@@ -105,12 +106,11 @@ void joystick_callback(int joy,int event) {
 }
 
 void fb_resize(GLFWwindow* window,int width,int height) {
-	GLfloat h = (GLfloat)height/(GLfloat)width;
-	glViewport(0,0,(GLint)width,(GLint)height);
-	
 	config_setting_set_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.width"),width);
 	config_setting_set_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.height"),height);
 	rsge_settings_save();
+
+	rsge_camera_reshape(width,height);
 }
 
 int main(char** argv,int argc) {
@@ -189,6 +189,11 @@ int main(char** argv,int argc) {
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	glfwSwapInterval(1);
 
+	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_LIGHTING);
+
+	fb_resize(window,res_w,res_h);
+
 	/* Initialize game */
 	err = rsge_game_init();
 	if(err != RSGE_ERROR_NONE) {
@@ -205,11 +210,13 @@ int main(char** argv,int argc) {
 	int exitStatus = EXIT_SUCCESS;
 	glfwSetTime(0.0);
 	while(!glfwWindowShouldClose(window)) {
+		rsge_camera_update();
 		err = rsge_game_update(glfwGetTime());
 		if(err != RSGE_ERROR_NONE) {
 			exitStatus = EXIT_FAILURE;
 			break;
 		}
+		glFlush();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

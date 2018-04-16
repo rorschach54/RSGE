@@ -15,7 +15,7 @@ var files = JSON.parse(fs.readFileSync(inpath).toString());
 var out = "#include <"+incprefix+name+".h>\n\n";
 
 for(var i = 0;i < files.length;i++) {
-	out += "rsge_asset_file_t "+name+"_"+files[i]["name"].split("/").join("_").split(".").join("__")+" = {";
+	out += "rsge_asset_t "+name+"_"+files[i]["name"].split("/").join("_").split(".").join("__").split("-").join("___")+" = {";
 	out += "\n\t.name = \""+files[i]["name"]+"\",";
 	var data = fs.readFileSync(files[i]["path"]);
 	out += "\n\t.data = (unsigned char["+data.length+"]) {";
@@ -31,7 +31,7 @@ for(var i = 0;i < files.length;i++) {
 out += "\nrsge_assets_t "+name+" = {\n\t.files = {";
 
 for(var i = 0;i < files.length;i++) {
-	out += "\n\t\t&"+name+"_"+files[i]["name"].split("/").join("_").split(".").join("__");
+	out += "\n\t\t&"+name+"_"+files[i]["name"].split("/").join("_").split(".").join("__").split("-").join("___");
 	if(i+1 < files.length) out += ",";
 }
 
@@ -39,11 +39,11 @@ out += "\n\t},\n\t.count = "+files.length+"\n};";
 fs.writeFileSync(outpath,out);
 
 /* Generate header */
-out = "#ifndef __"+name.toUpperCase().split(path.sep).join("_")+"__\n";
-out += "#define __"+name.toUpperCase().split(path.sep).join("_")+"__ 1\n\n";
+out = "#ifndef __"+name.toUpperCase().split(path.sep).join("_")+"_\n";
+out += "#define __"+name.toUpperCase().split(path.sep).join("_")+"_ 1\n\n";
 
 out += "#include <rsge/assets/file.h>\n";
-out += "#include <rsge/assets/def.h>\n";
+out += "#include <rsge/assets/def.h>\n\n";
 
 out += "extern rsge_assets_t "+name+";\n";
 

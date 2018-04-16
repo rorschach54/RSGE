@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 typedef struct {
-	rsge_asset_file_t** files;
+	rsge_asset_t* files;
 	size_t count;
 } rsge_assets_t;
 
