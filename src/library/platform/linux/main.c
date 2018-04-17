@@ -1,9 +1,11 @@
 #include <rsge/gfx/camera.h>
 #include <rsge/gfx/gl.h>
+#include <rsge/gfx/lighting.h>
 #include <rsge/snd/init.h>
 #include <rsge/config.h>
 #include <rsge/settings.h>
 #include <rsge/game.h>
+#include <rsge/ui.h>
 
 #if CONFIG_USE_FREETYPE == 1
 #include <ft2build.h>
@@ -192,9 +194,45 @@ int main(char** argv,int argc) {
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	glDisable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_FOG);
+	glFogi(GL_FOG_MODE,GL_EXP2);
+	glHint(GL_FOG_HINT,GL_NICEST);
+	
+	rsge_lighting_enableLight(0);
+	rsge_lighting_enableLight(1);
+	vec4 sunpos;
+	sunpos[0] = 0.0f;
+	sunpos[1] = 0.0f;
+	sunpos[2] = 0.0f;
+	sunpos[3] = 1.0f;
+	rsge_lighting_setpos(0,sunpos);
+	
+	float ambient[3];
+	ambient[0] = 1.0f;
+	ambient[1] = 1.0f;
+	ambient[2] = 1.0f;
+	rsge_lighting_setambient(1,ambient);
+	
+	float diffuse[3];
+	diffuse[0] = 1.0f;
+	diffuse[1] = 1.0f;
+	diffuse[2] = 1.0f;
+	rsge_lighting_setdiffuse(0,diffuse);
 
 	fb_resize(window,res_w,res_h);
+	
+	err = rsge_ui_init();
+	if(err != RSGE_ERROR_NONE) {
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		config_destroy(&rsge_libconfig_cfg);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
 	
 	vec3 pos;
 	pos[0] = 0.0f;
@@ -205,6 +243,7 @@ int main(char** argv,int argc) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
+		rsge_ui_deinit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -219,6 +258,7 @@ int main(char** argv,int argc) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
+		rsge_ui_deinit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -231,6 +271,7 @@ int main(char** argv,int argc) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
+		rsge_ui_deinit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -261,12 +302,14 @@ int main(char** argv,int argc) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
+		rsge_ui_deinit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 
+	rsge_ui_deinit();
 	rsge_audio_uninit();
 
 #if CONFIG_USE_FREETYPE == 1

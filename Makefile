@@ -10,6 +10,11 @@ GLAD_BIN=$(GLAD_PATH)/bin
 GLAD_INCLUDE=$(GLAD_PATH)/include
 GLAD_SRC=$(GLAD_PATH)/src
 
+LIST_PATH=$(DEPS)/list
+LIST_BIN=$(LIST_PATH)/bin
+LIST_INCLUDE=$(LIST_PATH)/src
+LIST_SRC=$(LIST_PATH)/src
+
 ASSETS_SRC=$(SRC)/assets
 BUILD_SRC=$(SRC)/build
 CONFIG_SRC=$(SRC)/config
@@ -23,6 +28,6 @@ TOOLS_SRC=$(SRC)/tools
 all: build
 
 clean:
-	@rm -rf $(BIN) $(CONFIG_SRC)/Makefile $(INCLUDE_SRC)/rsge/config.h $(GLAD_BIN)
+	@rm -rf $(BIN) $(CONFIG_SRC)/Makefile $(INCLUDE_SRC)/rsge/config.h $(GLAD_PATH)
 
 include $(BUILD_SRC)/Makefile

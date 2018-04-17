@@ -3,7 +3,7 @@ CC=gcc
 LD=gcc
 PKG_CONFIG=pkg-config
 
-LIBRARY_LIBS=glfw3 libconfig
+LIBRARY_LIBS=glfw3 libconfig libxml-2.0
 
 ifeq ($(CONFIG_USE_FREETYPE),y)
 LIBRARY_LIBS += freetype2

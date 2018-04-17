@@ -1,0 +1,20 @@
+<widget>
+    <styles>
+        <backgroundColor value="#9E9E9E" />
+        <foregroundColor value="#FFFFFF" />
+        <textColor value="#FFFFFF" />
+        <font value="fonts/thintel/thintel.ttf" />
+    </styles>
+    <events>
+        <event type="mouse.click">
+            <styles>
+                <backgroundColor value="#BDBDBD" />
+            </styles>
+        </event>
+        <event type="mouse.hover">
+            <styles>
+                <backgroundColor value="#BDBDBD" />
+            </styles>
+        </event>
+    </events>
+</widget>

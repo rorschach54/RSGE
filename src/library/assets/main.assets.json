@@ -26,5 +26,9 @@
 	{
 		"name": "shaders/shape/shader.vert",
 		"path": "src/assets/shaders/shape/shader.vert"
+	},
+	{
+		"name": "ui/widgets/label.xml",
+		"path": "src/assets/ui/widgets/label.xml"
 	}
 ]

@@ -13,7 +13,7 @@ attribute vec3 vPos;
 
 void main() {
     /* Sets the position */
-    gl_Position = (vec4(vPos,1.0))+vec4(position,1.0);
+    gl_Position = vec4(vPos,1.0);
     
     /* Passes the color to the fragment shader */
     color = vCol;

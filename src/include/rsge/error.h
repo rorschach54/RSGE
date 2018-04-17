@@ -53,7 +53,23 @@ typedef enum {
 	/**
 	 * No asset.
 	 */
-	RSGE_ERROR_NOASSET
+	RSGE_ERROR_NOASSET,
+	/**
+	 * OpenGL error.
+	 */
+	RSGE_ERROR_OPENGL,
+	/**
+	 * libxml2 error.
+	 */
+	RSGE_ERROR_LIBXML,
+	/**
+	 * From XML: UI widget is not valid. Registering a widget: Widget is already registered.
+	 */
+	RSGE_ERROR_INVALID_WIDGET,
+	/**
+	 * Invalid widget style name.
+	 */
+	RSGE_ERROR_INVALID_STYLE
 } rsge_error_e;
 
 #endif

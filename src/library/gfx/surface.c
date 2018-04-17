@@ -71,10 +71,9 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 
 	glEnable(GL_TEXTURE_2D);
 	if(surface->list == 0) {
-		if((surface->flags & RSGE_SURFACE_FLAG_MULTIDISPLLST) != RSGE_SURFACE_FLAG_MULTIDISPLLST) {
-			surface->list = glGenLists(1);
-			glNewList(surface->list,GL_COMPILE);
-		}
+		surface->list = glGenLists(1);
+		glNewList(surface->list,GL_COMPILE);
+		
 		glPushMatrix();
 		glBegin(GL_QUADS);
 
@@ -92,17 +91,13 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 
 		glEnd();
 		glPopMatrix();
-		if((surface->flags & RSGE_SURFACE_FLAG_MULTIDISPLLST) != RSGE_SURFACE_FLAG_MULTIDISPLLST) {
-			glEndList();
-		}
+		glEndList();
 	}
-	if((surface->flags & RSGE_SURFACE_FLAG_MULTIDISPLLST) != RSGE_SURFACE_FLAG_MULTIDISPLLST) {
-		glPushMatrix();
-		glTranslatef(0.0f,0.0f,0.0f);
-		glTranslatef(surface->pos[0],surface->pos[1],surface->pos[2]);
-		glCallList(surface->list);
-		glPopMatrix();
-	}
+	glPushMatrix();
+	glTranslatef(0.0f,0.0f,0.0f);
+	glTranslatef(surface->pos[0],surface->pos[1],surface->pos[2]);
+	glCallList(surface->list);
+	glPopMatrix();
 	return RSGE_ERROR_NONE;
 }
 
