@@ -30,7 +30,7 @@ rsge_error_e rsge_ui_deinit() {
 
 rsge_error_e rsge_ui_registerWidget(rsge_ui_widget_type_t* type) {
     list_node_t* node = list_find(rsge_ui_widget_types,type);
-    if(node != NULL || node->val == NULL) return RSGE_ERROR_INVALID_WIDGET;
+    if(node != NULL && node->val != NULL) return RSGE_ERROR_INVALID_WIDGET;
     node = list_node_new(type);
     if(!node) return RSGE_ERROR_MALLOC;
     list_rpush(rsge_ui_widget_types,node);
