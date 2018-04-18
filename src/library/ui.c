@@ -29,12 +29,15 @@ rsge_error_e rsge_ui_deinit() {
 }
 
 rsge_error_e rsge_ui_registerWidget(rsge_ui_widget_type_t* type) {
-    list_node_t* node = list_find(rsge_ui_widget_types,type);
-    if(node != NULL && node->val != NULL) return RSGE_ERROR_INVALID_WIDGET;
-    node = list_node_new(type);
-    if(!node) return RSGE_ERROR_MALLOC;
-    list_rpush(rsge_ui_widget_types,node);
-    return RSGE_ERROR_NONE;
+    rsge_ui_widget_type_t* tmp_type;
+    rsge_error_e err = rsge_ui_getregisteredwidget(type->tag,&tmp_type);
+    if(err == RSGE_ERROR_INVALID_WIDGET) {
+        list_node_t* node = list_node_new(type);
+        if(!node) return RSGE_ERROR_MALLOC;
+        list_rpush(rsge_ui_widget_types,node);
+        return RSGE_ERROR_NONE;
+    } else if(err != RSGE_ERROR_NONE) return err;
+    return RSGE_ERROR_INVALID_WIDGET;
 }
 
 rsge_error_e rsge_ui_getregisteredwidget(char* tag,rsge_ui_widget_type_t** type) {

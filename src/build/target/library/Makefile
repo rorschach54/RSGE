@@ -14,6 +14,7 @@ LIBRARY_OBJS += $(LIBRARY_BIN)/assets.o $(LIBRARY_BIN)/settings.o $(LIBRARY_BIN)
 
 LIBRARY_OBJS += $(LIBRARY_BIN)/assets/main.o
 LIBRARY_OBJS += $(LIST_BIN)/list.o $(LIST_BIN)/list_iterator.o $(LIST_BIN)/list_node.o
+LIBRARY_OBJS += $(LOGC_BIN)/log.o
 
 $(LIBRARY_BIN)/assets/%.c: $(LIBRARY_SRC)/assets/%.assets.json
 	@echo "Generating assets $<"
@@ -37,6 +38,11 @@ $(LIST_BIN)/%.o: $(LIST_SRC)/%.c
 	@echo "Compiling $<"
 	@mkdir -p $(@D)
 	@$(CC) -o $@ $< $(LIBRARY_CFLAGS)
+
+$(LOGC_BIN)/%.o: $(LOGC_SRC)/%.c
+	@echo "Compiling $<"
+	@mkdir -p $(@D)
+	@$(CC) -o $@ $< $(LIBRARY_CFLAGS) -DLOG_USE_COLOR
 
 $(LIBRARY_BIN)/%.o: $(LIBRARY_SRC)/%.c $(INCLUDE_SRC)
 	@echo "Compiling $<"

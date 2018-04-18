@@ -1,12 +1,13 @@
 #include <rsge/ui/xml/widget.h>
+#include <rsge/ui.h>
 #include <list.h>
 
-extern list_t* rsge_ui_widget_types;
-
 rsge_error_e rsge_ui_widget_fromXMLNode(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node) {
-    if(!xmlStrcmp(node->name,(const xmlChar*)"rsge.widget.label")) {
-        return RSGE_ERROR_NONE;
-    }
+    rsge_ui_widget_type_t* type;
+    rsge_error_e err = rsge_ui_getregisteredwidget((char*)node->name,&type);
+    if(err != RSGE_ERROR_NONE) return err;
+    
+    if(type->fromXMLNode != NULL) return type->fromXMLNode(widget,ui,doc,node);
     return RSGE_ERROR_INVALID_WIDGET;
 }
 

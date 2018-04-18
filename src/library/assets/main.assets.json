@@ -28,6 +28,10 @@
 		"path": "src/assets/shaders/shape/shader.vert"
 	},
 	{
+		"name": "ui/widgets/button.xml",
+		"path": "src/assets/ui/widgets/button.xml"
+	},
+	{
 		"name": "ui/widgets/label.xml",
 		"path": "src/assets/ui/widgets/label.xml"
 	}

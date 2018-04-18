@@ -48,8 +48,6 @@ rsge_error_e rsge_font_freetype_render(rsge_font_t* font,rsge_surface_t* surface
 		img_h += glyph_y;
 	}
 
-	printf("w = %d, h = %d\n",img_w,img_h);
-
 	/* Create surface */
 	rsge_error_e err = rsge_surface_create(surface,img_w,img_h,4,0);
 	if(err != RSGE_ERROR_NONE) return err;

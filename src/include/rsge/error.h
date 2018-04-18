@@ -69,7 +69,11 @@ typedef enum {
 	/**
 	 * Invalid widget style name.
 	 */
-	RSGE_ERROR_INVALID_STYLE
+	RSGE_ERROR_INVALID_STYLE,
+	/**
+	 * Invalid asset location.
+	 */
+	RSGE_ERROR_INVALID_ASSET_LOC
 } rsge_error_e;
 
 #endif

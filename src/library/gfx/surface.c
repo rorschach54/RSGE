@@ -77,6 +77,9 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 		glPushMatrix();
 		glBegin(GL_QUADS);
 
+		glTexCoord2f(0.0f,1.0f);
+		glVertex2f(0.0f,0.0f);
+
 		glTexCoord2f(0.0f,0.0f);
 		glVertex2f(0.0f,h);
 
@@ -85,9 +88,6 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 
 		glTexCoord2f(1.0f,1.0f);
 		glVertex2f(w,0.0f);
-
-		glTexCoord2f(0.0f,1.0f);
-		glVertex2f(0.0f,0.0f);
 
 		glEnd();
 		glPopMatrix();

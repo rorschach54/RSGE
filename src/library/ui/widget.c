@@ -89,18 +89,48 @@ rsge_error_e rsge_ui_widget_loadStyles(rsge_ui_widget_t* widget,rsge_ui_surface_
     return RSGE_ERROR_NONE;
 }
 
+rsge_error_e rsge_ui_widget_loadEvents(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node) {
+    list_node_t* no;
+    xmlNodePtr cur = node->xmlChildrenNode;
+    while(cur != NULL) {
+        cur = cur->next;
+    }
+    return RSGE_ERROR_NONE;
+}
+
 rsge_error_e rsge_ui_widget_create(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node) {
     memset(widget,0,sizeof(rsge_ui_widget_t));
     
+    widget->baseXML.doc = doc;
+    widget->baseXML.node = node;
+    
     widget->styles = list_new();
     if(!widget->styles) return RSGE_ERROR_MALLOC;
+    
+    widget->events = list_new();
+    if(!widget->events) {
+        list_destroy(widget->styles);
+        return RSGE_ERROR_MALLOC;
+    }
     
     rsge_error_e err;
     xmlNodePtr cur = node->xmlChildrenNode;
     while(cur != NULL) {
         if(!xmlStrcmp(cur->name,(const xmlChar*)"styles")) {
             err = rsge_ui_widget_loadStyles(widget,ui,doc,cur);
-            if(err != RSGE_ERROR_NONE) return err;
+            if(err != RSGE_ERROR_NONE) {
+                list_destroy(widget->styles);
+                list_destroy(widget->events);
+                return err;
+            }
+        }
+        if(!xmlStrcmp(cur->name,(const xmlChar*)"events")) {
+            err = rsge_ui_widget_loadEvents(widget,ui,doc,cur);
+            if(err != RSGE_ERROR_NONE) {
+                list_destroy(widget->styles);
+                list_destroy(widget->events);
+                return err;
+            }
         }
         cur = cur->next;
     }

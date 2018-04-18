@@ -2,10 +2,12 @@
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/lighting.h>
 #include <rsge/snd/init.h>
+#include <rsge/assets.h>
 #include <rsge/config.h>
 #include <rsge/settings.h>
 #include <rsge/game.h>
 #include <rsge/ui.h>
+#include <log.h>
 
 #if CONFIG_USE_FREETYPE == 1
 #include <ft2build.h>
@@ -22,8 +24,7 @@ FT_Library rsge_freetype_lib;
 config_t rsge_libconfig_cfg;
 
 void error_callback(int error,const char* description) {
-	// TODO: log_error("GLFW: %s",description);
-	fprintf(stderr,"GLFW: %s\n",description);
+	log_error("GLFW: %s",description);
 }
 
 void key_callback(GLFWwindow* window,int key,int scancode,int action,int mods) {
@@ -116,9 +117,26 @@ void fb_resize(GLFWwindow* window,int width,int height) {
 	rsge_camera_reshape(width,height);
 }
 
+#define MACRO2STR(m) #m
+
 int main(char** argv,int argc) {
 	/* Variables */
 	rsge_error_e err;
+	
+	log_debug("-- RSGE Configuration:");
+	log_debug("CONFIG_PLATFORM = \"%s\"",MACRO2STR(CONFIG_PLATFORM));
+	log_debug("CONFIG_AUDIO_BACKEND = \"%s\"",MACRO2STR(CONFIG_AUDIO_BACKEND));
+	#if CONFIG_USE_FREETYPE == 1
+	log_debug("Freetype2 is enabled");
+	#else
+	log_debug("Freetype2 is disabled");
+	#endif
+	#if CONFIG_USE_LIBPNG == 1
+	log_debug("libpng is enabled");
+	#else
+	log_debug("libpng is disabled");
+	#endif
+	log_debug("-- End of RSGE Configuration");
 
 	glfwSetErrorCallback(error_callback);
 	
@@ -143,6 +161,7 @@ int main(char** argv,int argc) {
 	}
 #endif
 
+	log_debug("Audio initializing");
 	err = rsge_audio_init();
 	if(err != RSGE_ERROR_NONE) {
 #if CONFIG_USE_FREETYPE == 1
@@ -164,13 +183,16 @@ int main(char** argv,int argc) {
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
+	
+	log_debug("Game Name: \"%s\"",gameinfo.name);
 
+	log_debug("Creating window");
 	/* Create window */
 	int res_w = config_setting_get_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.width"));
 	int res_h = config_setting_get_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.height"));
 	GLFWmonitor* monitor = NULL;
 	if(config_setting_get_bool(config_lookup(&rsge_libconfig_cfg,"gfx.fullscreen"))) monitor = glfwGetPrimaryMonitor();
-	// TODO: add fullscreen
+	log_debug("Setting resolution to %dx%d%s",res_w,res_h,monitor == NULL ? "" : " (Fullscreen)");
 	GLFWwindow* window = glfwCreateWindow(res_w,res_h,gameinfo.name,monitor,NULL);
 	if(!window) {
 #if CONFIG_USE_FREETYPE == 1
@@ -187,6 +209,7 @@ int main(char** argv,int argc) {
 	glfwSetMouseButtonCallback(window,mouse_button_callback);
 	glfwSetJoystickCallback(joystick_callback);
 
+	log_debug("Setting up OpenGL");
 	/* Set up OpenGL */
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -200,6 +223,7 @@ int main(char** argv,int argc) {
 	glFogi(GL_FOG_MODE,GL_EXP2);
 	glHint(GL_FOG_HINT,GL_NICEST);
 	
+	log_debug("Setting up lighting");
 	rsge_lighting_enableLight(0);
 	rsge_lighting_enableLight(1);
 	vec4 sunpos;
@@ -223,7 +247,8 @@ int main(char** argv,int argc) {
 
 	fb_resize(window,res_w,res_h);
 	
-	err = rsge_ui_init();
+	log_debug("Assets initializing");
+	err = rsge_assets_init();
 	if(err != RSGE_ERROR_NONE) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
@@ -234,6 +259,20 @@ int main(char** argv,int argc) {
 		return EXIT_FAILURE;
 	}
 	
+	log_debug("UI initializing");
+	err = rsge_ui_init();
+	if(err != RSGE_ERROR_NONE) {
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		config_destroy(&rsge_libconfig_cfg);
+		rsge_assets_uninit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
+	
+	log_debug("Setting up camera");
 	vec3 pos;
 	pos[0] = 0.0f;
 	pos[1] = 0.0f;
@@ -244,6 +283,7 @@ int main(char** argv,int argc) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_ui_deinit();
+		rsge_assets_uninit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -259,12 +299,14 @@ int main(char** argv,int argc) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_ui_deinit();
+		rsge_assets_uninit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 
+	log_info("RSGE: Initializing game");
 	/* Initialize game */
 	err = rsge_game_init();
 	if(err != RSGE_ERROR_NONE) {
@@ -272,6 +314,7 @@ int main(char** argv,int argc) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_ui_deinit();
+		rsge_assets_uninit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -296,6 +339,7 @@ int main(char** argv,int argc) {
 		glfwPollEvents();
 	}
 
+	log_info("RSGE: Uninitializing game");
 	/* Uninitialize game */
 	err = rsge_game_uninit();
 	if(err != RSGE_ERROR_NONE) {
@@ -303,6 +347,7 @@ int main(char** argv,int argc) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_ui_deinit();
+		rsge_assets_uninit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -311,6 +356,7 @@ int main(char** argv,int argc) {
 
 	rsge_ui_deinit();
 	rsge_audio_uninit();
+	rsge_assets_uninit();
 
 #if CONFIG_USE_FREETYPE == 1
 	FT_Done_FreeType(rsge_freetype_lib);

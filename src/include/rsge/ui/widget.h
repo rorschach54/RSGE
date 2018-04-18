@@ -13,11 +13,28 @@ typedef struct {
     void* value;
 } rsge_ui_widget_style_t;
 
+typedef struct {
+    /**
+     * \brief Widget styling.
+     */
+    list_t* styles;
+    
+    /**
+     * \brief The type of the event.
+     */
+    char* type;
+} rsge_ui_widget_event_t;
+
 typedef struct rsge_ui_widget {
     /**
      * \brief Widget styling.
      */
     list_t* styles;
+    
+    /**
+     * \brief Widget events.
+     */
+    list_t* events;
     
     /**
      * \brief The width of the widget.
@@ -52,6 +69,36 @@ typedef struct rsge_ui_widget {
      * \brief Widget implemented update function.
      */
     rsge_error_e (*update)(struct rsge_ui_widget* widget,rsge_ui_surface_t* ui);
+    
+    /**
+     * \brief Base widget XML substructure.
+     */
+    struct {
+        /**
+         * \brief XML document.
+         */
+        xmlDocPtr doc;
+        
+        /**
+         * \brief XML root node.
+         */
+        xmlNodePtr node;
+    } baseXML;
+    
+    /**
+     * \brief Instance widget XML substructure.
+     */
+    struct {
+        /**
+         * \brief XML document.
+         */
+        xmlDocPtr doc;
+        
+        /**
+         * \brief XML root node.
+         */
+        xmlNodePtr node;
+    } instXML;
 } rsge_ui_widget_t;
 
 typedef struct {

@@ -1,4 +1,4 @@
-CFLAGS=-g -I $(INCLUDE_SRC) -I $(GLAD_INCLUDE) -I $(LIST_INCLUDE) -std=gnu99
+CFLAGS=-g -I $(INCLUDE_SRC) -I $(GLAD_INCLUDE) -I $(LIST_INCLUDE) -I $(LOGC_INCLUDE) -std=gnu99
 LIBRARY_CFLAGS=-c $(CFLAGS)
 
 build: build-glad build-library build-examples
