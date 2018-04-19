@@ -33,6 +33,6 @@ TOOLS_SRC=$(SRC)/tools
 all: build
 
 clean:
-	@rm -rf $(BIN) $(CONFIG_SRC)/Makefile $(INCLUDE_SRC)/rsge/config.h $(GLAD_PATH) $(LIST_BIN)
+	@rm -rf $(BIN) $(CONFIG_SRC)/Makefile $(INCLUDE_SRC)/rsge/config.h $(GLAD_PATH) $(LIST_BIN) $(LOGC_BIN)
 
 include $(BUILD_SRC)/Makefile
