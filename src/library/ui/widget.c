@@ -18,7 +18,7 @@ rsge_error_e rsge_ui_widget_loadStyles(rsge_ui_widget_t* widget,rsge_ui_surface_
                 int color[4];
                 color[0] = color[1] = color[2] = 0;
                 color[3] = 0xFF;
-                if(strlen(value_raw) == 2) color[0] = atoi(value_raw);
+                if(strlen(value_raw) == 2) color[0] = (int)strtol(value_raw,NULL,16);
                 else if(strlen(value_raw) == 4) {
                     char raw_red[2];
                     char raw_green[2];
@@ -26,8 +26,8 @@ rsge_error_e rsge_ui_widget_loadStyles(rsge_ui_widget_t* widget,rsge_ui_surface_
                     memcpy(raw_red,value_raw,2);
                     memcpy(raw_green,value_raw+2,2);
                     
-                    color[0] = atoi(raw_red);
-                    color[1] = atoi(raw_green);
+                    color[0] = (int)strtol(raw_red,NULL,16);
+                    color[1] = (int)strtol(raw_green,NULL,16);
                 } else if(strlen(value_raw) == 6) {
                     char raw_red[2];
                     char raw_green[2];
@@ -37,9 +37,9 @@ rsge_error_e rsge_ui_widget_loadStyles(rsge_ui_widget_t* widget,rsge_ui_surface_
                     memcpy(raw_green,value_raw+2,2);
                     memcpy(raw_blue,value_raw+4,2);
                     
-                    color[0] = atoi(raw_red);
-                    color[1] = atoi(raw_green);
-                    color[2] = atoi(raw_blue);
+                    color[0] = (int)strtol(raw_red,NULL,16);
+                    color[1] = (int)strtol(raw_green,NULL,16);
+                    color[2] = (int)strtol(raw_blue,NULL,16);
                 } else if(strlen(value_raw) == 8) {
                     char raw_red[2];
                     char raw_green[2];
@@ -51,10 +51,10 @@ rsge_error_e rsge_ui_widget_loadStyles(rsge_ui_widget_t* widget,rsge_ui_surface_
                     memcpy(raw_blue,value_raw+4,2);
                     memcpy(raw_alpha,value_raw+6,2);
                     
-                    color[0] = atoi(raw_red);
-                    color[1] = atoi(raw_green);
-                    color[2] = atoi(raw_blue);
-                    color[3] = atoi(raw_alpha);
+                    color[0] = (int)strtol(raw_red,NULL,16);
+                    color[1] = (int)strtol(raw_green,NULL,16);
+                    color[2] = (int)strtol(raw_blue,NULL,16);
+                    color[3] = (int)strtol(raw_alpha,NULL,16);
                 }
                 
                 value = color;

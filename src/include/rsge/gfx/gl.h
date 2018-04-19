@@ -5,6 +5,9 @@
 
 #if CONFIG_PLATFORM == android
 #elif CONFIG_PLATFORM == linux
+#if CONFIG_SUBPLATFORM == desktop
+#define GLFW_INCLUDE_VULKAN
+#endif
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #else

@@ -6,7 +6,9 @@
 #include <rsge/config.h>
 #include <rsge/settings.h>
 #include <rsge/game.h>
+#include <rsge/misc.h>
 #include <rsge/ui.h>
+#include <argp.h>
 #include <log.h>
 
 #if CONFIG_USE_FREETYPE == 1
@@ -117,26 +119,98 @@ void fb_resize(GLFWwindow* window,int width,int height) {
 	rsge_camera_reshape(width,height);
 }
 
-#define MACRO2STR(m) #m
+static struct argp_option rsge_options[] = {
+	{ "log-level", 'l', "LEVEL", 0, "Sets the log level." },
+	{ "show-config", 'c', 0, 0, "Show the configuration of the game engine." },
+	{ "force-res", 'r', "WIDTHxHEIGHT", 0, "Forces a resolution instead of the one from the settings." },
+	{ "force-fullscreen", 'f', 0, 0, "Forces the window to be in fullscreen." },
+	{ "enable-vulkan", 'v', 0, 0, "Forces experimental Vulkan support, use at your own risk." },
+	{ 0 }
+};
 
-int main(char** argv,int argc) {
+struct arguments {
+	char* log_level;
+	int show_config;
+	char* force_res;
+	int force_fullscreen;
+	int enable_vulkan;
+};
+
+static error_t rsge_parse_opt(int key,char* arg,struct argp_state* state) {
+	struct arguments* arguments = state->input;
+	switch(key) {
+		case 'l':
+			arguments->log_level = arg;
+			break;
+		case 'c':
+			arguments->show_config = 1;
+			break;
+		case 'r':
+			arguments->force_res = arg;
+			break;
+		case 'f':
+			arguments->force_fullscreen = 1;
+			break;
+		case 'v':
+			arguments->enable_vulkan = 1;
+			break;
+		case ARGP_KEY_ARG: break;
+		case ARGP_KEY_END: break;
+		default: return ARGP_ERR_UNKNOWN;
+	}
+	return 0;
+}
+
+static struct argp argp = { rsge_options, rsge_parse_opt, "", "" };
+
+int main(int argc,char** argv) {
 	/* Variables */
 	rsge_error_e err;
+	struct arguments arguments;
 	
-	log_debug("-- RSGE Configuration:");
-	log_debug("CONFIG_PLATFORM = \"%s\"",MACRO2STR(CONFIG_PLATFORM));
-	log_debug("CONFIG_AUDIO_BACKEND = \"%s\"",MACRO2STR(CONFIG_AUDIO_BACKEND));
-	#if CONFIG_USE_FREETYPE == 1
-	log_debug("Freetype2 is enabled");
-	#else
-	log_debug("Freetype2 is disabled");
-	#endif
-	#if CONFIG_USE_LIBPNG == 1
-	log_debug("libpng is enabled");
-	#else
-	log_debug("libpng is disabled");
-	#endif
-	log_debug("-- End of RSGE Configuration");
+	arguments.log_level = "error";
+	arguments.show_config = 0;
+	arguments.force_res = NULL;
+	arguments.force_fullscreen = 0;
+	arguments.enable_vulkan = 0;
+	argp_parse(&argp,argc,argv,0,0,&arguments);
+	
+	log_set_level(LOG_INFO);
+	
+	if(!strcmp(arguments.log_level,"debug")) log_set_level(LOG_DEBUG);
+	else if(!strcmp(arguments.log_level,"trace")) log_set_level(LOG_TRACE);
+	else if(!strcmp(arguments.log_level,"info")) log_set_level(LOG_INFO);
+	else if(!strcmp(arguments.log_level,"warn")) log_set_level(LOG_WARN);
+	else if(!strcmp(arguments.log_level,"fatal")) log_set_level(LOG_FATAL);
+	else {
+		if(!!strcmp(arguments.log_level,"?")) printf("Invalid log level: %s\n",arguments.log_level);
+		printf("Log Level values:\n");
+		printf("\t?\tShows this help\n");
+		printf("\tdebug\tEnabled debug mode\n");
+		printf("\ttrace\tEnables trace mode\n");
+		printf("\tinfo\tEnables info mode\n");
+		printf("\twarn\tEnables warn mode\n");
+		printf("\tfatal\tEnables fatal mode\n");
+		return EXIT_SUCCESS;
+	}
+	
+	if(arguments.show_config) {
+		log_debug("-- RSGE Configuration --");
+		log_debug("CONFIG_PLATFORM = \""CONFIG_PLATFORM_STR"\"");
+		log_debug("CONFIG_AUDIO_BACKEND = \""CONFIG_AUDIO_BACKEND_STR"\"");
+		log_debug("CONFIG_SUBPLATFORM = \""CONFIG_SUBPLATFORM_STR"\"");
+		#if CONFIG_USE_FREETYPE == 1
+		log_debug("Freetype2 is enabled");
+		#else
+		log_debug("Freetype2 is disabled");
+		#endif
+		#if CONFIG_USE_LIBPNG == 1
+		log_debug("libpng is enabled");
+		#else
+		log_debug("libpng is disabled");
+		#endif
+		log_debug("-- End of RSGE Configuration --");
+	}
 
 	glfwSetErrorCallback(error_callback);
 	
@@ -190,8 +264,38 @@ int main(char** argv,int argc) {
 	/* Create window */
 	int res_w = config_setting_get_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.width"));
 	int res_h = config_setting_get_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.height"));
+	if(arguments.force_res != NULL) {
+		int split = 0;
+		for(int i = 0;i < strlen(arguments.force_res);i++) {
+			if(arguments.force_res[i] == 'x') {
+				split = i;
+				break;
+			}
+		}
+		char* res_w_str = malloc(split-1);
+		if(!res_w_str) {
+			log_error("Failed to allocate memory");
+			return EXIT_FAILURE;
+		}
+		char* res_h_str = malloc(strlen(arguments.force_res)-split);
+		if(!res_h_str) {
+			free(res_w_str);
+			log_error("Failed to allocate memory");
+			return EXIT_FAILURE;
+		}
+		
+		memcpy(res_w_str,arguments.force_res,split-1);
+		memcpy(res_h_str,arguments.force_res+split,strlen(arguments.force_res)-split);
+		
+		res_w = atoi(res_w_str);
+		res_h = atoi(res_h_str);
+		
+		free(res_w_str);
+		free(res_h_str);
+	}
 	GLFWmonitor* monitor = NULL;
 	if(config_setting_get_bool(config_lookup(&rsge_libconfig_cfg,"gfx.fullscreen"))) monitor = glfwGetPrimaryMonitor();
+	if(arguments.force_fullscreen) monitor = glfwGetPrimaryMonitor();
 	log_debug("Setting resolution to %dx%d%s",res_w,res_h,monitor == NULL ? "" : " (Fullscreen)");
 	GLFWwindow* window = glfwCreateWindow(res_w,res_h,gameinfo.name,monitor,NULL);
 	if(!window) {
@@ -202,6 +306,45 @@ int main(char** argv,int argc) {
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
+	
+	if(!glfwVulkanSupported() && arguments.enable_vulkan) {
+		log_error("Vulkan is not supported");
+		return EXIT_FAILURE;
+	}
+	
+	#if CONFIG_SUBPLATFORM == desktop
+	if(glfwVulkanSupported() && arguments.enable_vulkan) {
+		log_warn("Experimental Vulkan support is enabled and available.");
+		
+		log_debug("Getting Vulkan functions");
+		PFN_vkCreateInstance pfnCreateInstance = (PFN_vkCreateInstance)glfwGetInstanceProcAddress(NULL,"vkCreateInstance");
+		
+		VkInstance instance;
+		VkResult result = pfnCreateInstance(NULL,NULL,&instance);
+		if(result != VK_SUCCESS) {
+			log_error("vkCreateInstance failed");
+			return EXIT_FAILURE;
+		}
+		
+		PFN_vkGetDeviceProcAddr pfnGetDeviceProcAddr = (PFN_vkGetDeviceProcAddr)glfwGetInstanceProcAddress(instance,"vkGetDeviceProcAddr");
+		PFN_vkCreateDevice pfnCreateDevice = (PFN_vkCreateDevice)glfwGetInstanceProcAddress(instance,"vkCreateDevice");
+		
+		uint32_t extensions_count;
+		const char* extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
+		
+		VkInstanceCreateInfo ici;
+		memset(&ici,0,sizeof(ici));
+		ici.enabledExtensionCount = extensions_count;
+		ici.ppEnabledExtensionNames = extensions;
+		
+		VkSurfaceKHR surface;
+		result = glfwCreateWindowSurface(instance,window,NULL,&surface);
+		if(result != VK_SUCCESS) {
+			log_error("Failed to create a window surface with Vulkan.");
+			return EXIT_FAILURE;
+		}
+	}
+	#endif
 
 	glfwSetKeyCallback(window,key_callback);
 	glfwSetFramebufferSizeCallback(window,fb_resize);
