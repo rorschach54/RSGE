@@ -1,3 +1,4 @@
+#include <rsge/ui/widgets/button.h>
 #include <rsge/ui/widgets/label.h>
 #include <rsge/ui.h>
 #include <list.h>
@@ -11,6 +12,14 @@ rsge_error_e rsge_ui_init() {
     rsge_error_e err;
     
     /* Register widgets */
+    
+    /* Register widget: button (rsge.widget.button) */
+    rsge_ui_widget_type_t rsge_widget_button = {
+        .tag = "rsge.widget.button",
+        .fromXMLNode = rsge_ui_widget_button_fromXMLNode
+    };
+    err = rsge_ui_registerWidget(&rsge_widget_button);
+    if(err != RSGE_ERROR_NONE) return err;
     
     /* Register widget: label (rsge.widget.label) */
     rsge_ui_widget_type_t rsge_widget_label = {

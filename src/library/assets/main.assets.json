@@ -20,6 +20,10 @@
 		"path": "src/assets/fonts/thintel/licence.txt"
 	},
 	{
+		"name": "models/simple.xml",
+		"path": "src/assets/models/simple.xml"
+	},
+	{
 		"name": "shaders/shape/shader.frag",
 		"path": "src/assets/shaders/shape/shader.frag"
 	},

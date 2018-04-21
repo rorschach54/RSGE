@@ -168,14 +168,12 @@ int main(int argc,char** argv) {
 	rsge_error_e err;
 	struct arguments arguments;
 	
-	arguments.log_level = "error";
+	arguments.log_level = "info";
 	arguments.show_config = 0;
 	arguments.force_res = NULL;
 	arguments.force_fullscreen = 0;
 	arguments.enable_vulkan = 0;
 	argp_parse(&argp,argc,argv,0,0,&arguments);
-	
-	log_set_level(LOG_INFO);
 	
 	if(!strcmp(arguments.log_level,"debug")) log_set_level(LOG_DEBUG);
 	else if(!strcmp(arguments.log_level,"trace")) log_set_level(LOG_TRACE);
@@ -254,6 +252,7 @@ int main(int argc,char** argv) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		config_destroy(&rsge_libconfig_cfg);
+		rsge_audio_uninit();
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
@@ -302,6 +301,7 @@ int main(int argc,char** argv) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
+		rsge_audio_uninit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwTerminate();
 		return EXIT_FAILURE;
@@ -309,42 +309,99 @@ int main(int argc,char** argv) {
 	
 	if(!glfwVulkanSupported() && arguments.enable_vulkan) {
 		log_error("Vulkan is not supported");
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		config_destroy(&rsge_libconfig_cfg);
+		rsge_audio_uninit();
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 	
-	#if CONFIG_SUBPLATFORM == desktop
 	if(glfwVulkanSupported() && arguments.enable_vulkan) {
 		log_warn("Experimental Vulkan support is enabled and available.");
+
+		VkResult result;
+		uint32_t extensions_count;
+		const char** extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
+		if(!extensions) {
+			log_error("Failed to get required extensions");
+#if CONFIG_USE_FREETYPE == 1
+			FT_Done_FreeType(rsge_freetype_lib);
+#endif
+			config_destroy(&rsge_libconfig_cfg);
+			rsge_audio_uninit();
+			glfwTerminate();
+			return EXIT_FAILURE;
+		}
+
+		PFN_vkEnumerateInstanceLayerProperties pfnEnumerateInstanceLayerProperties = (PFN_vkEnumerateInstanceLayerProperties)glfwGetInstanceProcAddress(NULL,"vkEnumerateInstanceLayerProperties");
+
+		const char** instance_validation_layers = NULL;
+		uint32_t instance_layer_count;
+
+		result = pfnEnumerateInstanceLayerProperties(&instance_layer_count,NULL);
+		if(result != VK_SUCCESS) {
+			log_error("vkEnumerateInstanceLayerProperties failed");
+#if CONFIG_USE_FREETYPE == 1
+			FT_Done_FreeType(rsge_freetype_lib);
+#endif
+			config_destroy(&rsge_libconfig_cfg);
+			rsge_audio_uninit();
+			glfwTerminate();
+			return EXIT_FAILURE;
+		}
+
+		VkApplicationInfo app = {
+			.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+			.pNext = NULL,
+			.pApplicationName = gameinfo.name,
+			.applicationVersion = 0,
+			.pEngineName = "RSGE",
+			.engineVersion = 0,
+			.apiVersion = VK_API_VERSION_1_0
+		};
+		VkInstanceCreateInfo inst_info = {
+			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+			.pNext = NULL,
+			.pApplicationInfo = &app,
+			.enabledLayerCount = 3,
+			.ppEnabledLayerNames = (const char**)instance_validation_layers,
+			.enabledExtensionCount = extensions_count,
+			.ppEnabledExtensionNames = extensions
+		};
 		
-		log_debug("Getting Vulkan functions");
 		PFN_vkCreateInstance pfnCreateInstance = (PFN_vkCreateInstance)glfwGetInstanceProcAddress(NULL,"vkCreateInstance");
 		
 		VkInstance instance;
-		VkResult result = pfnCreateInstance(NULL,NULL,&instance);
+		result = pfnCreateInstance(&inst_info,NULL,&instance);
 		if(result != VK_SUCCESS) {
 			log_error("vkCreateInstance failed");
+#if CONFIG_USE_FREETYPE == 1
+			FT_Done_FreeType(rsge_freetype_lib);
+#endif
+			config_destroy(&rsge_libconfig_cfg);
+			rsge_audio_uninit();
+			glfwTerminate();
 			return EXIT_FAILURE;
 		}
 		
 		PFN_vkGetDeviceProcAddr pfnGetDeviceProcAddr = (PFN_vkGetDeviceProcAddr)glfwGetInstanceProcAddress(instance,"vkGetDeviceProcAddr");
 		PFN_vkCreateDevice pfnCreateDevice = (PFN_vkCreateDevice)glfwGetInstanceProcAddress(instance,"vkCreateDevice");
 		
-		uint32_t extensions_count;
-		const char* extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
-		
-		VkInstanceCreateInfo ici;
-		memset(&ici,0,sizeof(ici));
-		ici.enabledExtensionCount = extensions_count;
-		ici.ppEnabledExtensionNames = extensions;
-		
 		VkSurfaceKHR surface;
 		result = glfwCreateWindowSurface(instance,window,NULL,&surface);
 		if(result != VK_SUCCESS) {
 			log_error("Failed to create a window surface with Vulkan.");
+#if CONFIG_USE_FREETYPE == 1
+			FT_Done_FreeType(rsge_freetype_lib);
+#endif
+			config_destroy(&rsge_libconfig_cfg);
+			rsge_audio_uninit();
+			glfwTerminate();
 			return EXIT_FAILURE;
 		}
 	}
-	#endif
 
 	glfwSetKeyCallback(window,key_callback);
 	glfwSetFramebufferSizeCallback(window,fb_resize);
@@ -453,6 +510,7 @@ int main(int argc,char** argv) {
 	/* Initialize game */
 	err = rsge_game_init();
 	if(err != RSGE_ERROR_NONE) {
+		log_error("rsge_game_init() returned error code %d",err);
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif

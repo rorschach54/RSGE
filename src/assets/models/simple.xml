@@ -1,0 +1,8 @@
+<model>
+	<mode value="GL_TRIANGLES" />
+	<vertices>
+		<vertice position="-0.6,-0.4,0" />
+		<vertice position="0.6,-0.4,0" />
+		<vertice position="0.0,0.6,0" />
+	</vertices>
+</model>
