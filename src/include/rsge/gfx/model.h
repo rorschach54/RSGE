@@ -5,12 +5,12 @@
 #include <rsge/assets.h>
 
 /**
- * \fn rsge_error_e rsge_model_fromFile(rsge_shape_t* shape,rsge_asset_t* asset)
+ * \fn rsge_error_e rsge_model_fromFile(rsge_shape_t* shape,char* path)
  * \brief Loads a model from a file.
  * \param shape The pointer to the shape.
- * \param asset The asset to use.
+ * \param path The path to the asset to use.
  * \return An error code.
  */
-rsge_error_e rsge_model_fromFile(rsge_shape_t* shape,rsge_asset_t* asset);
+rsge_error_e rsge_model_fromFile(rsge_shape_t* shape,char* path);
 
 #endif

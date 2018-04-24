@@ -4,6 +4,6 @@
 #include <rsge/gfx/shape.h>
 #include <rsge/assets.h>
 
-rsge_error_e rsge_model_xml_fromFile(rsge_shape_t* shape,rsge_asset_t* asset);
+rsge_error_e rsge_model_xml_fromFile(rsge_shape_t* shape,char* path);
 
 #endif

@@ -6,7 +6,15 @@
 #include <stdint.h>
 
 typedef struct rsge_asset {
+	/**
+	 * \brief Function to find an asset.
+	 */
 	rsge_error_e (*find)(struct rsge_asset* assets,rsge_asset_t* file,char* key);
+
+	/**
+	 * \brief Implementation data.
+	 */
+	void* impl;
 } rsge_assets_t;
 
 #endif

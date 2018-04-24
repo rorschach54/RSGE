@@ -21,7 +21,7 @@ for(var i = 0;i < files.length;i++) {
 	out += "\tif(!strcmp(name,\""+files[i]["name"]+"\")) {\n";
 	out += "\t\tfile->name = \""+files[i]["name"]+"\";\n";
 	out += "\t\tfile->size = "+data.length+";\n";
-	out += "\t\tfile->data = (unsigned char["+data.length+"]){ ";
+	out += "\t\tfile->data = (char["+data.length+"]){ ";
 	for(var o = 0;o < data.length;o++) {
 		out += "0x"+Buffer.from([data[o]]).toString("hex");
 		if(o+1 < data.length) out += ",";

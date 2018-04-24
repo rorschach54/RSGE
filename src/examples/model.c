@@ -10,12 +10,7 @@
 rsge_shape_t model;
 
 rsge_error_e rsge_game_init() {
-	rsge_error_e err;
-	rsge_asset_t modelFile;
-	err = rsge_asset_find(&rsge_assets,&modelFile,"models/simple.xml");
-	if(err != RSGE_ERROR_NONE) return err;
-
-	err = rsge_model_fromFile(&model,&modelFile);
+	rsge_error_e err = rsge_model_fromFile(&model,"rsge@models/simple.xml");
 	if(err != RSGE_ERROR_NONE) return err;
 
 	model.pos[0] = 0.0f;

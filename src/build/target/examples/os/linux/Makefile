@@ -9,4 +9,4 @@ endif
 $(EXAMPLES_BIN)/%: $(EXAMPLES_SRC)/%.c $(LIB_OUT)
 	@echo "Building example $@"
 	@mkdir -p $(@D)
-	@$(CC) -o $@ $< $(CFLAGS) -L$(BIN) $(LIB_OUT)
+	@$(CC) -o $@ $< $(EXAMPLES_CFLAGS) -L$(BIN) $(LIB_OUT)

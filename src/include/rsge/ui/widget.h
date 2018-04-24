@@ -17,7 +17,7 @@ typedef struct {
     /**
      * \brief Widget styling.
      */
-    list_t* styles;
+    xmlNodePtr stylesNode;
     
     /**
      * \brief The type of the event.
@@ -141,5 +141,15 @@ rsge_error_e rsge_ui_widget_create(rsge_ui_widget_t* widget,rsge_ui_surface_t* u
  * \return An error code.
  */
 rsge_error_e rsge_ui_widget_getstyle(rsge_ui_widget_t* widget,char* name,void** value);
+
+/**
+ * \fn rsge_error_e rsge_ui_widget_getevent(rsge_ui_widget_t* widget,char* name,rsge_ui_widget_event_t*** events,int* count)
+ * \brief Gets all of the events that matched name.
+ * \param widget The pointer to the widget.
+ * \param name The name of the event.
+ * \param events The pointer to store the events.
+ * \param count The pointer to store the number of events.
+ */
+rsge_error_e rsge_ui_widget_getevent(rsge_ui_widget_t* widget,char* name,rsge_ui_widget_event_t*** events,int* count);
 
 #endif

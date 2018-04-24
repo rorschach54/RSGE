@@ -5,11 +5,11 @@
 #include <rsge/assets.h>
 
 /**
- * \fn rsge_error_e rsge_image_fromFile(rsge_surface_t* surface,rsge_asset_t* asset)
+ * \fn rsge_error_e rsge_image_fromFile(rsge_surface_t* surface,char* path)
  * \brief Loads an image onto a surface from an asset file.
  * \param surface The pointer to the surface.
- * \param asset The asset file to use.
+ * \param path The path to the asset.
  */
-rsge_error_e rsge_image_fromFile(rsge_surface_t* surface,rsge_asset_t* asset);
+rsge_error_e rsge_image_fromFile(rsge_surface_t* surface,char* path);
 
 #endif

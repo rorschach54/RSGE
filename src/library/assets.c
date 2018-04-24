@@ -13,11 +13,11 @@ rsge_error_e rsge_assets_init() {
 	}
 	
 	/* Register asset locations */
-	rsge_asset_loc_t loc_rsge = {
-		.assets = &rsge_assets,
-		.name = "rsge"
-	};
-	rsge_error_e err = rsge_assets_registerLocation(&loc_rsge);
+	rsge_asset_loc_t* loc_rsge = malloc(sizeof(rsge_asset_loc_t));
+	if(!loc_rsge) return RSGE_ERROR_NONE;
+	loc_rsge->assets = &rsge_assets;
+	loc_rsge->name = "rsge";
+	rsge_error_e err = rsge_assets_registerLocation(loc_rsge);
 	if(err != RSGE_ERROR_NONE) {
 		log_error("Failed to register location");
 		return err;
@@ -31,18 +31,18 @@ rsge_error_e rsge_assets_uninit() {
 }
 
 rsge_error_e rsge_assets_findloc(char* name,rsge_asset_loc_t** loc) {
-    list_node_t* node;
-    list_iterator_t* it = list_iterator_new(rsge_assets_locations,LIST_HEAD);
-    if(it == NULL) return RSGE_ERROR_MALLOC;
-    while((node = list_iterator_next(it))) {
-        rsge_asset_loc_t* tmp_loc = (rsge_asset_loc_t*)node->val;
-        if(!strcmp(tmp_loc->name,name)) {
-            *loc = tmp_loc;
-            list_iterator_destroy(it);
-            return RSGE_ERROR_NONE;
-        }
-    }
-    list_iterator_destroy(it);
+	list_node_t* node;
+	list_iterator_t* it = list_iterator_new(rsge_assets_locations,LIST_HEAD);
+	if(it == NULL) return RSGE_ERROR_MALLOC;
+	while((node = list_iterator_next(it))) {
+		log_debug("Found asset location %s",((rsge_asset_loc_t*)node->val)->name);
+		if(!strcmp(((rsge_asset_loc_t*)node->val)->name,name)) {
+			*loc = ((rsge_asset_loc_t*)node->val);
+			list_iterator_destroy(it);
+			return RSGE_ERROR_NONE;
+		}
+	}
+	list_iterator_destroy(it);
 	return RSGE_ERROR_INVALID_ASSET_LOC;
 }
 
@@ -51,8 +51,8 @@ rsge_error_e rsge_assets_registerLocation(rsge_asset_loc_t* loc) {
 	rsge_error_e err = rsge_assets_findloc(loc->name,&tmp_loc);
 	if(err == RSGE_ERROR_INVALID_ASSET_LOC) {
 		list_node_t* node = list_node_new(loc);
-    	if(!node) return RSGE_ERROR_MALLOC;
-    	list_rpush(rsge_assets_locations,node);
+		if(!node) return RSGE_ERROR_MALLOC;
+		list_rpush(rsge_assets_locations,node);
 		return RSGE_ERROR_NONE;
 	} else if(err != RSGE_ERROR_NONE) return err;
 	return RSGE_ERROR_INVALID_ASSET_LOC;
@@ -71,18 +71,44 @@ rsge_error_e rsge_asset_get(rsge_asset_t* file,char* name) {
 			break;
 		}
 	}
-	char* locname = malloc(splitter-1);
+	char* locname = malloc(splitter);
 	if(!locname) return RSGE_ERROR_MALLOC;
-	memcpy(locname,name+splitter,splitter-1);
+	strncpy(locname,name,splitter);
+	locname[splitter] = 0;
+
+	char* path = malloc(strlen(name)-splitter);
+	if(!path) {
+		free(locname);
+		return RSGE_ERROR_MALLOC;
+	}
+	memset(path,0,(strlen(name)-splitter));
+	strncpy(path,name+(splitter+1),strlen(name)-splitter);
+
+	log_debug("Looking for asset %s in %s",path,locname);
 	
 	rsge_asset_loc_t* loc;
 	rsge_error_e err = rsge_assets_findloc(locname,&loc);
 	if(err != RSGE_ERROR_NONE) {
+		log_error("%s is not a valid asset location",locname);
 		free(locname);
+		free(path);
 		return err;
 	}
 	
-	err = rsge_asset_find(loc->assets,file,name);
+	err = rsge_asset_find(loc->assets,file,path);
 	free(locname);
+	free(path);
 	return err;
+}
+
+rsge_error_e rsge_asset_read(char* name,char** buffer,size_t* count) {
+	rsge_asset_t file;
+	rsge_error_e err = rsge_asset_get(&file,name);
+	if(err != RSGE_ERROR_NONE) return err;
+
+	*count = file.size;
+	*buffer = malloc(*count);
+	if(buffer == NULL) return RSGE_ERROR_MALLOC;
+	memcpy(*buffer,file.data,*count);
+	return RSGE_ERROR_NONE;
 }

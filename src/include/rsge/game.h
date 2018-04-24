@@ -18,16 +18,6 @@ typedef struct {
 	 * \brief The id of the game
 	 */
 	char* id;
-	
-	/**
-	 * \brief Input mapping size
-	 */
-	int inputMapSize;
-	
-	/**
-	 * \brief Input map
-	 */
-	rsge_inputmap_entry_t* inputMap;
 } rsge_game_t;
 
 /**

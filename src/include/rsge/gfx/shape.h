@@ -10,6 +10,9 @@
 #define RSGE_SHAPE_VERT_FLAG_COLOR (1 << 1)
 #define RSGE_SHAPE_VERT_FLAG_2NDCOLOR (2 << 1)
 #define RSGE_SHAPE_VERT_FLAG_FOG (3 << 1)
+#define RSGE_SHAPE_VERT_FLAG_TEXTURE (4 << 1)
+
+#define RSGE_SHAPE_FLAG_SHADOWS (1 << 1)
 
 /**
  * \struct rsge_shape_mat_t rsge/gfx/shape.h
@@ -61,6 +64,11 @@ typedef struct {
 	 * \brief The fog coord value. Use when RSGE_SHAPE_VERT_FLAG_FOG flag is set.
 	 */
 	float fogCoord;
+
+	/**
+	 * \brief The texture coordinate value. Use when RSGE_SHAPE_VERT_FLAG_TEXTURE flag is set.
+	 */
+	vec3 textCoord;
 } rsge_shape_vert_t;
 
 /**
@@ -68,6 +76,10 @@ typedef struct {
  * \brief Defines a shape.
  */
 typedef struct {
+	/**
+	 * \brief flags.
+	 */
+	uint8_t flags;
 
 	/**
 	 * \brief A 3-tuplet float that defines the position.
@@ -101,18 +113,25 @@ typedef struct {
 	
 	GLuint list;
 	GLenum mode;
+
+	/**
+	 * \brief The texture ID, used when it's value is not zero.
+	 */
+	GLuint texture;
+	GLenum textureMode;
 } rsge_shape_t;
 
 /**
- * \fn rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount)
+ * \fn rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount,uint8_t flags)
  * \brief Creates a new shape.
  * \param shape The pointer to the shape.
  * \param mode The GL rendering mode to use.
  * \param vertices An array of vertices.
  * \param verticeCount The number of vertices.
+ * \param flags The flags to use.
  * \return An error code.
  */
-rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount);
+rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount,uint8_t flags);
 
 /**
  * \fn rsge_error_e rsge_shape_destroy(rsge_shape_t* shape)

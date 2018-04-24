@@ -73,7 +73,15 @@ typedef enum {
 	/**
 	 * Invalid asset location.
 	 */
-	RSGE_ERROR_INVALID_ASSET_LOC
+	RSGE_ERROR_INVALID_ASSET_LOC,
+	/**
+	 * Invalid input device.
+	 */
+	RSGE_ERROR_INVALID_DEVICE,
+	/**
+	 * An OS error.
+	 */
+	RSGE_ERROR_OS
 } rsge_error_e;
 
 #endif

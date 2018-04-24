@@ -1,0 +1,24 @@
+<inputDevice type="joystick" name="Microsoft X-Box 360 pad">
+	<axes>
+		<!-- TODO: Match what the os reports -->
+		<axis type="joystick" name="joystick.left" />
+		<axis type="joystick" name="joystick.right" />
+		<axis type="dpad" name="dpad" />
+		<axis type="trigger" name="trigger.left" />
+		<axis type="trigger" name="trigger.right" />
+	</axes>
+	<buttons>
+		<!-- TODO: Match what the os reports -->
+		<button name="A" />
+		<button name="B" />
+		<button name="X" />
+		<button name="Y" />
+		<button name="Pause" />
+		<button name="Start" />
+		<button name="Back" />
+		<button name="bumper.left" />
+		<button name="bumper.right" />
+		<button name="joystick.left" />
+		<button name="joystick.right" />
+	</buttons>
+</inputDevice>

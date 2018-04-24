@@ -71,4 +71,14 @@ rsge_error_e rsge_asset_find(rsge_assets_t* assets,rsge_asset_t* file,char* name
  */
 rsge_error_e rsge_asset_get(rsge_asset_t* file,char* name);
 
+/**
+ * \fn rsge_error_e rsge_asset_read(char* name,char** buffer,size_t* count)
+ * \brief Reads an asset. Name looks like "location@path"
+ * \param name The location of the asset.
+ * \param buffer The pointer to store the data.
+ * \param count The pointer to store the size.
+ * \return An error code.
+ */
+rsge_error_e rsge_asset_read(char* name,char** buffer,size_t* count);
+
 #endif

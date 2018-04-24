@@ -3,10 +3,10 @@
 #include <rsge/config.h>
 #include <string.h>
 
-rsge_error_e rsge_model_fromFile(rsge_shape_t* shape,rsge_asset_t* asset) {
+rsge_error_e rsge_model_fromFile(rsge_shape_t* shape,char* path) {
 	rsge_error_e err;
 
-	err = rsge_model_xml_fromFile(shape,asset);
+	err = rsge_model_xml_fromFile(shape,path);
 	if(err != RSGE_ERROR_NONE) return err;
 	return RSGE_ERROR_NONE;
 }

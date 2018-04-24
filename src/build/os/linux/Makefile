@@ -23,6 +23,8 @@ $(error "Invalid audio backend, $(CONFIG_AUDIO_BACKEND), for OpenAL")
 endif
 endif
 
+EXAMPLES_CFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS))
+
 LIBRARY_CFLAGS += $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS))
 LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) -ldl -lm -lopenal -lGLU
 

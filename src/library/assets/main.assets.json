@@ -20,8 +20,28 @@
 		"path": "src/assets/fonts/thintel/licence.txt"
 	},
 	{
+		"name": "input/devices/keyboard.xml",
+		"path": "src/assets/input/devices/keyboard.xml"
+	},
+	{
+		"name": "input/devices/mouse.xml",
+		"path": "src/assets/input/devices/mouse.xml"
+	},
+	{
+		"name": "input/devices/pathdrop.xml",
+		"path": "src/assets/input/devices/pathdrop.xml"
+	},
+	{
+		"name": "input/devices/xbox360.xml",
+		"path": "src/assets/input/devices/xbox360.xml"
+	},
+	{
 		"name": "models/simple.xml",
 		"path": "src/assets/models/simple.xml"
+	},
+	{
+		"name": "net/http/client/config.xml",
+		"path": "src/assets/net/http/client/config.xml"
 	},
 	{
 		"name": "shaders/shape/shader.frag",

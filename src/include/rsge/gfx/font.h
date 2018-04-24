@@ -38,13 +38,13 @@ typedef struct rsge_font {
 #define rsge_font_render(font,surface,text,color) ((font)->render == NULL ? RSGE_ERROR_NONE : (font)->render(font,surface,text,color))
 
 /**
- * \fn rsge_error_e rsge_font_fromFile(rsge_font_t* font,rsge_asset_t* asset,size_t sz)
+ * \fn rsge_error_e rsge_font_fromFile(rsge_font_t* font,char* path,size_t sz)
  * \brief Loads a font from an asset file.
  * \param font The pointer to a font.
- * \param asset The asset file to use.
+ * \param path The path to the asset.
  * \param sz The size to make the font
  * \return An error code.
  */
-rsge_error_e rsge_font_fromFile(rsge_font_t* font,rsge_asset_t* asset,size_t sz);
+rsge_error_e rsge_font_fromFile(rsge_font_t* font,char* path,size_t sz);
 
 #endif

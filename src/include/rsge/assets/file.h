@@ -13,7 +13,7 @@ typedef struct {
 	/**
 	 * \brief The asset's contents.
 	 */
-	unsigned char* data;
+	char* data;
 	/**
 	 * \brief The asset's size in bytes.
 	 */

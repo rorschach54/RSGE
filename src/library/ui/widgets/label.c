@@ -8,7 +8,6 @@ typedef struct {
     char* text;
     
     rsge_font_t font;
-    rsge_asset_t fontAsset;
 } rsge_ui_widget_label_t;
 
 rsge_error_e rsge_ui_widget_label_destroy(rsge_ui_widget_t* widget) {
@@ -108,13 +107,7 @@ rsge_error_e rsge_ui_widget_label_create(rsge_ui_widget_t* widget,rsge_ui_surfac
     err = rsge_ui_widget_getstyle(widget,"font",(void**)&fontPath);
     if(err != RSGE_ERROR_NONE) return err;
     
-    err = rsge_asset_get(&label->fontAsset,fontPath);
-    if(err != RSGE_ERROR_NONE) {
-        free(label);
-        return err;
-    }
-    
-    err = rsge_font_fromFile(&label->font,&label->fontAsset,widget->height/3);
+    err = rsge_font_fromFile(&label->font,fontPath,widget->height/3);
     if(err != RSGE_ERROR_NONE) {
         free(label);
         return err;

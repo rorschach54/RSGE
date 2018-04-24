@@ -3,6 +3,7 @@ LIBRARY_CFLAGS=-c $(CFLAGS)
 
 build: build-glad build-library build-examples
 
+-include $(BUILD_SRC)/os/$(CONFIG_OS)/Makefile
 -include $(BUILD_SRC)/platform/$(CONFIG_PLATFORM)/Makefile
 include $(BUILD_SRC)/target/config/Makefile
 include $(BUILD_SRC)/target/examples/Makefile

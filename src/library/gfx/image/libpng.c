@@ -3,7 +3,8 @@
 #include <stdint.h>
 
 typedef struct {
-	rsge_asset_t* asset;
+	char* data;
+	size_t size;
 	uint32_t off;
 } rsge_asset_libpng_t;
 
@@ -12,14 +13,23 @@ void rsge_image_libpng_read(png_structp png_ptr,png_bytep outBytes,png_size_t by
 	if(io_ptr == NULL) return;
 	rsge_asset_libpng_t* libpng_asset = (rsge_asset_libpng_t*)io_ptr;
 	for(size_t i = 0;i < byteCountToRead;i++) {
-		outBytes[i] = libpng_asset->asset->data[libpng_asset->off+i];
-		libpng_asset->off++;
+		if(libpng_asset->off > libpng_asset->size) {
+			outBytes[i] = libpng_asset->data[libpng_asset->off+i];
+			libpng_asset->off++;
+		} else {
+			outBytes[i] = 0;
+		}
 	}
 }
 
-rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_t* asset) {
+rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path) {
+	rsge_asset_libpng_t libpng_asset;
+	rsge_error_e err = rsge_asset_read(path,&libpng_asset.data,&libpng_asset.size);
+	if(err != RSGE_ERROR_NONE) return err;
+	libpng_asset.off = 0;
+
 	char header[8];
-	for(int i = 0;i < 8;i++) header[i] = asset->data[i];
+	for(int i = 0;i < 8;i++) header[i] = libpng_asset.data[i];
 	if(png_sig_cmp(header,0,8)) {
 		return RSGE_ERROR_LIBPNG;
 	}
@@ -37,10 +47,6 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_t* as
 	if(setjmp(png_jmpbuf(png_ptr))) {
 		return RSGE_ERROR_LIBPNG;
 	}
-
-	rsge_asset_libpng_t libpng_asset;
-	libpng_asset.asset = asset;
-	libpng_asset.off = 0;
 	png_set_read_fn(png_ptr,&libpng_asset,rsge_image_libpng_read);
 	png_set_sig_bytes(png_ptr,8);
 	png_read_info(png_ptr,info_ptr);
@@ -79,7 +85,7 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,rsge_asset_t* as
 		free(row_pointers);
 		return RSGE_ERROR_INVALID_BPP;
 	}
-	rsge_error_e err = rsge_surface_create(surface,width,height,bpp,0);
+	err = rsge_surface_create(surface,width,height,bpp,0);
 	if(err != RSGE_ERROR_NONE) {
 		free(row_pointers);
 		return err;

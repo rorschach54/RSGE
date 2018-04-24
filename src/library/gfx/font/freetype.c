@@ -120,14 +120,19 @@ rsge_error_e rsge_font_freetype_render(rsge_font_t* font,rsge_surface_t* surface
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_font_freetype_fromFile(rsge_font_t* font,rsge_asset_t* asset,size_t sz) {
+rsge_error_e rsge_font_freetype_fromFile(rsge_font_t* font,char* path,size_t sz) {
+	char* asset_data;
+	size_t asset_size;
+	rsge_error_e err = rsge_asset_read(path,&asset_data,&asset_size);
+	if(err != RSGE_ERROR_NONE) return err;
+
 	rsge_font_freetype_t* ft = malloc(sizeof(rsge_font_freetype_t));
 	if(!ft) return RSGE_ERROR_MALLOC;
 
 	int ftError = FT_New_Memory_Face(
                 rsge_freetype_lib,
-                asset->data,
-                asset->size,
+                asset_data,
+                asset_size,
 		0,
                 &ft->face
         );
@@ -142,7 +147,7 @@ rsge_error_e rsge_font_freetype_fromFile(rsge_font_t* font,rsge_asset_t* asset,s
 	font->impl = (void*)ft;
 
 	int width;
-	rsge_error_e err = rsge_settings_getint("gfx.res.width",&width);
+	err = rsge_settings_getint("gfx.res.width",&width);
 	if(err != RSGE_ERROR_NONE) return err;
 	ftError = FT_Set_Char_Size(((rsge_font_freetype_t*)font->impl)->face,sz*64,0,width,0);
 	if(ftError) {

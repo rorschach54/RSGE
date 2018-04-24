@@ -3,8 +3,8 @@
 
 #include <rsge/config.h>
 
-#if CONFIG_PLATFORM == android
-#elif CONFIG_PLATFORM == linux
+#if CONFIG_OS == android
+#elif CONFIG_OS == linux
 #define GLFW_INCLUDE_VULKAN
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
