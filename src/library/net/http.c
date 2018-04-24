@@ -4,24 +4,13 @@
 #include <log.h>
 #include <string.h>
 
-rsge_error_e rsge_net_http_client_splitKey(char* line,int i,char** key,char** value) {
-	char* temp;
-	char keys[][25] = {"Date: ","Hostname: ","Location: ","Content-Type: "};
-	if((temp = strstr(line,keys[i])) != NULL) {
-		memcpy(key,temp,strlen(keys[i]));
-		memcpy(value,temp+strlen(keys[i]),strlen(temp+strlen(keys[i])));
-		temp = temp+strlen(keys[i]);
-	}
-	return RSGE_ERROR_NONE;
-}
-
 rsge_error_e rsge_net_http_client_parseheaders(rsge_net_http_client_t* client,char* header) {
 	char temp[100];
 	char* line = strtok(header,"\n");
 	char* key;
 	char* value;
 	int i = 0;
-	client->headerCount = 1;
+	client->headerCount = 2;
 	client->headers = malloc(sizeof(rsge_net_http_header_t)*client->headerCount);
 	if(!client->headers) {
 		return RSGE_ERROR_MALLOC;
@@ -31,20 +20,29 @@ rsge_error_e rsge_net_http_client_parseheaders(rsge_net_http_client_t* client,ch
 	memset(header_ContentType,0,sizeof(rsge_net_http_header_t));
 	header_ContentType->name = "Content-Type";
 	header_ContentType->value = "";
+	
+	rsge_net_http_header_t* header_ContentLength = &client->headers[1];
+	memset(header_ContentLength,0,sizeof(rsge_net_http_header_t));
+	header_ContentLength->name = "Content-Length";
+	header_ContentLength->value = "";
 
 	while(line != NULL) {
 		strcpy(temp,line);
-		rsge_error_e err = rsge_net_http_client_splitKey(line,i,&key,&value);
-		if(err != RSGE_ERROR_NONE) {
-			free(client->headers);
-			return err;
+		log_debug("Parsing header line: %s",line);
+		char* tmp;
+		for(int a = 0;a < client->headerCount;a++) {
+			if(strncmp(line,client->headers[a].name,strlen(client->headers[a].name))) {
+				//tmp += strlen(client->headers[a].name)+strlen(": ");
+				client->headers[a].value = line+strlen(client->headers[a].name)+strlen(": ");
+				break;
+			}
 		}
-		log_debug("Found header; key: %s, value: %s",key,value);
-		if(!strcmp(key,"Content-Type")) {
-			header_ContentType->value = value;
-		}
+		//if(!strcmp(key,"Content-Type")) {
+			//header_ContentType->value = value;
+		//}
 		line = strtok(NULL,"\n");
 		i++;
+		if(strlen(line) == 0) break;
 	}
 	return RSGE_ERROR_NONE;
 }

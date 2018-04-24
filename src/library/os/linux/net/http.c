@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <list.h>
+#include <log.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,6 +39,8 @@ rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* u
 	client->headerCount = 0;
 	rsge_net_http_client_impl_t* impl = (rsge_net_http_client_impl_t*)client->impl;
 
+	char* temp;
+
 	if(port == 0) {
 		if((temp = strstr(url,"http://")) != NULL) {
 			url += 7;
@@ -47,126 +50,201 @@ rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* u
 			port = 443;
 		}
 	}
+	char* ip = url;
+	
+	struct hostent* ghbn = gethostbyname(ip);
+	if(ghbn != NULL) {
+		int found = 0;
+		struct in_addr inaddr;
+		for(int i = 0;i < ghbn->h_length;i++) {
+			ip = inet_ntoa(*(struct in_addr*)ghbn->h_addr_list[i]);
+			if(ip == NULL) continue;
+			log_debug("IP: %s",ip);
+			found = 1;
+			break;
+		}
+		if(!found) return RSGE_ERROR_OS;
+	}
 
 	char* ptr;
 	char* host;
-	char* temp;
-	char getrequest[1024];
+	char* getrequest;
 	char path[1000];
 	char buffer[1024];
 	struct sockaddr_in addr;
+	
+	int getrequestsz = 0;
+	
+	// TODO: fix it to work a lot better
+	int headerstrsz = 0;
+	for(int i = 0;i < client->cfg->headerCount;i++) {
+		log_debug("Adding header: %s: %s",client->cfg->headers[i].name,client->cfg->headers[i].value);
+		headerstrsz += strlen(client->cfg->headers[i].name)+strlen(": ")+strlen(client->cfg->headers[i].value)+strlen("\n");
+	}
+	char* headersstr = malloc(headerstrsz);
+	if(!headersstr) return RSGE_ERROR_MALLOC;
+	int headeroff = 0;
+	for(int i = 0;i < client->cfg->headerCount;i++) {
+		headeroff += sprintf(headersstr+headeroff,"%s: %s\n",client->cfg->headers[i].name,client->cfg->headers[i].value);
+	}
+	
+	char* request_get;
+	int request_getsz;
+	
 	if(inet_pton(AF_INET,url,&(addr.sin_addr)) != 0) {
-		sprintf(getrequest,"GET / HTTP/1.0\nHOST: %s\n\n",url);
+		char reqtmp[1];
+		strcpy(path,"/");
+		getrequestsz = sprintf(reqtmp,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr);
+		getrequest = malloc(getrequestsz);
+		if(!getrequest) {
+			free(headersstr);
+			return RSGE_ERROR_MALLOC;
+		}
+		sprintf(getrequest,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr);
+		request_getsz = sprintf(reqtmp,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr);
 	} else {
+		strcpy(path,"/");
+		char reqtmp[1];
 		if((ptr = strstr(url,"/")) == NULL) {
-			sprintf(getrequest,"%s / HTTP/1.0\nHOST: %s\n\n",mode,url); 
+			getrequestsz = sprintf(reqtmp,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr);
+			getrequest = malloc(getrequestsz);
+			if(!getrequest) {
+				free(headersstr);
+				return RSGE_ERROR_MALLOC;
+			}
+			sprintf(getrequest,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr); 
 		} else {
 			strcpy(path,ptr);
 			host = strtok(url,"/");
-			sprintf(getrequest,"%s %s HTTP/1.0\nHOST: %s\n\n",mode,path,url);
+			getrequestsz = sprintf(reqtmp,"HEAD %s HTTP/1.0\nHOST: %s\n%s\n\n",path,url,headersstr);
+			getrequest = malloc(getrequestsz);
+			if(!getrequest) {
+				free(headersstr);
+				return RSGE_ERROR_MALLOC;
+			}
+			sprintf(getrequest,"HEAD %s HTTP/1.0\nHOST: %s\n%s\n\n",path,url,headersstr);
 		}
 	}
 
 	int sockfd = socket(AF_INET,SOCK_STREAM,0);
-	if(sockfd < 0) return RSGE_ERROR_OS;
+	if(sockfd < 0) {
+		log_error("Failed to create a socket");
+		return RSGE_ERROR_OS;
+	}
 
 	memset(&addr,0,sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = inet_addr(url);
+	addr.sin_addr.s_addr = inet_addr(ip);
 	addr.sin_port = htons(port);
 
-	if(connect(sockfd,(struct sockaddr*)&addr,sizeof(addr)) < 0) return RSGE_ERROR_OS;
+	log_debug("Connecting to %s",url);
+	if(connect(sockfd,(struct sockaddr*)&addr,sizeof(addr)) < 0) {
+		log_error("Socket failed to connect to %s (%s)",url,ip);
+		free(getrequest);
+		free(headersstr);
+		return RSGE_ERROR_OS;
+	}
 
+	log_debug("Sending request");
 	write(sockfd,getrequest,strlen(getrequest));
 
+	log_debug("Receiving status");
 	memset(&buffer,0,sizeof(buffer));
+	int header_off = 0;
 	int ret = recv(sockfd,buffer,1024,0);
 	if(ret < 0) {
+		free(getrequest);
+		free(headersstr);
 		close(sockfd);
 		return RSGE_ERROR_OS;
 	} else {
-		if((temp = strstr(buffer,"HTTP/1.0 200 OK")) != NULL) {
+		log_debug("Downloaded: %s",buffer);
+		if((temp = strstr(buffer,"HTTP/1.0 200 OK")) != NULL || (temp = strstr(buffer,"HTTP/1.0 301 Moved Permanently")) || (temp = strstr(buffer,"HTTP/1.0 200 OK")) != NULL || (temp = strstr(buffer,"HTTP/1.0 301 Moved Permanently"))) {
 			send(sockfd,"OK",strlen("OK"),0);
+			header_off = strlen(temp);
 		} else {
+			log_error("Bad status: %s",buffer);
 			close(sockfd);
+			free(getrequest);
+			free(headersstr);
 			return RSGE_ERROR_OS;
 		}
 	}
 
-	memset(&buffer,0,sizeof(buffer));
-	ret = recv(sockfd,buffer,1024,0);
+	log_debug("Loading headers");
+	//memset(&buffer,0,sizeof(buffer));
+	//ret = recv(sockfd,buffer,1024,0);
 	if(ret < 0) {
 		close(sockfd);
+		free(getrequest);
+		free(headersstr);
 		return RSGE_ERROR_OS;
 	} else {
-		rsge_error_e err = rsge_net_http_client_parseheaders(client,buffer);
+		rsge_error_e err = rsge_net_http_client_parseheaders(client,buffer+header_off);
 		if(err != RSGE_ERROR_NONE) {
+			free(getrequest);
+			free(headersstr);
 			close(sockfd);
 			return err;
 		}
-		send(sockfd,"OK",strlen("OK"),0);
+		//send(sockfd,"OK",strlen("OK"),0);
 	}
+	log_debug("Loaded headers");
+	rsge_net_http_header_t* header_ContentLength = &client->headers[1];
 
-	list_t* tmp_buffs = list_new();
-	if(!tmp_buffs) {
-		close(sockfd);
-		return RSGE_ERROR_MALLOC;
-	}
-
-	memset(&buffer,0,sizeof(buffer));
-	while(recv(sockfd,buffer,1024,0) > 0) {
-		list_node_t* node = list_node_new(buffer);
-		if(!node) {
-			close(sockfd);
-			list_destroy(tmp_buffs);
-			return RSGE_ERROR_MALLOC;
-		}
-		list_rpush(tmp_buffs,node);
-		memset(&buffer,0,sizeof(buffer));
-	}
-
-	int buff_sz = 0;
-	list_node_t* node;
-	list_iterator_t* it = list_iterator_new(tmp_buffs,LIST_HEAD);
-	if(it == NULL) {
-		close(sockfd);
-		list_destroy(tmp_buffs);
-		return RSGE_ERROR_MALLOC;
-	}
-	while((node = list_iterator_next(it))) {
-		char* tmp_buff = (char*)node->val;
-		buff_sz += strlen(tmp_buff);
-	}
-	list_iterator_destroy(it);
-
-	client->content = malloc(sizeof(char)*buff_sz);
+	log_debug("Downloading %d bytes (%s)",atoi(header_ContentLength->value),header_ContentLength->value);
+	
+	client->content = malloc(atoi(header_ContentLength->value)+237);
 	if(!client->content) {
-		close(sockfd);
-		list_destroy(tmp_buffs);
+		log_error("Failed to allocate %d bytes of memory",atoi(header_ContentLength->value)+237);
+		free(getrequest);
+		free(headersstr);
 		return RSGE_ERROR_MALLOC;
 	}
-
-	int off = 0;
-	it = list_iterator_new(tmp_buffs,LIST_HEAD);
-	if(it == NULL) {
+	memset(client->content,0,atoi(header_ContentLength->value)+237);
+	char tmpdownreq[1];
+	int reqstrsz = sprintf(tmpdownreq,"%s %s\n",mode,path);
+	char* reqstr = malloc(reqstrsz);
+	if(!reqstrsz) {
+		free(client->content);
+		free(getrequest);
+		free(headersstr);
 		close(sockfd);
-		list_destroy(tmp_buffs);
 		return RSGE_ERROR_MALLOC;
 	}
-	while((node = list_iterator_next(it))) {
-		char* tmp_buff = (char*)node->val;
-		memcpy(client->content+off,tmp_buff,strlen(tmp_buff));
-		off += strlen(tmp_buff);
+	sprintf(reqstr,"%s %s\n",mode,path);
+	send(sockfd,reqstr,strlen(reqstr),0);
+	ret = recv(sockfd,client->content,atoi(header_ContentLength->value)+237,0);
+	if(ret < 0) {
+		free(client->content);
+		free(getrequest);
+		free(headersstr);
+		free(reqstr);
+		close(sockfd);
+		return RSGE_ERROR_OS;
 	}
-	list_iterator_destroy(it);
+	log_debug("%s",client->content);
+	client->content += 237;
+	//send(sockfd,"OK",strlen("OK"),0);
+	
+	log_debug("Downloaded page");
 
 	close(sockfd);
-	list_destroy(tmp_buffs);
+	free(getrequest);
+	free(headersstr);
+	free(reqstr);
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_net_http_client_disconnect(rsge_net_http_client_t* client) {
 	free(client->headers);
 	free(client->content);
+	return RSGE_ERROR_NONE;
+}
+
+rsge_error_e rsge_net_http_client_destroy(rsge_net_http_client_t* client) {
+	rsge_net_http_client_impl_t* impl = (rsge_net_http_client_impl_t*)client->impl;
+	free(impl);
+	memset(client,0,sizeof(rsge_net_http_client_t));
 	return RSGE_ERROR_NONE;
 }

@@ -5,7 +5,9 @@
 
 #if CONFIG_OS == android
 #elif CONFIG_OS == linux
+#if 0
 #define GLFW_INCLUDE_VULKAN
+#endif
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #else

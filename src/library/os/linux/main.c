@@ -237,6 +237,7 @@ int main(int argc,char** argv) {
 		return EXIT_FAILURE;
 	}
 	
+	#ifdef GLFW_INCLUDE_VULKAN
 	if(glfwVulkanSupported() && arguments.enable_vulkan) {
 		log_warn("Experimental Vulkan support is enabled and available.");
 
@@ -321,6 +322,7 @@ int main(int argc,char** argv) {
 			return EXIT_FAILURE;
 		}
 	}
+	#endif
 
 	log_debug("Setting up OpenGL");
 	/* Set up OpenGL */

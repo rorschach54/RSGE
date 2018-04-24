@@ -105,4 +105,12 @@ rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* u
  */
 rsge_error_e rsge_net_http_client_disconnect(rsge_net_http_client_t* client);
 
+/**
+ * \fn rsge_error_e rsge_net_http_client_destroy(rsge_net_http_client_t* client)
+ * \brief Destroyes the HTTP client.
+ * \param client The pointer to a client.
+ * \return An error code.
+ */
+rsge_error_e rsge_net_http_client_destroy(rsge_net_http_client_t* client);
+
 #endif
