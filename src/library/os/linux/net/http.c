@@ -11,33 +11,33 @@
 #include <unistd.h>
 
 typedef struct {
+	int sockfd;
+	int packetCount;
 } rsge_net_http_client_impl_t;
 
 extern rsge_error_e rsge_net_http_client_parseheaders(rsge_net_http_client_t* client,char* header);
 
 rsge_error_e rsge_net_http_client_create(rsge_net_http_client_t* client,rsge_net_http_client_cfg_t* cfg) {
+	if(cfg == NULL) {
+		rsge_net_http_client_cfg_t tmp_cfg;
+		rsge_error_e err = rsge_net_http_clientcfg_fromFile(&tmp_cfg,"rsge@net/http/client/config.xml");
+		if(err != RSGE_ERROR_NONE) return err;
+		return rsge_net_http_client_create(client,&tmp_cfg);
+	}
 	memset(client,0,sizeof(rsge_net_http_client_t));
 
 	rsge_net_http_client_impl_t* impl = malloc(sizeof(rsge_net_http_client_impl_t));
 	if(!impl) return RSGE_ERROR_MALLOC;
-
-	if(cfg == NULL) {
-		rsge_net_http_client_cfg_t tmp_cfg;
-		rsge_error_e err = rsge_net_http_clientcfg_fromFile(&tmp_cfg,"rsge@net/http/client/config.xml");
-		if(err != RSGE_ERROR_NONE) {
-			free(impl);
-			return err;
-		}
-		cfg = &tmp_cfg;
-	}
 	client->cfg = cfg;
 	client->impl = (void*)impl;
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* url,int port,char* mode) {
+rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* url,int port,char* method) {
 	client->headerCount = 0;
+	rsge_error_e err;
 	rsge_net_http_client_impl_t* impl = (rsge_net_http_client_impl_t*)client->impl;
+	impl->packetCount = 0;
 
 	char* temp;
 
@@ -50,195 +50,161 @@ rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* u
 			port = 443;
 		}
 	}
-	char* ip = url;
+
+	client->host = url;
 	
-	struct hostent* ghbn = gethostbyname(ip);
+	struct hostent* ghbn = gethostbyname(url);
 	if(ghbn != NULL) {
 		int found = 0;
 		struct in_addr inaddr;
 		for(int i = 0;i < ghbn->h_length;i++) {
-			ip = inet_ntoa(*(struct in_addr*)ghbn->h_addr_list[i]);
-			if(ip == NULL) continue;
-			log_debug("IP: %s",ip);
+			client->ip = inet_ntoa(*(struct in_addr*)ghbn->h_addr_list[i]);
+			if(client->ip == NULL) continue;
+			log_debug("IP: %s",client->ip);
 			found = 1;
 			break;
 		}
 		if(!found) return RSGE_ERROR_OS;
 	}
 
+	client->port = port;
+
 	char* ptr;
-	char* host;
 	char* getrequest;
-	char path[1000];
 	char buffer[1024];
 	struct sockaddr_in addr;
 	
-	int getrequestsz = 0;
-	
-	// TODO: fix it to work a lot better
-	int headerstrsz = 0;
-	for(int i = 0;i < client->cfg->headerCount;i++) {
-		log_debug("Adding header: %s: %s",client->cfg->headers[i].name,client->cfg->headers[i].value);
-		headerstrsz += strlen(client->cfg->headers[i].name)+strlen(": ")+strlen(client->cfg->headers[i].value)+strlen("\n");
-	}
-	char* headersstr = malloc(headerstrsz);
-	if(!headersstr) return RSGE_ERROR_MALLOC;
-	int headeroff = 0;
-	for(int i = 0;i < client->cfg->headerCount;i++) {
-		headeroff += sprintf(headersstr+headeroff,"%s: %s\n",client->cfg->headers[i].name,client->cfg->headers[i].value);
-	}
-	
-	char* request_get;
-	int request_getsz;
-	
 	if(inet_pton(AF_INET,url,&(addr.sin_addr)) != 0) {
 		char reqtmp[1];
-		strcpy(path,"/");
-		getrequestsz = sprintf(reqtmp,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr);
-		getrequest = malloc(getrequestsz);
-		if(!getrequest) {
-			free(headersstr);
-			return RSGE_ERROR_MALLOC;
-		}
-		sprintf(getrequest,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr);
-		request_getsz = sprintf(reqtmp,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr);
+		client->path = "/";
 	} else {
-		strcpy(path,"/");
+		client->path = "/";
 		char reqtmp[1];
-		if((ptr = strstr(url,"/")) == NULL) {
-			getrequestsz = sprintf(reqtmp,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr);
-			getrequest = malloc(getrequestsz);
-			if(!getrequest) {
-				free(headersstr);
-				return RSGE_ERROR_MALLOC;
-			}
-			sprintf(getrequest,"HEAD / HTTP/1.0\nHOST: %s\n%s\n\n",url,headersstr); 
-		} else {
-			strcpy(path,ptr);
-			host = strtok(url,"/");
-			getrequestsz = sprintf(reqtmp,"HEAD %s HTTP/1.0\nHOST: %s\n%s\n\n",path,url,headersstr);
-			getrequest = malloc(getrequestsz);
-			if(!getrequest) {
-				free(headersstr);
-				return RSGE_ERROR_MALLOC;
-			}
-			sprintf(getrequest,"HEAD %s HTTP/1.0\nHOST: %s\n%s\n\n",path,url,headersstr);
+		if((ptr = strstr(url,"/")) != NULL) {
+			client->path = malloc(strlen(ptr));
+			if(!client->path) return RSGE_ERROR_MALLOC;
+			strcpy(client->path,ptr);
+			char* host = strtok(url,"/");
 		}
 	}
 
-	int sockfd = socket(AF_INET,SOCK_STREAM,0);
-	if(sockfd < 0) {
+	impl->sockfd = socket(AF_INET,SOCK_STREAM,0);
+	if(impl->sockfd < 0) {
 		log_error("Failed to create a socket");
 		return RSGE_ERROR_OS;
 	}
 
+	log_debug("Linux socket fd: %d",impl->sockfd);
+
 	memset(&addr,0,sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = inet_addr(ip);
-	addr.sin_port = htons(port);
+	addr.sin_addr.s_addr = inet_addr(client->ip);
+	addr.sin_port = htons(client->port);
 
 	log_debug("Connecting to %s",url);
-	if(connect(sockfd,(struct sockaddr*)&addr,sizeof(addr)) < 0) {
-		log_error("Socket failed to connect to %s (%s)",url,ip);
-		free(getrequest);
-		free(headersstr);
+	if(connect(impl->sockfd,(struct sockaddr*)&addr,sizeof(addr)) < 0) {
+		log_error("Socket failed to connect to %s (%s)",url,client->ip);
 		return RSGE_ERROR_OS;
 	}
 
-	log_debug("Sending request");
-	write(sockfd,getrequest,strlen(getrequest));
+	err = rsge_net_http_client_exec(client,method);
+	if(err != RSGE_ERROR_NONE) {
+		close(impl->sockfd);
+		return err;
+	}
 
 	log_debug("Receiving status");
 	memset(&buffer,0,sizeof(buffer));
 	int header_off = 0;
-	int ret = recv(sockfd,buffer,1024,0);
+	int ret = recv(impl->sockfd,buffer,1024,0);
 	if(ret < 0) {
-		free(getrequest);
-		free(headersstr);
-		close(sockfd);
+		close(impl->sockfd);
 		return RSGE_ERROR_OS;
 	} else {
-		log_debug("Downloaded: %s",buffer);
-		if((temp = strstr(buffer,"HTTP/1.0 200 OK")) != NULL || (temp = strstr(buffer,"HTTP/1.0 301 Moved Permanently")) || (temp = strstr(buffer,"HTTP/1.0 200 OK")) != NULL || (temp = strstr(buffer,"HTTP/1.0 301 Moved Permanently"))) {
-			send(sockfd,"OK",strlen("OK"),0);
-			header_off = strlen(temp);
+		if((temp = strstr(buffer,"HTTP/1.0 200 OK")) != NULL || (temp = strstr(buffer,"HTTP/1.0 301 Moved Permanently")) || (temp = strstr(buffer,"HTTP/1.1 200 OK")) != NULL || (temp = strstr(buffer,"HTTP/1.1 301 Moved Permanently"))) {
 		} else {
 			log_error("Bad status: %s",buffer);
-			close(sockfd);
-			free(getrequest);
-			free(headersstr);
-			return RSGE_ERROR_OS;
+			close(impl->sockfd);
+			return RSGE_ERROR_OS; // TODO: use RSGE_ERROR_HTTP_BAD_STATUS
 		}
 	}
 
 	log_debug("Loading headers");
-	//memset(&buffer,0,sizeof(buffer));
-	//ret = recv(sockfd,buffer,1024,0);
-	if(ret < 0) {
-		close(sockfd);
-		free(getrequest);
-		free(headersstr);
-		return RSGE_ERROR_OS;
-	} else {
-		rsge_error_e err = rsge_net_http_client_parseheaders(client,buffer+header_off);
-		if(err != RSGE_ERROR_NONE) {
-			free(getrequest);
-			free(headersstr);
-			close(sockfd);
-			return err;
-		}
-		//send(sockfd,"OK",strlen("OK"),0);
+	err = rsge_net_http_client_parseheaders(client,buffer);
+	if(err != RSGE_ERROR_NONE) {
+		close(impl->sockfd);
+		return err;
 	}
-	log_debug("Loaded headers");
 	rsge_net_http_header_t* header_ContentLength = &client->headers[1];
+	int header_ContentLength_v = atoi(header_ContentLength->value);
+	log_debug("Loaded headers");
 
-	log_debug("Downloading %d bytes (%s)",atoi(header_ContentLength->value),header_ContentLength->value);
-	
-	client->content = malloc(atoi(header_ContentLength->value)+237);
-	if(!client->content) {
-		log_error("Failed to allocate %d bytes of memory",atoi(header_ContentLength->value)+237);
-		free(getrequest);
-		free(headersstr);
+	log_debug("Downloading %d bytes",header_ContentLength_v);
+
+	char* content_wh = malloc(header_ContentLength_v);
+	if(!content_wh) {
+		log_error("Failed to allocate %d bytes of memory",header_ContentLength_v);
 		return RSGE_ERROR_MALLOC;
 	}
-	memset(client->content,0,atoi(header_ContentLength->value)+237);
-	char tmpdownreq[1];
-	int reqstrsz = sprintf(tmpdownreq,"%s %s\n",mode,path);
-	char* reqstr = malloc(reqstrsz);
-	if(!reqstrsz) {
-		free(client->content);
-		free(getrequest);
-		free(headersstr);
-		close(sockfd);
-		return RSGE_ERROR_MALLOC;
+	memset(content_wh,0,header_ContentLength_v);
+
+	err = rsge_net_http_client_exec(client,method);
+	if(err != RSGE_ERROR_NONE) {
+		free(content_wh);
+		close(impl->sockfd);
+		return err;
 	}
-	sprintf(reqstr,"%s %s\n",mode,path);
-	send(sockfd,reqstr,strlen(reqstr),0);
-	ret = recv(sockfd,client->content,atoi(header_ContentLength->value)+237,0);
+
+	ret = recv(impl->sockfd,content_wh,header_ContentLength_v,0);
 	if(ret < 0) {
-		free(client->content);
-		free(getrequest);
-		free(headersstr);
-		free(reqstr);
-		close(sockfd);
+		free(content_wh);
+		close(impl->sockfd);
 		return RSGE_ERROR_OS;
 	}
-	log_debug("%s",client->content);
-	client->content += 237;
-	//send(sockfd,"OK",strlen("OK"),0);
+
+	int content_off = 0;
+	char* line = strtok(content_wh,"\n");
+	while(line != NULL) {
+		content_off += strlen(line);
+		if(strlen(line) == 1) break;
+		log_debug("Header line: %s",line);
+		line = strtok(NULL,"\n");
+	}
+
+	log_debug("Header size: %d",content_off);
+
+	client->content = malloc(header_ContentLength_v-content_off);
+	if(!client->content) {
+		log_error("Failed to allocate %d bytes",header_ContentLength_v-content_off);
+		free(content_wh);
+		close(impl->sockfd);
+		return RSGE_ERROR_MALLOC;
+	}
+	memset(client->content,0,header_ContentLength_v-content_off);
+	memcpy(client->content,content_wh+content_off,header_ContentLength_v-content_off);
 	
 	log_debug("Downloaded page");
+	return RSGE_ERROR_NONE;
+}
 
-	close(sockfd);
-	free(getrequest);
-	free(headersstr);
-	free(reqstr);
+rsge_error_e rsge_net_http_client_exec(rsge_net_http_client_t* client,char* method) {
+	rsge_net_http_client_impl_t* impl = (rsge_net_http_client_impl_t*)client->impl;
+	log_debug("Linux socket fd: %d",impl->sockfd);
+	char request[1024];
+	memset(request,0,sizeof(request));
+	sprintf(request,"%s %s HTTP/1.1\nHost: %s\n\n",method,client->path,client->host);
+	log_debug("Sending request: %s",request);
+	if(impl->packetCount == 0) write(impl->sockfd,request,strlen(request));
+	else send(impl->sockfd,request,strlen(request),0);
+	impl->packetCount++;
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_net_http_client_disconnect(rsge_net_http_client_t* client) {
+	rsge_net_http_client_impl_t* impl = (rsge_net_http_client_impl_t*)client->impl;
 	free(client->headers);
 	free(client->content);
+	close(impl->sockfd);
 	return RSGE_ERROR_NONE;
 }
 

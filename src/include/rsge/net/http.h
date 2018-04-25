@@ -3,11 +3,13 @@
 
 #include <rsge/error.h>
 #include <list.h>
+#include <stdarg.h>
 
 #define RSGE_NET_HTTP_STATUS_OK 200
 
-#define RSGE_NET_HTTP_MODE_GET "GET"
-#define RSGE_NET_HTTP_MODE_PUT "PUT"
+#define RSGE_NET_HTTP_METHOD_GET "GET"
+#define RSGE_NET_HTTP_METHOD_PUT "PUT"
+#define RSGE_NET_HTTP_METHOD_HEAD "HEAD"
 
 typedef struct {
 	/**
@@ -63,6 +65,26 @@ typedef struct {
 	 * \brief The HTTP headers recieved.
 	 */
 	rsge_net_http_header_t* headers;
+
+	/**
+	 * \brief The path part of the URL.
+	 */
+	char* path;
+
+	/**
+	 * \brief The port the client is connected to.
+	 */
+	int port;
+
+	/**
+	 * \brief The hostname of the server.
+	 */
+	char* host;
+
+	/**
+	 * \brief The ip of the server.
+	 */
+	char* ip;
 } rsge_net_http_client_t;
 
 /**
@@ -84,23 +106,29 @@ rsge_error_e rsge_net_http_clientcfg_fromFile(rsge_net_http_client_cfg_t* cfg,ch
 rsge_error_e rsge_net_http_client_create(rsge_net_http_client_t* client,rsge_net_http_client_cfg_t* cfg);
 
 /**
- * \fn rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* url,int port,char* mode)
+ * \fn rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* url,int port,char* method)
  * \brief Connects to an HTTP server.
  * \param client The pointer to a client.
  * \param url The URL of the server.
  * \param port The port of the server.
- * \param mode The HTTP mode to use.
+ * \param method The HTTP method to use.
  * \return An error code.
  */
-rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* url,int port,char* mode);
+rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* url,int port,char* method);
+
+/**
+ * \fn rsge_error_e rsge_net_http_client_exec(rsge_net_http_client_t* client,char* method)
+ * \brief Runs a method.
+ * \param client The pointer to a client.
+ * \param method The method to execute.
+ * \return An error code.
+ */
+rsge_error_e rsge_net_http_client_exec(rsge_net_http_client_t* client,char* method);
 
 /**
  * \fn rsge_error_e rsge_net_http_client_disconnect(rsge_net_http_client_t* client)
  * \brief Disconnects from an HTTP server.
  * \param client The pointer to a client.
- * \param url The URL of the server.
- * \param port The port of the server.
- * \param mode The HTTP mode to use.
  * \return An error code.
  */
 rsge_error_e rsge_net_http_client_disconnect(rsge_net_http_client_t* client);

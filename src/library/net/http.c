@@ -27,22 +27,19 @@ rsge_error_e rsge_net_http_client_parseheaders(rsge_net_http_client_t* client,ch
 	header_ContentLength->value = "";
 
 	while(line != NULL) {
+		if(strlen(line) == 1) break;
 		strcpy(temp,line);
 		log_debug("Parsing header line: %s",line);
 		char* tmp;
 		for(int a = 0;a < client->headerCount;a++) {
-			if(strncmp(line,client->headers[a].name,strlen(client->headers[a].name))) {
-				//tmp += strlen(client->headers[a].name)+strlen(": ");
-				client->headers[a].value = line+strlen(client->headers[a].name)+strlen(": ");
+			if((tmp = strstr(line,client->headers[a].name)) != NULL) {
+				tmp += strlen(client->headers[a].name)+strlen(": ");
+				client->headers[a].value = tmp;
 				break;
 			}
 		}
-		//if(!strcmp(key,"Content-Type")) {
-			//header_ContentType->value = value;
-		//}
 		line = strtok(NULL,"\n");
 		i++;
-		if(strlen(line) == 0) break;
 	}
 	return RSGE_ERROR_NONE;
 }
