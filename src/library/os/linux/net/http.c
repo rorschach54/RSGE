@@ -141,58 +141,48 @@ rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* u
 
 	log_debug("Downloading %d bytes",header_ContentLength_v);
 
-	char* content_wh = malloc(header_ContentLength_v);
-	if(!content_wh) {
+	client->content = malloc(header_ContentLength_v);
+	if(!client->content) {
 		log_error("Failed to allocate %d bytes of memory",header_ContentLength_v);
 		return RSGE_ERROR_MALLOC;
 	}
-	memset(content_wh,0,header_ContentLength_v);
+	memset(client->content,0,header_ContentLength_v);
 
 	err = rsge_net_http_client_exec(client,method);
 	if(err != RSGE_ERROR_NONE) {
-		free(content_wh);
+		free(client->content);
 		close(impl->sockfd);
 		return err;
 	}
 
-	ret = recv(impl->sockfd,content_wh,header_ContentLength_v,0);
+	ret = recv(impl->sockfd,client->content,header_ContentLength_v,0);
 	if(ret < 0) {
-		free(content_wh);
+		free(client->content);
 		close(impl->sockfd);
 		return RSGE_ERROR_OS;
 	}
-
-	int content_off = 0;
-	char* line = strtok(content_wh,"\n");
-	while(line != NULL) {
-		content_off += strlen(line);
-		if(strlen(line) == 1) break;
-		log_debug("Header line: %s",line);
-		line = strtok(NULL,"\n");
-	}
-
-	log_debug("Header size: %d",content_off);
-
-	client->content = malloc(header_ContentLength_v-content_off);
-	if(!client->content) {
-		log_error("Failed to allocate %d bytes",header_ContentLength_v-content_off);
-		free(content_wh);
-		close(impl->sockfd);
-		return RSGE_ERROR_MALLOC;
-	}
-	memset(client->content,0,header_ContentLength_v-content_off);
-	memcpy(client->content,content_wh+content_off,header_ContentLength_v-content_off);
 	
-	log_debug("Downloaded page");
+	log_debug("Downloaded %d bytes",strlen(client->content));
+	if(strlen(client->content) != header_ContentLength_v) {
+		log_error("Failed to download %d bytes, only downloaded %d/%d bytes",strlen(client->content),strlen(client->content),header_ContentLength_v);
+		free(client->content);
+		close(impl->sockfd);
+		return RSGE_ERROR_OS;
+	}
+	
+	for(int i = 0;i < strlen(client->content);i++) {
+		if(client->content[i] == '<') break;
+		client->content++;
+	}
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_net_http_client_exec(rsge_net_http_client_t* client,char* method) {
 	rsge_net_http_client_impl_t* impl = (rsge_net_http_client_impl_t*)client->impl;
 	log_debug("Linux socket fd: %d",impl->sockfd);
-	char request[1024];
+	char request[256];
 	memset(request,0,sizeof(request));
-	sprintf(request,"%s %s HTTP/1.1\nHost: %s\n\n",method,client->path,client->host);
+	sprintf(request,"%s %s HTTP/1.1\nHost: %s\nConnection: keep-alive\n\n",method,client->path,client->host);
 	log_debug("Sending request: %s",request);
 	if(impl->packetCount == 0) write(impl->sockfd,request,strlen(request));
 	else send(impl->sockfd,request,strlen(request),0);
