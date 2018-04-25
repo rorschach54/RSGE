@@ -1,7 +1,16 @@
 {
-    "name": "RSGE",
-    "version": "0.0.1",
-    "repo": "Ross-Software/RSGE",
-    "description": "RSGE is short for Ross Software Game Engine",
-    "license": "GPL-3.0"
+  "name": "rsge",
+  "version": "0.0.1",
+  "repo": "Ross-Software/RSGE",
+  "description": "RSGE is short for Ross Software Game Engine",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ross-Software/RSGE.git"
+  },
+  "author": "Spaceboy Ross",
+  "bugs": {
+    "url": "https://github.com/Ross-Software/RSGE/issues"
+  },
+  "homepage": "https://github.com/Ross-Software/RSGE#readme"
 }
