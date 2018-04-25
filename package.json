@@ -8,9 +8,15 @@
     "type": "git",
     "url": "git+https://github.com/Ross-Software/RSGE.git"
   },
-  "author": "Spaceboy Ross",
+  "authors": [
+    { "name": "Spaceboy Ross", "email": "spaceboyross@gmail.com", "url": "https://youtube.com/c/SpaceboyRoss" },
+  ],
   "bugs": {
     "url": "https://github.com/Ross-Software/RSGE/issues"
   },
-  "homepage": "https://github.com/Ross-Software/RSGE#readme"
+  "homepage": "https://github.com/Ross-Software/RSGE#readme",
+  "dependencies": {
+    "list": "git://github.com/clibs/list",
+    "log.c": "git://github.com/rxi/log.c"
+  }
 }
