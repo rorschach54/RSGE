@@ -18,7 +18,7 @@ rsge_error_e rsge_game_uninit() {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_update(double time) {
+rsge_error_e rsge_game_update(double time,int fps) {
 	surf.pos[0] = 0.0f;
 	surf.pos[1] = 0.0f;
 	surf.pos[2] = 0.0f;

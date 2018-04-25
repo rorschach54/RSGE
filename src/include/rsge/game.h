@@ -36,12 +36,13 @@ rsge_error_e rsge_game_getinfo(rsge_game_t* gameinfo);
 rsge_error_e rsge_game_init();
 
 /**
- * \fn rsge_error_e rsge_game_update(double time)
+ * \fn rsge_error_e rsge_game_update(double time,int fps)
  * \brief A function implemented by the game, this function is called when the game engine updates.
  * \param time Use this time for animations.
+ * \param fps The fps.
  * \return An error code.
  */
-rsge_error_e rsge_game_update(double time);
+rsge_error_e rsge_game_update(double time,int fps);
 
 /**
  * \fn rsge_error_e rsge_game_uninit()

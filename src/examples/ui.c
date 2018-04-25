@@ -18,7 +18,7 @@ rsge_error_e rsge_game_uninit() {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_update(double time) {
+rsge_error_e rsge_game_update(double time,int fps) {
 	rsge_error_e err = rsge_ui_surface_update(&uisurf);
 	if(err != RSGE_ERROR_NONE) return err;
 	return RSGE_ERROR_NONE;

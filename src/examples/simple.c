@@ -46,7 +46,7 @@ rsge_error_e rsge_game_uninit() {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_update(double time) {
+rsge_error_e rsge_game_update(double time,int fps) {
 	rsge_shape_render(&tri);
 	rsge_surface_render(&text,0.004f,0.004f);
 	return RSGE_ERROR_NONE;

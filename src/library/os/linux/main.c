@@ -458,21 +458,30 @@ int main(int argc,char** argv) {
 
 	/* Update game */
 	int exitStatus = EXIT_SUCCESS;
-	glfwSetTime(0.0);
-	while(!glfwWindowShouldClose(window)) {
+	//glfwSetTime(0.0);
+	double prevTime = glfwGetTime();
+	int frameCount = 0;
+	do {
+		double currentTime = glfwGetTime();
+		frameCount++;
 		int width,height;
 		glfwGetFramebufferSize(window,&width,&height);
 		rsge_camera_reshape(width,height);
 		rsge_camera_update();
-		err = rsge_game_update(glfwGetTime());
+		err = rsge_game_update(currentTime,frameCount);
 		if(err != RSGE_ERROR_NONE) {
 			exitStatus = EXIT_FAILURE;
 			break;
 		}
+		if(currentTime-prevTime >= 1.0) {
+			log_debug("%f ms/frame (FPS: %d)",1000.0/frameCount,frameCount);
+			frameCount = 0;
+			prevTime += 1.0;
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-	}
+	} while(!glfwWindowShouldClose(window));
 
 	log_info("RSGE: Uninitializing game");
 	/* Uninitialize game */
