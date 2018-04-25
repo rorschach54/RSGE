@@ -81,7 +81,11 @@ typedef enum {
 	/**
 	 * An OS error.
 	 */
-	RSGE_ERROR_OS
+	RSGE_ERROR_OS,
+	/**
+	 * Invalid bmp file.
+	 */
+	RSGE_ERROR_INVALID_BMP
 } rsge_error_e;
 
 #endif

@@ -1,6 +1,7 @@
 ifeq ($(CONFIG_USE_FREETYPE),y)
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/font/freetype.o
 endif
+LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/image/bmp.o
 ifeq ($(CONFIG_USE_LIBPNG),y)
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/image/libpng.o
 endif
