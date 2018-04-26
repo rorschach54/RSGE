@@ -3,6 +3,7 @@ DEPS=./deps
 SRC=./src
 
 EXAMPLES_BIN=$(BIN)/examples
+IDE_BIN=$(BIN)/ide
 LIBRARY_BIN=$(BIN)/library
 
 GLAD_PATH=$(DEPS)/glad
@@ -24,6 +25,7 @@ ASSETS_SRC=$(SRC)/assets
 BUILD_SRC=$(SRC)/build
 CONFIG_SRC=$(SRC)/config
 EXAMPLES_SRC=$(SRC)/examples
+IDE_SRC=$(SRC)/ide
 INCLUDE_SRC=$(SRC)/include
 LIBRARY_SRC=$(SRC)/library
 TOOLS_SRC=$(SRC)/tools
