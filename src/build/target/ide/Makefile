@@ -1,4 +1,5 @@
-IDE_OBJS=$(IDE_BIN)/main.o
+IDE_OBJS += $(IDE_BIN)/screens/startup.o
+IDE_OBJS += $(IDE_BIN)/main.o
 
 $(IDE_BIN)/%.o: $(IDE_SRC)/%.c $(INCLUDE_SRC)
 	@echo "Compiling $<"

@@ -25,7 +25,7 @@ endif
 
 IDE_LIBS=libconfig gtk+-3.0
 
-IDE_CFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(IDE_LIBS))
+IDE_CFLAGS=$(CFLAGS) -c $(shell $(PKG_CONFIG) --cflags $(IDE_LIBS))
 IDE_LDFLAGS=$(shell $(PKG_CONFIG) --libs $(IDE_LIBS))
 
 EXAMPLES_CFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS))
