@@ -5,9 +5,6 @@
 rsge_ide_screen_t rsge_ide_screen_startup;
 
 static void activate(GtkApplication* app,gpointer user_data) {
-    /* Initialize settings */
-    GSettings* settings = g_settings_new("com.rosssoftware.rsge.ide");
-
     /* Create window */
     GtkWidget* window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window),"RSGE IDE");
@@ -16,10 +13,11 @@ static void activate(GtkApplication* app,gpointer user_data) {
     /* Initialize screens */
     rsge_ide_error_e err;
     
-    err = RSGE_IDE_SCREEN_CREATE(startup,&rsge_ide_screen_startup);
+    err = rsge_ide_screen_startup_create(&rsge_ide_screen_startup);
     if(err != RSGE_IDE_ERROR_NONE) return;
     
-    // TODO: show startup screen
+    err = rsge_ide_screen_startup_show(&rsge_ide_screen_startup,window);
+    if(err != RSGE_IDE_ERROR_NONE) return;
     
     /* Show window */
     gtk_widget_show_all(window);

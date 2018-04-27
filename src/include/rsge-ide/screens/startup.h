@@ -4,6 +4,9 @@
 #include <gtk/gtk.h>
 #include <rsge-ide/screen.h>
 
-RSGE_IDE_SCREEN_CREATE_PROTO(startup);
+rsge_ide_error_e rsge_ide_screen_startup_create(rsge_ide_screen_t* screen);
+rsge_ide_error_e rsge_ide_screen_startup_destroy(rsge_ide_screen_t* screen);
+rsge_ide_error_e rsge_ide_screen_startup_show(rsge_ide_screen_t* screen,GtkWidget* window);
+rsge_ide_error_e rsge_ide_screen_startup_hide(rsge_ide_screen_t* screen,GtkWidget* window);
 
 #endif
