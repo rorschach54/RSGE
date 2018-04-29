@@ -28,6 +28,43 @@ typedef struct {
 
 typedef struct {
 	/**
+	 * \brief Cookie hostname
+	 */
+	char* hostname;
+
+	/**
+	 * \brief Include subdomains.
+	 */
+	int subdomains;
+
+	/**
+	 * \brief Cookie path.
+	 */
+	char* path;
+
+	/**
+	 * \brief Secure.
+	 */
+	int secure;
+
+	/**
+	 * \brief Cookie expires.
+	 */
+	char* expires;
+
+	/**
+	 * \brief Cookie name.
+	 */
+	char* name;
+
+	/**
+	 * \brief Cookie value.
+	 */
+	char* value;
+} rsge_net_http_cookie_t;
+
+typedef struct {
+	/**
 	 * \brief The instance of libcurl created.
 	 */
 	CURL* curl;
@@ -51,6 +88,16 @@ typedef struct {
 	 * \brief The headers received.
 	 */
 	rsge_net_http_header_t* headers;
+
+	/**
+	 * \brief The number of cookies set.
+	 */
+	int cookieCount;
+
+	/**
+	 * \brief The cookies set.
+	 */
+	rsge_net_http_cookie_t* cookies;
 
 	/**
 	 * \brief The content received from the connection.
