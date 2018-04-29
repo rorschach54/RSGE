@@ -28,10 +28,10 @@ IDE_LIBS=libconfig gtk+-3.0
 IDE_CFLAGS=$(CFLAGS) -c $(shell $(PKG_CONFIG) --cflags $(IDE_LIBS))
 IDE_LDFLAGS=$(shell $(PKG_CONFIG) --libs $(IDE_LIBS))
 
-EXAMPLES_CFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS))
+EXAMPLES_CFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shell curl-config --cflags)
 
-LIBRARY_CFLAGS += $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS))
-LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) -ldl -lm -lopenal -lGLU
+LIBRARY_CFLAGS += $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shell curl-config --cflags)
+LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) $(shell curl-config --libs) -ldl -lm -lopenal -lGLU
 
 ifeq ($(CONFIG_LINKMODE),shared)
 LIBRARY_CFLAGS += -fpic

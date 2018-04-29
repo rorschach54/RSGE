@@ -40,10 +40,6 @@
 		"path": "src/assets/models/simple.xml"
 	},
 	{
-		"name": "net/http/client/config.xml",
-		"path": "src/assets/net/http/client/config.xml"
-	},
-	{
 		"name": "shaders/shape/shader.frag",
 		"path": "src/assets/shaders/shape/shader.frag"
 	},

@@ -1,3 +1,4 @@
+#include <curl/curl.h>
 #include <rsge/gfx/camera.h>
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/lighting.h>
@@ -11,10 +12,12 @@
 #include <rsge/ui.h>
 #include <argp.h>
 #include <log.h>
+#include <signal.h>
 
 extern void rsge_callbacks_init();
 extern void error_callback(int error,const char* description);
 extern void fb_resize(GLFWwindow* window,int width,int height);
+extern void rsge_sigint(int dummy);
 
 #if CONFIG_USE_FREETYPE == 1
 #include <ft2build.h>
@@ -144,6 +147,8 @@ int main(int argc,char** argv) {
 		return EXIT_FAILURE;
 	}
 
+	signal(SIGINT,rsge_sigint);
+
 #if CONFIG_USE_FREETYPE == 1
 	if(FT_Init_FreeType(&rsge_freetype_lib)) {
 		config_destroy(&rsge_libconfig_cfg);
@@ -163,6 +168,8 @@ int main(int argc,char** argv) {
 		return EXIT_FAILURE;
 	}
 
+	curl_global_init(CURL_GLOBAL_ALL);
+
 	/* Get game information */
 	rsge_game_t gameinfo;
 	err = rsge_game_getinfo(&gameinfo);
@@ -172,6 +179,7 @@ int main(int argc,char** argv) {
 #endif
 		config_destroy(&rsge_libconfig_cfg);
 		rsge_audio_uninit();
+		curl_global_cleanup();
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
@@ -193,12 +201,14 @@ int main(int argc,char** argv) {
 		char* res_w_str = malloc(split-1);
 		if(!res_w_str) {
 			log_error("Failed to allocate memory");
+			curl_global_cleanup();
 			return EXIT_FAILURE;
 		}
 		char* res_h_str = malloc(strlen(arguments.force_res)-split);
 		if(!res_h_str) {
 			free(res_w_str);
 			log_error("Failed to allocate memory");
+			curl_global_cleanup();
 			return EXIT_FAILURE;
 		}
 		
@@ -221,6 +231,7 @@ int main(int argc,char** argv) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_audio_uninit();
+		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwTerminate();
 		return EXIT_FAILURE;
@@ -233,6 +244,7 @@ int main(int argc,char** argv) {
 #endif
 		config_destroy(&rsge_libconfig_cfg);
 		rsge_audio_uninit();
+		curl_global_cleanup();
 		glfwTerminate();
 		return EXIT_FAILURE;
 	}
@@ -251,6 +263,7 @@ int main(int argc,char** argv) {
 #endif
 			config_destroy(&rsge_libconfig_cfg);
 			rsge_audio_uninit();
+			curl_global_cleanup();
 			glfwTerminate();
 			return EXIT_FAILURE;
 		}
@@ -268,6 +281,7 @@ int main(int argc,char** argv) {
 #endif
 			config_destroy(&rsge_libconfig_cfg);
 			rsge_audio_uninit();
+			curl_global_cleanup();
 			glfwTerminate();
 			return EXIT_FAILURE;
 		}
@@ -302,6 +316,7 @@ int main(int argc,char** argv) {
 #endif
 			config_destroy(&rsge_libconfig_cfg);
 			rsge_audio_uninit();
+			curl_global_cleanup();
 			glfwTerminate();
 			return EXIT_FAILURE;
 		}
@@ -318,6 +333,7 @@ int main(int argc,char** argv) {
 #endif
 			config_destroy(&rsge_libconfig_cfg);
 			rsge_audio_uninit();
+			curl_global_cleanup();
 			glfwTerminate();
 			return EXIT_FAILURE;
 		}
@@ -369,6 +385,7 @@ int main(int argc,char** argv) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		config_destroy(&rsge_libconfig_cfg);
+		curl_global_cleanup();
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		return EXIT_FAILURE;
@@ -381,6 +398,7 @@ int main(int argc,char** argv) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_assets_uninit();
+		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -395,6 +413,7 @@ int main(int argc,char** argv) {
 #endif
 		config_destroy(&rsge_libconfig_cfg);
 		rsge_assets_uninit();
+		curl_global_cleanup();
 		rsge_input_deinit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -416,6 +435,7 @@ int main(int argc,char** argv) {
 		rsge_ui_deinit();
 		rsge_assets_uninit();
 		rsge_input_deinit();
+		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -433,6 +453,7 @@ int main(int argc,char** argv) {
 		rsge_ui_deinit();
 		rsge_assets_uninit();
 		rsge_input_deinit();
+		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -450,6 +471,7 @@ int main(int argc,char** argv) {
 		rsge_ui_deinit();
 		rsge_assets_uninit();
 		rsge_input_deinit();
+		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -458,7 +480,6 @@ int main(int argc,char** argv) {
 
 	/* Update game */
 	int exitStatus = EXIT_SUCCESS;
-	//glfwSetTime(0.0);
 	double prevTime = glfwGetTime();
 	int frameCount = 0;
 	do {
@@ -491,6 +512,7 @@ int main(int argc,char** argv) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_ui_deinit();
+		curl_global_cleanup();
 		rsge_assets_uninit();
 		rsge_input_deinit();
 		config_destroy(&rsge_libconfig_cfg);
@@ -507,6 +529,7 @@ int main(int argc,char** argv) {
 #if CONFIG_USE_FREETYPE == 1
 	FT_Done_FreeType(rsge_freetype_lib);
 #endif
+	curl_global_cleanup();
 	config_destroy(&rsge_libconfig_cfg);
 	glfwDestroyWindow(window);
 	glfwTerminate();

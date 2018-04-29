@@ -8,12 +8,11 @@
 rsge_net_http_client_t client;
 
 rsge_error_e rsge_game_init() {
-	rsge_net_http_client_cfg_t cfg;
 	rsge_error_e err;
-	err = rsge_net_http_client_create(&client,NULL);
+	err = rsge_net_http_client_create(&client);
 	if(err != RSGE_ERROR_NONE) return err;
 	
-	err = rsge_net_http_client_connect(&client,"spaceboyross.tk",80,RSGE_NET_HTTP_METHOD_GET);
+	err = rsge_net_http_client_connect(&client,"http://spaceboyross.tk",RSGE_HTTP_METHOD_GET);
 	if(err != RSGE_ERROR_NONE) return err;
 	
 	log_info("%s",client.content);

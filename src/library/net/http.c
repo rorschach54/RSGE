@@ -4,119 +4,207 @@
 #include <log.h>
 #include <string.h>
 
-rsge_error_e rsge_net_http_client_parseheaders(rsge_net_http_client_t* client,char* header) {
-	char temp[100];
-	char* line = strtok(header,"\n");
-	char* key;
-	char* value;
-	int i = 0;
-	client->headerCount = 2;
-	client->headers = malloc(sizeof(rsge_net_http_header_t)*client->headerCount);
-	if(!client->headers) {
+static size_t rsge_net_http_client_write(void* buffer,size_t size,size_t nmemb,void* userdata) {
+	rsge_net_http_client_t* client = (rsge_net_http_client_t*)userdata;
+	if(client->content == NULL) {
+		client->content = malloc(client->contentSize+(size*nmemb)+1);
+		if(!client->content) {
+			log_error("Failed to allocate %d bytes of memory",(size*nmemb)+1);
+			return 0;
+		}
+	} else {
+		client->content = realloc(client->content,client->contentSize+(size*nmemb)+1);
+		if(!client->content) {
+			log_error("Failed to reallocate %d bytes of memory",client->contentSize+(size*nmemb)+1);
+			return 0;
+		}
+	}
+	memcpy(&(client->content[client->contentSize]),buffer,size*nmemb);
+	client->contentSize += size*nmemb;
+	client->content[client->contentSize] = 0;
+	return size*nmemb;
+}
+
+static size_t rsge_net_http_client_headerswrite(void* buffer,size_t size,size_t nmemb,void* userdata) {
+	rsge_net_http_client_t* client = (rsge_net_http_client_t*)userdata;
+	size_t totalSize = size*nmemb;
+	if(totalSize > 2) {
+		if(!strncmp((char*)buffer,"HTTP",4)) {
+			char* statusFull = strstr((char*)buffer," ");
+			statusFull++;
+
+			char* statusStr = strstr(statusFull," ");
+			statusStr++;
+
+			char* statusCodeStr = statusFull;
+			statusCodeStr[strlen(statusFull)-strlen(statusStr)] = 0;
+			client->status = atoi(statusCodeStr);
+		} else {
+			while(((char*)buffer)[totalSize-1] == '\r' || ((char*)buffer)[totalSize-1] == '\n') totalSize--;
+			char* header = malloc(totalSize);
+			if(!header) return 0;
+			memset(header,0,totalSize);
+			memcpy(header,buffer,totalSize);
+			header[totalSize] = 0;
+			list_node_t* node = list_node_new(header);
+			if(!node) {
+				free(header);
+				return 0;
+			}
+			list_rpush(client->tmpHeaders,node);
+		}
+	}
+	return size*nmemb;
+}
+
+rsge_error_e rsge_net_http_client_create(rsge_net_http_client_t* client) {
+	memset(client,0,sizeof(rsge_net_http_client_t));
+
+	/* Setup headers */
+	client->defaultHeaderCount = 1;
+	client->defaultHeaders = malloc(sizeof(rsge_net_http_header_t)*client->defaultHeaderCount);
+	if(!client->defaultHeaders) {
+		log_error("Failed to allocate %d bytes",sizeof(rsge_net_http_header_t)*client->defaultHeaderCount);
 		return RSGE_ERROR_MALLOC;
 	}
 
-	rsge_net_http_header_t* header_ContentType = &client->headers[0];
-	memset(header_ContentType,0,sizeof(rsge_net_http_header_t));
-	header_ContentType->name = "Content-Type";
-	header_ContentType->value = "";
-	
-	rsge_net_http_header_t* header_ContentLength = &client->headers[1];
-	memset(header_ContentLength,0,sizeof(rsge_net_http_header_t));
-	header_ContentLength->name = "Content-Length";
-	header_ContentLength->value = "";
+	client->defaultHeaders[0].name = "User-agent";
+	client->defaultHeaders[0].value = "RSGE";
 
-	while(line != NULL) {
-		if(strlen(line) == 1) break;
-		strcpy(temp,line);
-		log_debug("Parsing header line: %s",line);
-		char* tmp;
-		for(int a = 0;a < client->headerCount;a++) {
-			if((tmp = strstr(line,client->headers[a].name)) != NULL) {
-				tmp += strlen(client->headers[a].name)+strlen(": ");
-				client->headers[a].value = tmp;
-				break;
-			}
-		}
-		line = strtok(NULL,"\n");
-		i++;
+	/* Setup CURL */
+	client->curl = curl_easy_init();
+	if(!client->curl) {
+		free(client->defaultHeaders);
+		return RSGE_ERROR_CURL;
 	}
+	curl_easy_setopt(client->curl,CURLOPT_FOLLOWLOCATION,1L);
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_net_http_clientcfg_fromFile(rsge_net_http_client_cfg_t* cfg,char* path) {
-	char* asset_data;
-	size_t asset_size;
-	rsge_error_e err = rsge_asset_read(path,&asset_data,&asset_size);
-	if(err != RSGE_ERROR_NONE) {
-		log_error("Failed to read asset");
-		return err;
+rsge_error_e rsge_net_http_client_connect(rsge_net_http_client_t* client,char* url,rsge_net_http_method_e method) {
+	client->content = NULL;
+	client->contentSize = 0;
+
+	client->headers = NULL;
+	client->headerCount = 0;
+	client->tmpHeaders = list_new();
+	if(!client->tmpHeaders) return RSGE_ERROR_MALLOC;
+
+	curl_easy_setopt(client->curl,CURLOPT_WRITEFUNCTION,rsge_net_http_client_write);
+	curl_easy_setopt(client->curl,CURLOPT_WRITEDATA,client);
+
+	curl_easy_setopt(client->curl,CURLOPT_HEADERFUNCTION,rsge_net_http_client_headerswrite);
+	curl_easy_setopt(client->curl,CURLOPT_HEADERDATA,client);
+
+	if(method == RSGE_HTTP_METHOD_GET) {
+		curl_easy_setopt(client->curl,CURLOPT_HTTPGET,1L);
+	} else if(method == RSGE_HTTP_METHOD_POST) {
+		curl_easy_setopt(client->curl,CURLOPT_POST,1L);
+	} else if(method == RSGE_HTTP_METHOD_PUT) {
+		curl_easy_setopt(client->curl,CURLOPT_PUT,1L);
+	} else {
+		log_error("Invalid or unsupported HTTP method: %d",method);
+		return RSGE_ERROR_INVALID_HTTP_METHOD;
 	}
-	xmlDocPtr doc = xmlReadMemory(asset_data,asset_size,path,NULL,0);
-	if(doc == NULL) {
-		log_error("Cannot parse XML document");
-		return RSGE_ERROR_LIBXML;
-	}
-	xmlNodePtr node = xmlDocGetRootElement(doc);
-	if(node == NULL) {
-		log_error("Cannot get root XML node");
-		xmlFreeDoc(doc);
-		return RSGE_ERROR_LIBXML;
-	}
+	curl_easy_setopt(client->curl,CURLOPT_URL,url);
 
-	if(!!xmlStrcmp(node->name,(const xmlChar*)"httpClientConfig")) {
-		log_error("XML document root node is not the httpClientConfig tag");
-		xmlFreeDoc(doc);
-		return RSGE_ERROR_LIBXML;
-	}
-
-	xmlNodePtr cur = node->children;
-	while(cur != NULL) {
-		if(!xmlStrcmp(cur->name,(const xmlChar*)"headers")) {
-			cfg->headerCount = 0;
-			xmlNodePtr headerCur = cur->children;
-			while(headerCur != NULL) {
-				if(headerCur->type == XML_ELEMENT_NODE && !xmlStrcmp(headerCur->name,(const xmlChar*)"header")) {
-					cfg->headerCount++;
-				}
-				headerCur = headerCur->next;
-			}
-
-			cfg->headers = malloc(sizeof(rsge_net_http_header_t)*cfg->headerCount);
-			if(!cfg->headers) {
-				log_error("Failed to allocate %d bytes of memory",sizeof(rsge_net_http_header_t)*cfg->headerCount);
-				xmlFreeDoc(doc);
-				return RSGE_ERROR_MALLOC;
-			}
-
-			int i = 0;
-			headerCur = cur->children;
-			while(headerCur != NULL) {
-				if(headerCur->type == XML_ELEMENT_NODE && !xmlStrcmp(headerCur->name,(const xmlChar*)"header")) {
-					rsge_net_http_header_t* header = &cfg->headers[i];
-					memset(header,0,sizeof(rsge_net_http_header_t));
-
-					header->name = (char*)xmlGetProp(headerCur,"name");
-					if(!header->name) {
-						xmlFreeDoc(doc);
-						free(cfg->headers);
-						return RSGE_ERROR_LIBXML;
-					}
-
-					header->value = (char*)xmlGetProp(headerCur,"value");
-					if(!header->value) {
-						xmlFreeDoc(doc);
-						free(cfg->headers);
-						return RSGE_ERROR_LIBXML;
-					}
-
-					i++;
-				}
-				headerCur = headerCur->next;
-			}
+	struct curl_slist* headers = NULL;
+	char header_tmp[1];
+	for(size_t i = 0;i < client->defaultHeaderCount;i++) {
+		size_t header_sz = sprintf(header_tmp,"%s: %s",client->defaultHeaders[i].name,client->defaultHeaders[i].value);
+		char* header = malloc(header_sz);
+		if(!header) {
+			log_error("Failed to allocate %d bytes",header_sz);
+			return RSGE_ERROR_MALLOC;
 		}
-		cur = cur->next;
+		memset(header,0,header_sz);
+		sprintf(header,"%s: %s",client->defaultHeaders[i].name,client->defaultHeaders[i].value);
+		headers = curl_slist_append(headers,header);
+		free(header);
 	}
-	xmlFreeDoc(doc);
+
+	curl_easy_setopt(client->curl,CURLOPT_HTTPHEADER,headers);
+
+	CURLcode res = curl_easy_perform(client->curl);
+	if(res != CURLE_OK) {
+		log_error("curl_easy_perform() failed: %s",curl_easy_strerror(res));
+		curl_slist_free_all(headers);
+		return RSGE_ERROR_CURL;
+	}
+
+	client->headerCount = 0;
+
+	list_iterator_t* headers_it = list_iterator_new(client->tmpHeaders,LIST_HEAD);
+	if(!headers_it) {
+		curl_slist_free_all(headers);
+		list_destroy(client->tmpHeaders);
+		return RSGE_ERROR_MALLOC;
+	}
+
+	list_node_t* header_node;
+	while((header_node = list_iterator_next(headers_it))) {
+		char* headerStr = (char*)header_node->val;
+		char* value = strstr(headerStr,": ");
+		if(!value) value = strstr(headerStr,":");
+		else value++;
+		if(!value) continue;
+		value++;
+		client->headerCount++;
+	}
+	list_iterator_destroy(headers_it);
+
+	client->headers = malloc(sizeof(rsge_net_http_header_t)*client->headerCount);
+	if(!client->headers) {
+		curl_slist_free_all(headers);
+		list_destroy(client->tmpHeaders);
+		return RSGE_ERROR_MALLOC;
+	}
+
+	headers_it = list_iterator_new(client->tmpHeaders,LIST_HEAD);
+	if(!headers_it) {
+		free(client->headers);
+		curl_slist_free_all(headers);
+		list_destroy(client->tmpHeaders);
+		return RSGE_ERROR_MALLOC;
+	}
+
+	size_t headerIndex = 0;
+	while((header_node = list_iterator_next(headers_it))) {
+		char* headerStr = (char*)header_node->val;
+		int nameOff = 1;
+		char* value = strstr(headerStr,": ");
+		if(!value) value = strstr(headerStr,":");
+		else nameOff++;
+		if(!value) continue;
+		value += nameOff;
+
+		rsge_net_http_header_t* header = (rsge_net_http_header_t*)&client->headers[headerIndex++];
+		memset(header,0,sizeof(rsge_net_http_header_t));
+
+		header->value = value;
+
+		header->name = headerStr;
+		header->name[strlen(headerStr)-strlen(value)-nameOff] = 0;
+	}
+	list_iterator_destroy(headers_it);
+
+	curl_slist_free_all(headers);
+	list_destroy(client->tmpHeaders);
+	return RSGE_ERROR_NONE;
+}
+
+rsge_error_e rsge_net_http_client_disconnect(rsge_net_http_client_t* client) {
+	client->status = 0;
+	client->contentSize = 0;
+	client->headerCount = 0;
+	free(client->content);
+	free(client->headers);
+	return RSGE_ERROR_NONE;
+}
+
+rsge_error_e rsge_net_http_client_destroy(rsge_net_http_client_t* client) {
+	curl_easy_cleanup(client->curl);
+	free(client->defaultHeaders);
+	memset(client,0,sizeof(rsge_net_http_client_t));
 	return RSGE_ERROR_NONE;
 }

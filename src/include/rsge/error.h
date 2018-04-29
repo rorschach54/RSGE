@@ -85,7 +85,19 @@ typedef enum {
 	/**
 	 * Invalid bmp file.
 	 */
-	RSGE_ERROR_INVALID_BMP
+	RSGE_ERROR_INVALID_BMP,
+	/**
+	 * Network error.
+	 */
+	RSGE_ERROR_NET,
+	/**
+	 * Invalid HTTP method
+	 */
+	RSGE_ERROR_INVALID_HTTP_METHOD,
+	/**
+	 * libcurl error
+	 */
+	RSGE_ERROR_CURL
 } rsge_error_e;
 
 #endif

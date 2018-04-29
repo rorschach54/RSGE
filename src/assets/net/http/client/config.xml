@@ -1,5 +1,0 @@
-<httpClientConfig>
-	<headers>
-		<header name="Connection" value="keep-alive" />
-	</headers>
-</httpClientConfig>

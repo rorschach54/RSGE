@@ -6,6 +6,11 @@
 
 extern config_t rsge_libconfig_cfg;
 
+void rsge_sigint(int dummy) {
+	GLFWwindow* window = glfwGetCurrentContext();
+	if(window != NULL) glfwSetWindowShouldClose(window,GLFW_TRUE);
+}
+
 void error_callback(int error,const char* description) {
 	log_error("GLFW: %s",description);
 }
