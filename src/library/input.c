@@ -6,6 +6,10 @@
 
 list_t* rsge_input_devices;
 
+static int rsge_input_findcb(void (*cb)(rsge_input_device_t*,void*),rsge_input_event_t* event) {
+	return event->cb == cb;
+}
+
 rsge_error_e rsge_input_init() {
 	rsge_input_devices = list_new();
 	if(!rsge_input_devices) return RSGE_ERROR_MALLOC;
@@ -53,6 +57,7 @@ rsge_error_e rsge_input_registerdev(rsge_input_device_t* device) {
 	rsge_input_device_t* tmp_dev;
 	err = rsge_input_getdev_byname(&tmp_dev,device->name);
 	if(err == RSGE_ERROR_INVALID_DEVICE) {
+		device->callbacks->match = (int (*)(void*,void*))rsge_input_findcb;
 		list_node_t* node = list_node_new(device);
 		if(!node) return RSGE_ERROR_MALLOC;
 		list_rpush(rsge_input_devices,node);
@@ -226,23 +231,43 @@ rsge_error_e rsge_input_registerdev_fromFile(char* path) {
 }
 
 rsge_error_e rsge_input_emit(rsge_input_device_t* device) {
+	device->callbacks->match = (int (*)(void*,void*))rsge_input_findcb;
 	list_node_t* node;
 	list_iterator_t* it = list_iterator_new(device->callbacks,LIST_HEAD);
 	if(it == NULL) return RSGE_ERROR_MALLOC;
 	while((node = list_iterator_next(it))) {
-		void (*cb)(rsge_input_device_t*) = (void (*)(rsge_input_device_t*))node->val;
-		if(cb != NULL) cb(device);
+		rsge_input_event_t* event = (rsge_input_event_t*)node->val;
+		if(event->cb != NULL) event->cb(device,event->userdata);
 	}
 	list_iterator_destroy(it);
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_input_addcb(char* devname,void (*cb)(rsge_input_device_t*)) {
+rsge_error_e rsge_input_addcb(char* devname,void (*cb)(rsge_input_device_t*,void*),void* userdata) {
 	rsge_input_device_t* device;
 	rsge_error_e err = rsge_input_getdev_byname(&device,devname);
 	if(err != RSGE_ERROR_NONE) return err;
-	list_node_t* node = list_node_new(cb);
-	if(!node) return RSGE_ERROR_MALLOC;
+	device->callbacks->match = (int (*)(void*,void*))rsge_input_findcb;
+	rsge_input_event_t* event = malloc(sizeof(rsge_input_event_t));
+	if(!event) return RSGE_ERROR_MALLOC;
+	event->cb = cb;
+	event->userdata = userdata;
+	list_node_t* node = list_node_new(event);
+	if(!node) {
+		free(event);
+		return RSGE_ERROR_MALLOC;
+	}
 	list_rpush(device->callbacks,node);
+	return RSGE_ERROR_NONE;
+}
+
+rsge_error_e rsge_input_rmcb(char* devname,void (*cb)(rsge_input_device_t*,void*)) {
+	rsge_input_device_t* device;
+	rsge_error_e err = rsge_input_getdev_byname(&device,devname);
+	if(err != RSGE_ERROR_NONE) return err;
+	device->callbacks->match = (int (*)(void*,void*))rsge_input_findcb;
+	list_node_t* node = list_find(device->callbacks,cb);
+	if(!node) return RSGE_ERROR_MALLOC;
+	list_remove(device->callbacks,node);
 	return RSGE_ERROR_NONE;
 }

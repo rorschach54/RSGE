@@ -18,8 +18,6 @@ LIBRARY_LDFLAGS += -laudio
 else
 ifeq ($(CONFIG_AUDIO_BACKEND),alut)
 LIBRARY_LDFLAGS += -lalut
-else
-$(error "Invalid audio backend, $(CONFIG_AUDIO_BACKEND), for OpenAL")
 endif
 endif
 

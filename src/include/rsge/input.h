@@ -163,6 +163,18 @@ typedef struct {
 	list_t* callbacks;
 } rsge_input_device_t;
 
+typedef struct {
+	/**
+	 * \brief The callback.
+	 */
+	void (*cb)(rsge_input_device_t*,void*);
+	
+	/**
+	 * \brief The userdata.
+	 */
+	void* userdata;
+} rsge_input_event_t;
+
 /**
  * \fn rsge_error_e rsge_input_init()
  * \brief Initializes the input component of the game engine, this is called automatically.
@@ -211,13 +223,23 @@ rsge_error_e rsge_input_registerdev_fromFile(char* path);
 rsge_error_e rsge_input_emit(rsge_input_device_t* device);
 
 /**
- * \fn rsge_error_e rsge_input_addcb(char* devname,void (*cb)(rsge_input_device_t*));
+ * \fn rsge_error_e rsge_input_addcb(char* devname,void (*cb)(rsge_input_device_t*,void*),void* userdata)
  * \brief Adds a callback to the device.
+ * \param devname The name of the device.
+ * \param cb The callback function.
+ * \param userdata Any extra stuff that is stored.
+ * \return An error code.
+ */
+rsge_error_e rsge_input_addcb(char* devname,void (*cb)(rsge_input_device_t*,void*),void* userdata);
+
+/**
+ * \fn rsge_error_e rsge_input_rmcb(char* devname,void (*cb)(rsge_input_device_t*,void*))
+ * \brief Removes a callback from the device.
  * \param devname The name of the device.
  * \param cb The callback function.
  * \return An error code.
  */
-rsge_error_e rsge_input_addcb(char* devname,void (*cb)(rsge_input_device_t*));
+rsge_error_e rsge_input_rmcb(char* devname,void (*cb)(rsge_input_device_t*,void*));
 
 /**
  * \fn rsge_error_e rsge_input_getclipboard(char** str)

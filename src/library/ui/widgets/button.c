@@ -2,18 +2,63 @@
 #include <rsge/gfx/font.h>
 #include <rsge/ui/widgets/button.h>
 #include <rsge/assets.h>
+#include <rsge/input.h>
 #include <string.h>
 
 typedef struct {
     char* text;
     
     rsge_font_t font;
+    
+    rsge_ui_surface_t* ui;
 } rsge_ui_widget_button_t;
+
+static void rsge_ui_widget_button_mouse_callback(rsge_input_device_t* device,void* userdata) {
+    rsge_ui_widget_t* widget = (rsge_ui_widget_t*)userdata;
+    rsge_ui_widget_button_t* button = (rsge_ui_widget_button_t*)widget->impl;
+    rsge_error_e err;
+    
+    /* Load the default style */
+    xmlNodePtr cur = widget->baseXML.node->children;
+    while(cur != NULL) {
+        if(!xmlStrcmp(cur->name,(const xmlChar*)"styles")) {
+            err = rsge_ui_widget_loadStyles(widget,button->ui,widget->baseXML.doc,cur->children);
+            if(err != RSGE_ERROR_NONE) continue;
+            break;
+        }
+        cur = cur->next;
+    }
+    
+    list_node_t* node;
+    list_iterator_t* it = list_iterator_new(widget->events,LIST_HEAD);
+    if(it == NULL) return;
+    while((node = list_iterator_next(it))) {
+        rsge_ui_widget_event_t* event = (rsge_ui_widget_event_t*)node->val;
+        /* Check mouse X position */
+        if(widget->x-device->mouse.posX >= 0 && widget->x-device->mouse.posX < widget->width) {
+            /* Check mouse Y position */
+            if(widget->y-device->mouse.posY >= 0 && widget->y-device->mouse.posX < widget->height) {
+                /* Find which button was pressed */
+                if(device->mouse.buttonLeft && !strcmp(event->type,"mouse.click")) {
+                    err = rsge_ui_widget_loadStyles(widget,button->ui,widget->baseXML.doc,event->stylesNode);
+                    if(err != RSGE_ERROR_NONE) continue;
+                    
+                    // TODO: call UI event callbacks (onclick, onactive)
+                } else if(!device->mouse.buttonLeft && !device->mouse.buttonMiddle && !device->mouse.buttonRight && !strcmp(event->type,"mouse.hover")) {
+                    err = rsge_ui_widget_loadStyles(widget,button->ui,widget->baseXML.doc,event->stylesNode);
+                    if(err != RSGE_ERROR_NONE) continue;
+                }
+            }
+        }
+    }
+    list_iterator_destroy(it);
+}
 
 rsge_error_e rsge_ui_widget_button_destroy(rsge_ui_widget_t* widget) {
     rsge_ui_widget_button_t* button = (rsge_ui_widget_button_t*)widget->impl;
     
     rsge_font_destroy(&button->font);
+    rsge_input_rmcb("mouse",rsge_ui_widget_button_mouse_callback);
     
     free(button);
     memset(widget,0,sizeof(rsge_ui_widget_t));
@@ -95,6 +140,7 @@ rsge_error_e rsge_ui_widget_button_create(rsge_ui_widget_t* widget,rsge_ui_surfa
     
     rsge_ui_widget_button_t* button = malloc(sizeof(rsge_ui_widget_button_t));
     if(!button) return RSGE_ERROR_MALLOC;
+    button->ui = ui;
     
     button->text = text;
     widget->destroy = rsge_ui_widget_button_destroy;
@@ -114,6 +160,12 @@ rsge_error_e rsge_ui_widget_button_create(rsge_ui_widget_t* widget,rsge_ui_surfa
     }
     
     widget->impl = (void*)button;
+    
+    err = rsge_input_addcb("mouse",rsge_ui_widget_button_mouse_callback,widget);
+    if(err != RSGE_ERROR_NONE) {
+        free(button);
+        return err;
+    }
     return RSGE_ERROR_NONE;
 }
 
