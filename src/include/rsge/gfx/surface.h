@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#define RSGE_SURFACE_FLAG_MIPMAP (1 << 0)
+
 /**
  * \struct rsge_surface_t rsge/gfx/surface.h
  * \brief A structure that defines a surface

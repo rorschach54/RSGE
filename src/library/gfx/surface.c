@@ -22,7 +22,7 @@ rsge_error_e rsge_surface_destroy(rsge_surface_t* surface) {
 	if(surface->texture != 0) {
 		glDeleteTextures(1,&surface->texture);
 	}
-	if(surface->list != 0) {
+	if(surface->list != 0 && !(surface->flags & RSGE_SURFACE_FLAG_MIPMAP)) {
 		glDeleteLists(1,surface->list);
 	}
 	free(surface->buffer);
@@ -62,42 +62,50 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 	//glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 	//glPixelStorei(GL_PACK_ALIGNMENT,1);
 
-	if(surface->bpp == 4) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGBA,GL_UNSIGNED_BYTE,surface->buffer);
-	else if(surface->bpp == 3) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGB,GL_UNSIGNED_BYTE,surface->buffer);
-	else return RSGE_ERROR_INVALID_BPP;
-
-	float w = surface->width*sx;
-	float h = surface->height*sy;
-
-	glEnable(GL_TEXTURE_2D);
-	if(surface->list == 0) {
-		surface->list = glGenLists(1);
-		glNewList(surface->list,GL_COMPILE);
-		
-		glPushMatrix();
-		glBegin(GL_QUADS);
-
-		glTexCoord2f(0.0f,1.0f);
-		glVertex2f(0.0f,0.0f);
-
-		glTexCoord2f(0.0f,0.0f);
-		glVertex2f(0.0f,h);
-
-		glTexCoord2f(1.0f,0.0f);
-		glVertex2f(w,h);
-
-		glTexCoord2f(1.0f,1.0f);
-		glVertex2f(w,0.0f);
-
-		glEnd();
-		glPopMatrix();
-		glEndList();
+	if(surface->flags & RSGE_SURFACE_FLAG_MIPMAP) {
+		if(surface->bpp == 4) gluBuild2DMipmaps(GL_TEXTURE_2D,3,surface->width,surface->height,GL_RGBA,GL_UNSIGNED_BYTE,surface->buffer);
+		else if(surface->bpp == 3) gluBuild2DMipmaps(GL_TEXTURE_2D,3,surface->width,surface->height,GL_RGB,GL_UNSIGNED_BYTE,surface->buffer);
+		else return RSGE_ERROR_INVALID_BPP;
+	} else {
+		if(surface->bpp == 4) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGBA,GL_UNSIGNED_BYTE,surface->buffer);
+		else if(surface->bpp == 3) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGB,GL_UNSIGNED_BYTE,surface->buffer);
+		else return RSGE_ERROR_INVALID_BPP;
 	}
-	glPushMatrix();
-	glTranslatef(0.0f,0.0f,0.0f);
-	glTranslatef(surface->pos[0],surface->pos[1],surface->pos[2]);
-	glCallList(surface->list);
-	glPopMatrix();
+
+	if(!(surface->flags & RSGE_SURFACE_FLAG_MIPMAP)) {
+		float w = surface->width*sx;
+		float h = surface->height*sy;
+	
+		glEnable(GL_TEXTURE_2D);
+		if(surface->list == 0) {
+			surface->list = glGenLists(1);
+			glNewList(surface->list,GL_COMPILE);
+			
+			glPushMatrix();
+			glBegin(GL_QUADS);
+	
+			glTexCoord2f(0.0f,1.0f);
+			glVertex2f(0.0f,0.0f);
+	
+			glTexCoord2f(0.0f,0.0f);
+			glVertex2f(0.0f,h);
+	
+			glTexCoord2f(1.0f,0.0f);
+			glVertex2f(w,h);
+	
+			glTexCoord2f(1.0f,1.0f);
+			glVertex2f(w,0.0f);
+	
+			glEnd();
+			glPopMatrix();
+			glEndList();
+		}
+		glPushMatrix();
+		glTranslatef(0.0f,0.0f,0.0f);
+		glTranslatef(surface->pos[0],surface->pos[1],surface->pos[2]);
+		glCallList(surface->list);
+		glPopMatrix();
+	}
 	return RSGE_ERROR_NONE;
 }
 
