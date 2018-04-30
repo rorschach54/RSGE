@@ -53,9 +53,6 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 	glBindTexture(GL_TEXTURE_2D,surface->texture);
 	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 
@@ -63,10 +60,16 @@ rsge_error_e rsge_surface_render(rsge_surface_t* surface,float sx,float sy) {
 	//glPixelStorei(GL_PACK_ALIGNMENT,1);
 
 	if(surface->flags & RSGE_SURFACE_FLAG_MIPMAP) {
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+		
 		if(surface->bpp == 4) gluBuild2DMipmaps(GL_TEXTURE_2D,3,surface->width,surface->height,GL_RGBA,GL_UNSIGNED_BYTE,surface->buffer);
 		else if(surface->bpp == 3) gluBuild2DMipmaps(GL_TEXTURE_2D,3,surface->width,surface->height,GL_RGB,GL_UNSIGNED_BYTE,surface->buffer);
 		else return RSGE_ERROR_INVALID_BPP;
 	} else {
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		
 		if(surface->bpp == 4) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGBA,GL_UNSIGNED_BYTE,surface->buffer);
 		else if(surface->bpp == 3) glTexImage2D(GL_TEXTURE_2D,0,3,surface->width,surface->height,0,GL_RGB,GL_UNSIGNED_BYTE,surface->buffer);
 		else return RSGE_ERROR_INVALID_BPP;
