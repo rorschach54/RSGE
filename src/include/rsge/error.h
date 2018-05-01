@@ -2,6 +2,10 @@
 #define __RSGE_ERROR_H_ 1
 
 /**
+ * \headerfile src/include/rsge/error.h <rsge/error.h>
+ */
+
+/**
  * \enum rsge_error_e
  * \brief An enum containing all error codes.
  */

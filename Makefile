@@ -37,4 +37,7 @@ all: build
 clean:
 	@rm -rf $(BIN) $(CONFIG_SRC)/Makefile $(INCLUDE_SRC)/rsge/config.h $(GLAD_PATH) $(LIST_BIN) $(LOGC_BIN)
 
+doc:
+	@doxygen $(CONFIG_SRC)/doxygen.cfg
+
 include $(BUILD_SRC)/Makefile

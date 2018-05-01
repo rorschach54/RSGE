@@ -6,6 +6,10 @@
 #include <rsge/error.h>
 
 /**
+ * \headerfile src/include/rsge/assets.h <rsge/assets.h>
+ */
+
+/**
  * \struct rsge_asset_loc_t rsge/assets.h
  * \brief An asset location.
  */
