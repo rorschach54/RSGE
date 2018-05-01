@@ -8,6 +8,10 @@
 #include <string.h>
 
 #define RSGE_SURFACE_FLAG_MIPMAP (1 << 0)
+#define RSGE_SURFACE_FLAG_FB (1 << 1)
+#define RSGE_SURFACE_FLAG_WRAP_REPEAT (1 << 2)
+#define RSGE_SURFACE_FLAG_WRAP_MIRROR_REPEAT (1 << 3)
+#define RSGE_SURFACE_FLAG_WRAP_CLAMP (1 << 4)
 
 /**
  * \struct rsge_surface_t rsge/gfx/surface.h
@@ -43,6 +47,11 @@ typedef struct {
 	 * \brief The texture ID used for rendering.
 	 */
 	GLuint texture;
+
+	/**
+	 * \brief The framebuffer ID used for rendering.
+	 */
+	GLuint fb;
 
 	/**
 	 * \brief The display list ID used for rendering.

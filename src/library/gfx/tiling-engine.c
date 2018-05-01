@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-rsge_error_e rsge_tiling_create(rsge_tiling_t* tiling,int** map,int width,int height,rsge_surface_t** surfaces,int surfaceCount) {
+rsge_error_e rsge_tiling_create(rsge_tiling_t* tiling,int** map,int width,int height,rsge_surface_t** surfaces,int surfaceCount,int flags) {
     memset(tiling,0,sizeof(rsge_tiling_t));
     
+	tiling->flags = flags;
     tiling->textureCount = surfaceCount;
     tiling->textures = malloc(sizeof(GLuint)*tiling->textureCount);
     if(!tiling->textures) return RSGE_ERROR_MALLOC;
@@ -44,7 +45,8 @@ rsge_error_e rsge_tiling_render(rsge_tiling_t* tiling) {
                 glBindTexture(GL_TEXTURE_2D,tiling->textures[tile-1]);
                 
                 glPushMatrix();
-                glTranslatef(tiling->pos[0]+(x*1.0f),tiling->pos[1],tiling->pos[2]+(z*1.0f));
+				if(tiling->flags & RSGE_TILING_FLAG_TOPDOWN) glTranslatef(tiling->pos[0]+(x*1.0f),tiling->pos[1]+(z*1.0f),tiling->pos[2]);
+                else glTranslatef(tiling->pos[0]+(x*1.0f),tiling->pos[1],tiling->pos[2]+(z*1.0f));
                 
                 glBegin(GL_QUADS);
                 

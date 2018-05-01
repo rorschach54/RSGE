@@ -97,7 +97,11 @@ typedef enum {
 	/**
 	 * libcurl error
 	 */
-	RSGE_ERROR_CURL
+	RSGE_ERROR_CURL,
+	/**
+	 * Invalid flag
+	 */
+	RSGE_ERROR_INVALID_FLAG
 } rsge_error_e;
 
 #endif
