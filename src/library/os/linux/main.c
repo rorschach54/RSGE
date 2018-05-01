@@ -2,6 +2,7 @@
 #include <rsge/gfx/camera.h>
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/lighting.h>
+#include <rsge/physics/init.h>
 #include <rsge/snd/init.h>
 #include <rsge/assets.h>
 #include <rsge/config.h>
@@ -405,6 +406,21 @@ int main(int argc,char** argv) {
 		return EXIT_FAILURE;
 	}
 	
+	log_debug("Physics initializing");
+	err = rsge_physics_init();
+	if(err != RSGE_ERROR_NONE) {
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		config_destroy(&rsge_libconfig_cfg);
+		rsge_assets_uninit();
+		curl_global_cleanup();
+		rsge_input_deinit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
+	
 	log_debug("UI initializing");
 	err = rsge_ui_init();
 	if(err != RSGE_ERROR_NONE) {
@@ -415,6 +431,7 @@ int main(int argc,char** argv) {
 		rsge_assets_uninit();
 		curl_global_cleanup();
 		rsge_input_deinit();
+		rsge_physics_deinit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		return EXIT_FAILURE;
@@ -471,6 +488,7 @@ int main(int argc,char** argv) {
 		rsge_ui_deinit();
 		rsge_assets_uninit();
 		rsge_input_deinit();
+		rsge_physics_deinit();
 		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
@@ -511,6 +529,7 @@ int main(int argc,char** argv) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
+		rsge_physics_deinit();
 		rsge_ui_deinit();
 		curl_global_cleanup();
 		rsge_assets_uninit();
@@ -525,6 +544,7 @@ int main(int argc,char** argv) {
 	rsge_audio_uninit();
 	rsge_assets_uninit();
 	rsge_input_deinit();
+	rsge_physics_deinit();
 
 #if CONFIG_USE_FREETYPE == 1
 	FT_Done_FreeType(rsge_freetype_lib);

@@ -14,6 +14,9 @@ LIBRARY_OBJS += $(LIBRARY_BIN)/net/ftp.o $(LIBRARY_BIN)/net/http.o $(LIBRARY_BIN
 LIBRARY_OBJS += $(LIBRARY_BIN)/os/$(CONFIG_OS)/callbacks.o $(LIBRARY_BIN)/os/$(CONFIG_OS)/input.o \
 $(LIBRARY_BIN)/os/$(CONFIG_OS)/main.o $(LIBRARY_BIN)/os/$(CONFIG_OS)/settings.o \
 $(LIBRARY_BIN)/os/$(CONFIG_OS)/window.o
+LIBRARY_OBJS += $(LIBRARY_BIN)/physics/collision/box.o $(LIBRARY_BIN)/physics/collision/shape.o \
+$(LIBRARY_BIN)/physics/collision/sphere.o
+LIBRARY_OBJS += $(LIBRARY_BIN)/physics/init.o $(LIBRARY_BIN)/physics/rigid-body.o $(LIBRARY_BIN)/physics/world.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/snd/buffer.o $(LIBRARY_BIN)/snd/init.o $(LIBRARY_BIN)/snd/source.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/ui/xml/widget.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/ui/widgets/button.o $(LIBRARY_BIN)/ui/widgets/label.o
@@ -52,6 +55,11 @@ $(LOGC_BIN)/%.o: $(LOGC_SRC)/%.c
 	@echo "Compiling $<"
 	@mkdir -p $(@D)
 	@$(CC) -o $@ $< $(LIBRARY_CFLAGS) -DLOG_USE_COLOR
+
+$(LIBRARY_BIN)/%.o: $(LIBRARY_SRC)/%.cc $(INCLUDE_SRC)
+	@echo "Compiling $<"
+	@mkdir -p $(@D)
+	@$(CXX) -o $@ $< $(LIBRARY_CXXFLAGS)
 
 $(LIBRARY_BIN)/%.o: $(LIBRARY_SRC)/%.c $(INCLUDE_SRC)
 	@echo "Compiling $<"

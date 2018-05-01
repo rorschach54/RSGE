@@ -1,9 +1,10 @@
 AR=ar
 CC=gcc
-LD=gcc
+CXX=g++
+LD=g++
 PKG_CONFIG=pkg-config
 
-LIBRARY_LIBS=glfw3 libconfig libxml-2.0
+LIBRARY_LIBS=glfw3 libconfig libxml-2.0 bullet
 
 ifeq ($(CONFIG_USE_FREETYPE),y)
 LIBRARY_LIBS += freetype2
@@ -35,3 +36,9 @@ ifeq ($(CONFIG_LINKMODE),shared)
 LIBRARY_CFLAGS += -fpic
 LIBRARY_LDFLAGS += -shared
 endif
+
+LIBRARY_CXXFLAGS=$(LIBRARY_CFLAGS) -fPIC
+
+IDE_CFLAGS += -std=gnu99
+EXAMPLES_CFLAGS += -std=gnu99
+LIBRARY_CFLAGS += -std=gnu99

@@ -47,46 +47,62 @@ static const char *level_colors[] = {
 };
 #endif
 
-
+#ifdef __cplusplus
+extern
+#endif
 static void lock(void)   {
   if (L.lock) {
     L.lock(L.udata, 1);
   }
 }
 
-
+#ifdef __cplusplus
+extern
+#endif
 static void unlock(void) {
   if (L.lock) {
     L.lock(L.udata, 0);
   }
 }
 
-
+#ifdef __cplusplus
+extern
+#endif
 void log_set_udata(void *udata) {
   L.udata = udata;
 }
 
-
+#ifdef __cplusplus
+extern
+#endif
 void log_set_lock(log_LockFn fn) {
   L.lock = fn;
 }
 
-
+#ifdef __cplusplus
+extern "C"
+#endif
 void log_set_fp(FILE *fp) {
   L.fp = fp;
 }
 
-
+#ifdef __cplusplus
+extern
+#endif
 void log_set_level(int level) {
   L.level = level;
 }
 
-
+#ifdef __cplusplus
+extern
+#endif
 void log_set_quiet(int enable) {
   L.quiet = enable ? 1 : 0;
 }
 
-
+#ifdef __cplusplus
+extern
+#endif
 void log_log(int level, const char *file, int line, const char *fmt, ...) {
   if (level < L.level) {
     return;
