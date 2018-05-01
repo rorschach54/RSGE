@@ -43,6 +43,11 @@ typedef struct {
      * \brief The base position.
      */
     vec3 pos;
+    
+    /**
+     * \brief The display list used.
+     */
+    GLuint list;
 } rsge_tiling_t;
 
 /**

@@ -32,40 +32,49 @@ rsge_error_e rsge_tiling_create(rsge_tiling_t* tiling,int** map,int width,int he
 }
 
 rsge_error_e rsge_tiling_destroy(rsge_tiling_t* tiling) {
+    if(tiling->list != 0) glDeleteLists(1,tiling->list);
     free(tiling->textures);
     memset(tiling,0,sizeof(rsge_tiling_t));
     return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_tiling_render(rsge_tiling_t* tiling) {
-    for(int z = 0;z < tiling->height;z++) {
-        for(int x = 0;x < tiling->width;x++) {
-            int tile = tiling->map[z][x];
-            if(tile > 0 && tile-1 < tiling->textureCount && tile-1 >= 0) {
-                glBindTexture(GL_TEXTURE_2D,tiling->textures[tile-1]);
-                
-                glPushMatrix();
-				if(tiling->flags & RSGE_TILING_FLAG_TOPDOWN) glTranslatef(tiling->pos[0]+(x*1.0f),tiling->pos[1]+(z*1.0f),tiling->pos[2]);
-                else glTranslatef(tiling->pos[0]+(x*1.0f),tiling->pos[1],tiling->pos[2]+(z*1.0f));
-                
-                glBegin(GL_QUADS);
-                
-                glTexCoord2d(0.0,0.0);
-                glVertex3f(0.0,0.0,0.0);
-                
-                glTexCoord2d(1.0,0.0);
-                glVertex3f(1.0,0.0,0.0);
-
-                glTexCoord2d(1.0,1.0);
-                glVertex3f(1.0,1.0,0.0);
-
-                glTexCoord2d(0.0,1.0);
-                glVertex3f(0.0,1.0,0.0);
-                glEnd();
-                
-                glPopMatrix();
+    if(tiling->list == 0) {
+        tiling->list = glGenLists(1);
+		glNewList(tiling->list,GL_COMPILE);
+        for(int z = 0;z < tiling->height;z++) {
+            for(int x = 0;x < tiling->width;x++) {
+                int tile = tiling->map[z][x];
+                if(tile > 0 && tile-1 < tiling->textureCount && tile-1 >= 0) {
+                    glBindTexture(GL_TEXTURE_2D,tiling->textures[tile-1]);
+                    
+                    glPushMatrix();
+    				if(tiling->flags & RSGE_TILING_FLAG_TOPDOWN) glTranslatef(tiling->pos[0]+(x*1.0f),tiling->pos[1]+(z*1.0f),tiling->pos[2]);
+                    else glTranslatef(tiling->pos[0]+(x*1.0f),tiling->pos[1],tiling->pos[2]+(z*1.0f));
+                    
+                    glBegin(GL_QUADS);
+                    
+                    glTexCoord2d(0.0,0.0);
+                    glVertex3f(0.0,0.0,0.0);
+                    
+                    glTexCoord2d(1.0,0.0);
+                    glVertex3f(1.0,0.0,0.0);
+    
+                    glTexCoord2d(1.0,1.0);
+                    glVertex3f(1.0,1.0,0.0);
+    
+                    glTexCoord2d(0.0,1.0);
+                    glVertex3f(0.0,1.0,0.0);
+                    glEnd();
+                    
+                    glPopMatrix();
+                }
             }
         }
+		glEndList();
     }
+    glPushMatrix();
+	glCallList(tiling->list);
+	glPopMatrix();
     return RSGE_ERROR_NONE;
 }
