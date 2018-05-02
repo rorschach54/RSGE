@@ -1,6 +1,11 @@
 #ifndef __RSGE_SND_INIT_H_
 #define __RSGE_SND_INIT_H_ 1
 
+/** \file src/include/rsge/snd/init.h
+ * \brief Audio initialization
+ * \author Spaceboy Ross
+ */
+
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <rsge/config.h>
