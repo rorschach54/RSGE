@@ -11,8 +11,12 @@ rsge_error_e rsge_ui_widget_fromXMLNode(rsge_ui_widget_t* widget,rsge_ui_surface
 	return RSGE_ERROR_INVALID_WIDGET;
 }
 
-rsge_error_e rsge_ui_widget_fromAssets(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,rsge_asset_t* asset) {
-	xmlDocPtr doc = xmlReadMemory((char*)asset->data,asset->size,asset->name,NULL,0);
+rsge_error_e rsge_ui_widget_fromAssets(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,char* path) {
+	char* data;
+	size_t sz;
+	rsge_error_e err = rsge_asset_read(path,&data,&sz);
+	if(err != RSGE_ERROR_NONE) return err;
+	xmlDocPtr doc = xmlReadMemory(data,sz,path,NULL,0);
 	if(doc == NULL) return RSGE_ERROR_LIBXML;
 	xmlNodePtr node = xmlDocGetRootElement(doc);
 	if(node == NULL) {
