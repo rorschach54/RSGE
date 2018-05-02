@@ -1,6 +1,11 @@
 #ifndef __RSGE_GAME_H_
 #define __RSGE_GAME_H_ 1
 
+/** \file src/include/rsge/game.h
+ * \brief A header file to be used for the game itself.
+ * \author Spaceboy Ross
+ */
+
 #include <rsge/error.h>
 #include <rsge/input.h>
 

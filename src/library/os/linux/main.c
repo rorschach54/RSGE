@@ -15,6 +15,7 @@
 #include <log.h>
 #include <signal.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern void rsge_callbacks_init();
 extern void error_callback(int error,const char* description);
 extern void fb_resize(GLFWwindow* window,int width,int height);
@@ -555,3 +556,4 @@ int main(int argc,char** argv) {
 	glfwTerminate();
 	return exitStatus;
 }
+#endif

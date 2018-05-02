@@ -1,13 +1,14 @@
 #ifndef __RSGE_ASSETS_H_
 #define __RSGE_ASSETS_H_ 1
 
+/** \file src/include/rsge/assets.h
+ * \brief The assets component of RSGE.
+ * \author Spaceboy Ross
+ */
+
 #include <rsge/assets/def.h>
 #include <rsge/assets/file.h>
 #include <rsge/error.h>
-
-/**
- * \headerfile src/include/rsge/assets.h <rsge/assets.h>
- */
 
 /**
  * \struct rsge_asset_loc_t rsge/assets.h

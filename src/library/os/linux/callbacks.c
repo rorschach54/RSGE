@@ -4,6 +4,7 @@
 #include <rsge/settings.h>
 #include <log.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern config_t rsge_libconfig_cfg;
 
 void rsge_sigint(int dummy) {
@@ -114,3 +115,4 @@ void rsge_callbacks_init() {
 	glfwSetScrollCallback(window,scroll_callback);
 	glfwSetDropCallback(window,drop_callback);
 }
+#endif

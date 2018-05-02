@@ -2,6 +2,7 @@
 #include <rsge/gfx/image.h>
 #include <rsge/input.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 rsge_error_e rsge_input_getclipboard(char** str) {
 	GLFWwindow* window = glfwGetCurrentContext();
 	*str = (char*)glfwGetClipboardString(window);
@@ -44,3 +45,4 @@ rsge_error_e rsge_input_setmousemode(rsge_input_mouse_mode_e mode) {
 	else if(mode == RSGE_INPUT_MOUSE_MODE_HIDDEN) glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_HIDDEN);
 	return RSGE_ERROR_NONE;
 }
+#endif

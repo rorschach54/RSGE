@@ -1,8 +1,9 @@
 #ifndef __RSGE_ERROR_H_
 #define __RSGE_ERROR_H_ 1
 
-/**
- * \headerfile src/include/rsge/error.h <rsge/error.h>
+/** \file src/include/rsge/error.h
+ * \brief The error codes and error handling functions.
+ * \author Spaceboy Ross
  */
 
 /**

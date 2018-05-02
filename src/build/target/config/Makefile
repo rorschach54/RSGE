@@ -20,6 +20,9 @@ config:
 	@mkdir -p $(CONFIG_SRC)
 	@printf "#ifndef __RSGE_CONFIG_H_\n" > $(INCLUDE_SRC)/rsge/config.h
 	@printf "#define __RSGE_CONFIG_H_ 1\n\n" >> $(INCLUDE_SRC)/rsge/config.h
+	@printf "/** \\\\file src/include/rsge/config.h\n" >> $(INCLUDE_SRC)/rsge/config.h
+	@printf " * \\\\brief The configuration for the game engine.\n" >> $(INCLUDE_SRC)/rsge/config.h
+	@printf " */\n\n" >> $(INCLUDE_SRC)/rsge/config.h
 	@printf "#define CONFIG_OS $(CONFIG_OS)\n" >> $(INCLUDE_SRC)/rsge/config.h
 	@printf "#define CONFIG_AUDIO_BACKEND $(CONFIG_AUDIO_BACKEND)\n" >> $(INCLUDE_SRC)/rsge/config.h
 	@printf "#define CONFIG_OS_STR \"$(CONFIG_OS)\"\n" >> $(INCLUDE_SRC)/rsge/config.h
