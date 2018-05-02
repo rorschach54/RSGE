@@ -1,17 +1,37 @@
 #ifndef __RSGE_GFX_SHAPE_H_
 #define __RSGE_GFX_SHAPE_H_ 1
 
+/** \file src/include/rsge/gfx/shape.h
+ * \brief Shape stuff
+ * \author Spaceboy Ross
+ */
+
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/shader.h>
 #include <rsge/error.h>
 #include <linmath.h>
 #include <stdint.h>
 
+/**
+ * \brief Enable color.
+ */
 #define RSGE_SHAPE_VERT_FLAG_COLOR (1 << 1)
+/**
+ * \brief Enable secondary color.
+ */
 #define RSGE_SHAPE_VERT_FLAG_2NDCOLOR (2 << 1)
+/**
+ * \brief Enable fog.
+ */
 #define RSGE_SHAPE_VERT_FLAG_FOG (3 << 1)
+/**
+ * \brief Enable texturing.
+ */
 #define RSGE_SHAPE_VERT_FLAG_TEXTURE (4 << 1)
 
+/**
+ * \brief Enable shadows.
+ */
 #define RSGE_SHAPE_FLAG_SHADOWS (1 << 1)
 
 /**
@@ -110,25 +130,38 @@ typedef struct {
 	 * \brief Shader program.
 	 */
 	rsge_shaderprg_t shaderProg;
-	
+
+	/**
+	 * \brief The OpenGL display list used.
+	 */
 	GLuint list;
+
+	/**
+	 * \brief The glBegin mode to use.
+	 */
 	GLenum mode;
 
 	/**
 	 * \brief The texture ID, used when it's value is not zero.
 	 */
 	GLuint texture;
+
+	/**
+	 * \brief The texture mode to use.
+	 */
 	GLenum textureMode;
 } rsge_shape_t;
 
 /**
  * \fn rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount,uint8_t flags)
  * \brief Creates a new shape.
- * \param shape The pointer to the shape.
- * \param mode The GL rendering mode to use.
- * \param vertices An array of vertices.
- * \param verticeCount The number of vertices.
- * \param flags The flags to use.
+ * \param[out] shape The pointer to the shape.
+ * \param[in] mode The GL rendering mode to use.
+ * \param[in] vertices An array of vertices.
+ * \param[in] verticeCount The number of vertices.
+ * \param[in] materials The materials to use.
+ * \param[in] materialCount The number of materials.
+ * \param[in] flags The flags to use.
  * \return An error code.
  */
 rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount,uint8_t flags);
@@ -136,7 +169,7 @@ rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t
 /**
  * \fn rsge_error_e rsge_shape_destroy(rsge_shape_t* shape)
  * \brief Destroyes the shape.
- * \param shape The pointer to the shape.
+ * \param[out] shape The pointer to the shape.
  * \return An error code.
  */
 rsge_error_e rsge_shape_destroy(rsge_shape_t* shape);
@@ -144,7 +177,7 @@ rsge_error_e rsge_shape_destroy(rsge_shape_t* shape);
 /**
  * \fn rsge_error_e rsge_shape_render(rsge_shape_t* shape)
  * \brief Renders the shape.
- * \param shape The pointer to the shape.
+ * \param[out] shape The pointer to the shape.
  * \return An error code.
  */
 rsge_error_e rsge_shape_render(rsge_shape_t* shape);

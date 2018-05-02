@@ -1,6 +1,11 @@
 #ifndef __RSGE_SND_BUFFER_H_
 #define __RSGE_SND_BUFFER_H_ 1
 
+/** \file src/include/rsge/snd/buffer.h
+ * \brief Audio buffer
+ * \author Spaceboy Ross
+ */
+
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <rsge/config.h>
@@ -15,6 +20,9 @@
 #include <AL/alut.h>
 #endif
 
+/** \struct rsge_audio_buffer_t src/include/rsge/snd/buffer.h rsge/snd/buffer.h
+ * \brief An audio buffer.
+ */
 typedef struct {
     /**
      * \brief The OpenAL buffer ID.

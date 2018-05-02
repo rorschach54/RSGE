@@ -4,13 +4,14 @@
 #include <rsge/assets.h>
 #include <string.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct {
     char* text;
     
     rsge_font_t font;
 } rsge_ui_widget_label_t;
 
-rsge_error_e rsge_ui_widget_label_destroy(rsge_ui_widget_t* widget) {
+static rsge_error_e rsge_ui_widget_label_destroy(rsge_ui_widget_t* widget) {
     rsge_ui_widget_label_t* label = (rsge_ui_widget_label_t*)widget->impl;
     
     rsge_font_destroy(&label->font);
@@ -20,7 +21,7 @@ rsge_error_e rsge_ui_widget_label_destroy(rsge_ui_widget_t* widget) {
     return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_ui_widget_label_update(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui) {
+static rsge_error_e rsge_ui_widget_label_update(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui) {
     rsge_ui_widget_label_t* label = (rsge_ui_widget_label_t*)widget->impl;
     rsge_error_e err;
     
@@ -126,3 +127,4 @@ rsge_error_e rsge_ui_widget_label_fromXMLNode(rsge_ui_widget_t* widget,rsge_ui_s
     
     return RSGE_ERROR_NONE;
 }
+#endif

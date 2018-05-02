@@ -1,6 +1,11 @@
 #ifndef __RSGE_SND_SOURCE_H_
 #define __RSGE_SND_SOURCE_H_ 1
 
+/** \file src/include/rsge/snd/source.h
+ * \brief Audio source.
+ * \author Spaceboy Ross
+ */
+
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <rsge/snd/buffer.h>
@@ -17,6 +22,9 @@
 #include <AL/alut.h>
 #endif
 
+/** \struct rsge_audio_source_t src/include/rsge/snd/source.h rsge/snd/source.h
+ * \brief Audio source
+ */
 typedef struct {
     /**
      * \brief The OpenAL source ID.

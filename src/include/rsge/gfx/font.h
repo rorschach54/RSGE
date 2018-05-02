@@ -62,9 +62,9 @@ typedef struct rsge_font {
 /**
  * \fn rsge_error_e rsge_font_fromFile(rsge_font_t* font,char* path,size_t sz)
  * \brief Loads a font from an asset file.
- * \param font The pointer to a font.
- * \param path The path to the asset.
- * \param sz The size to make the font
+ * \param[out] font The pointer to a font.
+ * \param[in] path The path to the asset.
+ * \param[in] sz The size to make the font
  * \return An error code.
  */
 rsge_error_e rsge_font_fromFile(rsge_font_t* font,char* path,size_t sz);

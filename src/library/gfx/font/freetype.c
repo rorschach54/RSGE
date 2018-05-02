@@ -4,13 +4,13 @@
 
 extern FT_Library rsge_freetype_lib;
 
-rsge_error_e rsge_font_freetype_destroy(rsge_font_t* font) {
+static rsge_error_e rsge_font_freetype_destroy(rsge_font_t* font) {
 	free((rsge_font_freetype_t*)font->impl);
 	memset(font,0,sizeof(rsge_font_freetype_t));
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_font_freetype_render(rsge_font_t* font,rsge_surface_t* surface,char* text,int color[4]) {
+static rsge_error_e rsge_font_freetype_render(rsge_font_t* font,rsge_surface_t* surface,char* text,int color[4]) {
 	/* Get the font implementation structure */
 	rsge_font_freetype_t* ft = (rsge_font_freetype_t*)font->impl;
 

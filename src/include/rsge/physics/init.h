@@ -1,6 +1,11 @@
 #ifndef __RSGE_PHYSICS_INIT_H_
 #define __RSGE_PHYSICS_INIT_H_ 1
 
+/** \file src/include/rsge/physics/init.h
+ * \brief Physics initialization.
+ * \author Spaceboy Ross
+ */
+
 #include <rsge/error.h>
 #ifdef __cplusplus
 #include <btBulletDynamicsCommon.h>

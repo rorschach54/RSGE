@@ -1,6 +1,11 @@
 #ifndef __RSGE_GFX_COLORS_H_
 #define __RSGE_GFX_COLORS_H_ 1
 
+/** \file src/include/rsge/gfx/colors.h
+ * \brief Just a bunch of macro's that defines colors
+ * \author Spaceboy Ross
+ */
+
 #define RSGE_COLOR_RGBA(r,g,b,a) ((int[4]){r,g,b,a})
 #define RSGE_COLOR_RGB(r,g,b) RSGE_COLOR_RGBA(r,g,b,0xFF)
 

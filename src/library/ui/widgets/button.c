@@ -5,6 +5,7 @@
 #include <rsge/input.h>
 #include <string.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct {
     char* text;
     
@@ -178,3 +179,4 @@ rsge_error_e rsge_ui_widget_button_fromXMLNode(rsge_ui_widget_t* widget,rsge_ui_
     
     return RSGE_ERROR_NONE;
 }
+#endif

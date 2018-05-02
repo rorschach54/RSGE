@@ -1,11 +1,19 @@
 #ifndef __RSGE_GFX_PARTICLE_ENGINE_H_
 #define __RSGE_GFX_PARTICLE_ENGINE_H_ 1
 
+/** \file src/include/rsge/gfx/particle-engine.h
+ * \brief Particle stuff
+ * \author Spaceboy Ross
+ */
+
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/surface.h>
 #include <rsge/error.h>
 #include <linmath.h>
 
+/** \struct rsge_particle_t src/include/rsge/gfx/particle-engine.h rsge/gfx/particle-engine.h
+ * \brief A single particle
+ */
 typedef struct {
     /**
      * \brief The position.
@@ -43,6 +51,9 @@ typedef struct {
     float scale;
 } rsge_particle_t;
 
+/** \struct rsge_particles_t src/include/rsge/gfx/particle-engine.h rsge/gfx/particle-engine.h
+ * \brief A bunch of particles
+ */
 typedef struct {
     /**
      * \brief The particles.
@@ -73,10 +84,10 @@ typedef struct {
 /**
  * \fn rsge_error_e rsge_particles_create(rsge_particles_t* particles,rsge_particle_t* p,int pc,rsge_surface_t* surfaces[2])
  * \brief Creates particles.
- * \param particles The pointer to the particles.
- * \param p The actual particles.
- * \param pc The particle count.
- * \param surfaces The two surfaces to use as the textures.
+ * \param[out] particles The pointer to the particles.
+ * \param[in] p The actual particles.
+ * \param[in] pc The particle count.
+ * \param[in] surfaces The two surfaces to use as the textures.
  * \return An error code.
  */
 rsge_error_e rsge_particles_create(rsge_particles_t* particles,rsge_particle_t* p,int pc,rsge_surface_t* surfaces[2]);
@@ -84,7 +95,7 @@ rsge_error_e rsge_particles_create(rsge_particles_t* particles,rsge_particle_t* 
 /**
  * \fn rsge_error_e rsge_particles_destroy(rsge_particles_t* particles)
  * \brief Destroyes the particles.
- * \param particles The pointer to the particles.
+ * \param[out] particles The pointer to the particles.
  * \return An error code.
  */
 rsge_error_e rsge_particles_destroy(rsge_particles_t* particles);
@@ -92,7 +103,7 @@ rsge_error_e rsge_particles_destroy(rsge_particles_t* particles);
 /**
  * \fn rsge_error_e rsge_particles_update(rsge_particles_t* particles)
  * \brief Calculates and updates the particles.
- * \param particles The pointer to the particles.
+ * \param[out] particles The pointer to the particles.
  * \return An error code.
  */
 rsge_error_e rsge_particles_update(rsge_particles_t* particles);
@@ -100,7 +111,7 @@ rsge_error_e rsge_particles_update(rsge_particles_t* particles);
 /**
  * \fn rsge_error_e rsge_particles_render(rsge_particles_t* particles)
  * \brief Renders the particles.
- * \param particles The pointer to the particles.
+ * \param[out] particles The pointer to the particles.
  * \return An error code.
  */
 rsge_error_e rsge_particles_render(rsge_particles_t* particles);

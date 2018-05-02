@@ -1,6 +1,11 @@
 #ifndef __RSGE_PHYSICS_RIGID_BODY_H_
 #define __RSGE_PHYSICS_RIGID_BODY_H_ 1
 
+/** \file src/include/rsge/physics/rigid-body.h
+ * \brief Physics rigid body.
+ * \author Spaceboy Ross
+ */
+
 #include <rsge/physics/collision/shape.h>
 #include <rsge/error.h>
 #ifdef __cplusplus
@@ -8,6 +13,9 @@
 #endif
 #include <linmath.h>
 
+/** \struct rsge_physics_rigid_body_t src/include/rsge/physics/rigid-body.h rsge/physics/rigid-body.h
+ * \brief Rigid body
+ */
 typedef struct {
 #ifdef __cplusplus
     /**
@@ -20,9 +28,9 @@ typedef struct {
 /**
  * \fn rsge_error_e rsge_physics_rigid_body_create(rsge_physics_rigid_body_t* rb,rsge_physics_collision_shape_t* shape,int mass)
  * \brief Creates a new rigid body.
- * \param rb The pointer to store the rigid body.
- * \param shape The collision shape to use.
- * \param mass The mass to give the rigid body.
+ * \param[out] rb The pointer to store the rigid body.
+ * \param[in] shape The collision shape to use.
+ * \param[in] mass The mass to give the rigid body.
  * \return An error code.
  */
 #ifdef __cplusplus
@@ -33,7 +41,7 @@ rsge_error_e rsge_physics_rigid_body_create(rsge_physics_rigid_body_t* rb,rsge_p
 /**
  * \fn rsge_error_e rsge_physics_rigid_body_destroy(rsge_physics_rigid_body_t* rb)
  * \brief Destroyes the rigid body.
- * \param rb The pointer to store the rigid body.
+ * \param[out] rb The pointer to store the rigid body.
  * \return An error code.
  */
 #ifdef __cplusplus
@@ -44,8 +52,8 @@ rsge_error_e rsge_physics_rigid_body_destroy(rsge_physics_rigid_body_t* rb);
 /**
  * \fn rsge_error_e rsge_physics_rigid_body_setuserpointer(rsge_physics_rigid_body_t* rb,void* userpointer)
  * \brief Sets the user pointer data of the rigid body.
- * \param rb The pointer to store the rigid body.
- * \param userpointer The user pointer data.
+ * \param[out] rb The pointer to store the rigid body.
+ * \param[in] userpointer The user pointer data.
  * \return An error code.
  */
 #ifdef __cplusplus
@@ -56,8 +64,8 @@ rsge_error_e rsge_physics_rigid_body_setuserpointer(rsge_physics_rigid_body_t* r
 /**
  * \fn rsge_error_e rsge_physics_rigid_body_getuserpointer(rsge_physics_rigid_body_t* rb,void** userpointer)
  * \brief Gets the user pointer data of the rigid body.
- * \param rb The pointer to store the rigid body.
- * \param userpointer The pointer to store the user pointer.
+ * \param[out] rb The pointer to store the rigid body.
+ * \param[out] userpointer The pointer to store the user pointer.
  * \return An error code.
  */
 #ifdef __cplusplus

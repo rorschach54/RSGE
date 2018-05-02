@@ -1,6 +1,11 @@
 #ifndef __RSGE_UI_WIDGET_H_
 #define __RSGE_UI_WIDGET_H_ 1
 
+/** \file src/include/rsge/ui/widget.h
+ * \brief UI widget stuff.
+ * \author Spaceboy Ross
+ */
+
 #include <rsge/gfx/colors.h>
 #include <rsge/gfx/font.h>
 #include <rsge/ui/surface.h>
@@ -8,11 +13,23 @@
 #include <list.h>
 #include <string.h>
 
+/** \struct rsge_ui_widget_style_t src/include/rsge/ui/widget.h rsge/ui/widget.h
+ * \brief UI widget style.
+ */
 typedef struct {
+	/**
+	 * \brief Style name.
+	 */
     char* name;
+	/**
+	 * \brief Style value.
+	 */
     void* value;
 } rsge_ui_widget_style_t;
 
+/** \struct rsge_ui_widget_event_t src/include/rsge/ui/widget.h rsge/ui/widget.h
+ * \brief UI widget event.
+ */
 typedef struct {
     /**
      * \brief Widget styling.
@@ -25,6 +42,9 @@ typedef struct {
     char* type;
 } rsge_ui_widget_event_t;
 
+/** \struct rsge_ui_widget_t src/include/rsge/ui/widget.h rsge/ui/widget.h
+ * \brief UI widget
+ */
 typedef struct rsge_ui_widget {
     /**
      * \brief Widget styling.
@@ -101,22 +121,28 @@ typedef struct rsge_ui_widget {
     } instXML;
 } rsge_ui_widget_t;
 
+/** \struct rsge_ui_widget_type_t src/include/rsge/ui/widget.h rsge/ui/widget.h
+ * \brief UI widget type.
+ */
 typedef struct {
     /**
      * \brief XML tag name.
      */
     char* tag;
     
+	/**
+	 * \brief The callback that is used to create the widget from an XML node.
+	 */
     rsge_error_e (*fromXMLNode)(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node);
 } rsge_ui_widget_type_t;
 
 /**
  * \fn rsge_error_e rsge_ui_widget_loadStyles(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node)
  * \brief Load the styles from an XML node.
- * \param widget The pointer to the widget.
- * \param ui The UI surface to use.
- * \param doc The XML document to use for base widget.
- * \param node The XML node to use.
+ * \param[out] widget The pointer to the widget.
+ * \param[in] ui The UI surface to use.
+ * \param[in] doc The XML document to use for base widget.
+ * \param[in] node The XML node to use.
  * \return An error code.
  */
 rsge_error_e rsge_ui_widget_loadStyles(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node);
@@ -124,10 +150,10 @@ rsge_error_e rsge_ui_widget_loadStyles(rsge_ui_widget_t* widget,rsge_ui_surface_
 /**
  * \fn rsge_error_e rsge_ui_widget_create(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node)
  * \brief Creates a generic widget.
- * \param widget The pointer to the widget.
- * \param ui The UI surface to use.
- * \param doc The XML document to use for base widget.
- * \param node The XML node to use.
+ * \param[out] widget The pointer to the widget.
+ * \param[in] ui The UI surface to use.
+ * \param[in] doc The XML document to use for base widget.
+ * \param[in] node The XML node to use.
  * \return An error code.
  */
 rsge_error_e rsge_ui_widget_create(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node);
@@ -135,9 +161,9 @@ rsge_error_e rsge_ui_widget_create(rsge_ui_widget_t* widget,rsge_ui_surface_t* u
 /**
  * \fn rsge_error_e rsge_ui_widget_getstyle(rsge_ui_widget_t* widget,char* name,void** value)
  * \brief Gets a style value from the widget.
- * \param widget The pointer to the widget.
- * \param name The name of the style.
- * \param value The value of the style.
+ * \param[out] widget The pointer to the widget.
+ * \param[in] name The name of the style.
+ * \param[out] value The value of the style.
  * \return An error code.
  */
 rsge_error_e rsge_ui_widget_getstyle(rsge_ui_widget_t* widget,char* name,void** value);
@@ -145,10 +171,10 @@ rsge_error_e rsge_ui_widget_getstyle(rsge_ui_widget_t* widget,char* name,void** 
 /**
  * \fn rsge_error_e rsge_ui_widget_getevent(rsge_ui_widget_t* widget,char* name,rsge_ui_widget_event_t*** events,int* count)
  * \brief Gets all of the events that matched name.
- * \param widget The pointer to the widget.
- * \param name The name of the event.
- * \param events The pointer to store the events.
- * \param count The pointer to store the number of events.
+ * \param[out] widget The pointer to the widget.
+ * \param[in] name The name of the event.
+ * \param[out] events The pointer to store the events.
+ * \param[out] count The pointer to store the number of events.
  */
 rsge_error_e rsge_ui_widget_getevent(rsge_ui_widget_t* widget,char* name,rsge_ui_widget_event_t*** events,int* count);
 

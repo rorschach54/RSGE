@@ -1,6 +1,7 @@
 #include <rsge/gfx/image/bmp.h>
 #include <rsge/assets.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct {
     char* data;
     size_t datasz;
@@ -85,3 +86,4 @@ rsge_error_e rsge_image_bmp_fromFile(rsge_surface_t* surface,char* path) {
 	memcpy(surface->buffer,bmp.data+bmp.off,(res_w*res_h)*bpp);
 	return RSGE_ERROR_NONE;
 }
+#endif

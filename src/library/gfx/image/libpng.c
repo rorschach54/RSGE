@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct {
 	char* data;
 	size_t size;
@@ -105,3 +106,4 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path) {
 	free(row_pointers);
 	return RSGE_ERROR_NONE;
 }
+#endif
