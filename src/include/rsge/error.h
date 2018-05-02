@@ -106,7 +106,11 @@ typedef enum {
 	/**
 	 * Invalid flag
 	 */
-	RSGE_ERROR_INVALID_FLAG
+	RSGE_ERROR_INVALID_FLAG,
+	/**
+	 * Bullet physics
+	 */
+	RSGE_ERROR_BULLET_PHYSICS
 } rsge_error_e;
 
 #endif

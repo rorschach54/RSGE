@@ -23,6 +23,11 @@ typedef struct {
      * \brief The bullet physics world class.
      */
     btDiscreteDynamicsWorld* btWorld;
+#else
+    /**
+     * \brief The bullet physics world class.
+     */
+    void* btWorld;
 #endif
 } rsge_physics_world_t;
 

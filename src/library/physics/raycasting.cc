@@ -23,7 +23,7 @@ rsge_error_e rsge_physics_raycast_create(rsge_physics_raycast_t* ray,rsge_physic
     );
     
     if(ray->RayCallback.hasHit()) {
-        ray->collisionObject.btObject = ray->RayCallback.m_collisionObject;
+        ray->collisionObject.btObject = const_cast<btCollisionObject*>(ray->RayCallback.m_collisionObject);
     }
     return RSGE_ERROR_NONE;
 }

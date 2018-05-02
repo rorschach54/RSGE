@@ -1,5 +1,6 @@
 #include <rsge/physics/init.h>
 #include <rsge/physics/world.h>
+#include <log.h>
 #include <string.h>
 
 #ifdef __cplusplus

@@ -6,6 +6,11 @@ LIB_OUT=$(BIN)/librsge.a
 endif
 endif
 
+$(EXAMPLES_BIN)/%: $(EXAMPLES_SRC)/%.cc $(LIB_OUT)
+	@echo "Building example $@"
+	@mkdir -p $(@D)
+	@$(CXX) -o $@ $< $(EXAMPLES_CXXFLAGS) -L$(BIN) $(LIB_OUT)
+
 $(EXAMPLES_BIN)/%: $(EXAMPLES_SRC)/%.c $(LIB_OUT)
 	@echo "Building example $@"
 	@mkdir -p $(@D)

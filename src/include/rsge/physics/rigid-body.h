@@ -23,21 +23,27 @@ typedef struct {
      * \brief The bullet physics rigid body.
      */
     btRigidBody* btRB;
+#else
+    /**
+     * \brief The bullet physics rigid body.
+     */
+    void* btRB;
 #endif
 } rsge_physics_rigid_body_t;
 
 /**
- * \fn rsge_error_e rsge_physics_rigid_body_create(rsge_physics_rigid_body_t* rb,rsge_physics_collision_shape_t* shape,int mass)
+ * \fn rsge_error_e rsge_physics_rigid_body_create(rsge_physics_rigid_body_t* rb,rsge_physics_collision_shape_t* shape,vec3 localInertia,float mass)
  * \brief Creates a new rigid body.
  * \param[out] rb The pointer to store the rigid body.
  * \param[in] shape The collision shape to use.
+ * \param[in] localInertia The local intertia to use.
  * \param[in] mass The mass to give the rigid body.
  * \return An error code.
  */
 #ifdef __cplusplus
 extern "C"
 #endif
-rsge_error_e rsge_physics_rigid_body_create(rsge_physics_rigid_body_t* rb,rsge_physics_collision_shape_t* shape,int mass);
+rsge_error_e rsge_physics_rigid_body_create(rsge_physics_rigid_body_t* rb,rsge_physics_collision_shape_t* shape,vec3 localInertia,float mass);
 
 /**
  * \fn rsge_error_e rsge_physics_rigid_body_destroy(rsge_physics_rigid_body_t* rb)

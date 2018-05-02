@@ -17,24 +17,25 @@
  * \brief Physics transform.
  */
 typedef struct {
-#ifdef __cplusplus
     /**
-     * \brief Bullet physics transform.
+     * \brief The basis matrix for the rotation.
      */
-    btTransform btTF;
-#endif
+    mat3x3 basis;
+    
+    /**
+     * \brief The origin vector translation.
+     */
+    vec3 origin;
+    
+    /**
+     * \brief A quaternion representing the rotation.
+     */
+    quat rotation;
+    
+    /**
+     * \brief The OpenGL version of the transform.
+     */
+    float glMatrix[15];
 } rsge_physics_transform_t;
-
-/**
- * \fn rsge_error_e rsge_physics_transform_getorigin(rsge_physics_transform_t* transform,vec3* pos)
- * \brief Gets the origin of the tranform.
- * \param[out] transform The transform to use.
- * \param[out] pos The pointer to the position.
- * \return An error code.
- */
-#ifdef __cplusplus
-extern "C"
-#endif
-rsge_error_e rsge_physics_transform_getorigin(rsge_physics_transform_t* transform,vec3* pos);
 
 #endif

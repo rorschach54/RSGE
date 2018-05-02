@@ -20,6 +20,11 @@ typedef struct {
      * \brief Bullet physics raycasting callback.
      */
     btCollisionWorld::ClosestRayResultCallback RayCallback;
+#else
+    /**
+     * \brief Bullet physics raycasting callback.
+     */
+    void* RayCallback;
 #endif
 
     /**

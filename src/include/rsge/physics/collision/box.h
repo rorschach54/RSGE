@@ -10,15 +10,15 @@
 #include <linmath.h>
 
 /**
- * \fn rsge_error_e rsge_physics_box_create(rsge_physics_collision_shape_t* shape,vec3 pos)
+ * \fn rsge_error_e rsge_physics_box_create(rsge_physics_collision_shape_t* shape,vec3 boxHalfExtents)
  * \brief Creates a box collision shape.
  * \param[out] shape The pointer to store the collision shape.
- * \param[in] pos The position of the shape.
+ * \param[in] boxHalfExtents The half extents of the box.
  * \return An error code.
  */
 #ifdef __cplusplus
 extern "C"
 #endif
-rsge_error_e rsge_physics_box_create(rsge_physics_collision_shape_t* shape,vec3 pos);
+rsge_error_e rsge_physics_box_create(rsge_physics_collision_shape_t* shape,vec3 boxHalfExtents);
 
 #endif

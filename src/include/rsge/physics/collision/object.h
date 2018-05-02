@@ -22,6 +22,11 @@ typedef struct {
      * \brief The bullet physics collision object.
      */
     btCollisionObject* btObject;
+#else
+    /**
+     * \brief The bullet physics collision object.
+     */
+    void* btObject;
 #endif
 } rsge_physics_collision_object_t;
 

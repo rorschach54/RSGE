@@ -80,6 +80,36 @@ static inline void vec4_reflect(vec4 r, vec4 v, vec4 n)
 		r[i] = v[i] - p*n[i];
 }
 
+/* -- Added by Spaceboy Ross -- */
+typedef vec3 mat3x3[3];
+static inline void mat3x3_identity(mat3x3 M)
+{
+	int i, j;
+	for(i=0; i<3; ++i)
+		for(j=0; j<3; ++j)
+			M[i][j] = i==j ? 1.f : 0.f;
+}
+static inline void mat3x3_dup(mat3x3 M, mat3x3 N)
+{
+	int i, j;
+	for(i=0; i<3; ++i)
+		for(j=0; j<3; ++j)
+			M[i][j] = N[i][j];
+}
+static inline void mat3x3_row(vec3 r, mat3x3 M, int i)
+{
+	int k;
+	for(k=0; k<3; ++k)
+		r[k] = M[k][i];
+}
+static inline void mat3x3_col(vec3 r, mat3x3 M, int i)
+{
+	int k;
+	for(k=0; k<3; ++k)
+		r[k] = M[i][k];
+}
+/* -- Not added by Spaceboy Ross */
+
 typedef vec4 mat4x4[4];
 static inline void mat4x4_identity(mat4x4 M)
 {

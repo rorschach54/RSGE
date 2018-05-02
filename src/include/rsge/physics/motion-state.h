@@ -23,6 +23,11 @@ typedef struct {
      * \brief Bullet physics motion state.
      */
     btMotionState* btMS;
+#else
+    /**
+     * \brief Bullet physics motion state.
+     */
+    void* btMS;
 #endif
 } rsge_physics_motion_state_t;
 
