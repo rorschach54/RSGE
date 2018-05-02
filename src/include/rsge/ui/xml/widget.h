@@ -23,13 +23,13 @@
 rsge_error_e rsge_ui_widget_fromXMLNode(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,xmlDocPtr doc,xmlNodePtr node);
 
 /**
- * \fn rsge_error_e rsge_ui_widget_fromAssets(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,rsge_asset_t* asset)
+ * \fn rsge_error_e rsge_ui_widget_fromAssets(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,char* path)
  * \brief Loads a widget from a XML asset file.
  * \param[out] widget The pointer to the widget.
  * \param[in] ui The UI surface to use.
- * \param[in] asset The asset to load from.
+ * \param[in] path The path of the asset to load from.
  * \return An error.
  */
-rsge_error_e rsge_ui_widget_fromAssets(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,rsge_asset_t* asset);
+rsge_error_e rsge_ui_widget_fromAssets(rsge_ui_widget_t* widget,rsge_ui_surface_t* ui,char* path);
 
 #endif
