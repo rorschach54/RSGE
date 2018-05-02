@@ -1,6 +1,11 @@
 #ifndef __RSGE_UI_H_
 #define __RSGE_UI_H_ 1
 
+/** \file src/include/rsge/ui.h
+ * \brief UI component.
+ * \author Spaceboy Ross
+ */
+
 #include <rsge/ui/widget.h>
 #include <rsge/error.h>
 
@@ -21,7 +26,7 @@ rsge_error_e rsge_ui_deinit();
 /**
  * \fn rsge_error_e rsge_ui_registerWidget(rsge_ui_widget_type_t* type)
  * \brief Registers a new widget.
- * \param type The widget type to register.
+ * \param[in] type The widget type to register.
  * \return An error code.
  */
 rsge_error_e rsge_ui_registerWidget(rsge_ui_widget_type_t* type);
@@ -29,8 +34,8 @@ rsge_error_e rsge_ui_registerWidget(rsge_ui_widget_type_t* type);
 /**
  * \fn rsge_error_e rsge_ui_getregisteredwidget(char* tag,rsge_ui_widget_type_t** type)
  * \brief Gets a registered widget by tag.
- * \param tag The tag to search for.
- * \param type The pointer to the type.
+ * \param[in] tag The tag to search for.
+ * \param[out] type The pointer to the type.
  * \return An error code.
  */
 rsge_error_e rsge_ui_getregisteredwidget(char* tag,rsge_ui_widget_type_t** type);
