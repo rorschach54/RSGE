@@ -14,19 +14,19 @@ rsge_error_e rsge_ui_init() {
     /* Register widgets */
     
     /* Register widget: button (rsge.widget.button) */
-    rsge_ui_widget_type_t rsge_widget_button = {
-        .tag = "rsge.widget.button",
-        .fromXMLNode = rsge_ui_widget_button_fromXMLNode
-    };
-    err = rsge_ui_registerWidget(&rsge_widget_button);
+    rsge_ui_widget_type_t* rsge_widget_button = malloc(sizeof(rsge_ui_widget_type_t));
+    if(rsge_widget_button == NULL) return RSGE_ERROR_MALLOC;
+    rsge_widget_button->tag = "rsge.widget.button";
+    rsge_widget_button->fromXMLNode = rsge_ui_widget_button_fromXMLNode;
+    err = rsge_ui_registerWidget(rsge_widget_button);
     if(err != RSGE_ERROR_NONE) return err;
     
     /* Register widget: label (rsge.widget.label) */
-    rsge_ui_widget_type_t rsge_widget_label = {
-        .tag = "rsge.widget.label",
-        .fromXMLNode = rsge_ui_widget_label_fromXMLNode
-    };
-    err = rsge_ui_registerWidget(&rsge_widget_label);
+    rsge_ui_widget_type_t rsge_widget_label = malloc(sizeof(rsge_ui_widget_type_t));
+    if(rsge_widget_label == NULL) return RSGE_ERROR_MALLOC;
+    rsge_widget_label->tag = "rsge.widget.label";
+    rsge_widget_label->fromXMLNode = rsge_ui_widget_label_fromXMLNode;
+    err = rsge_ui_registerWidget(rsge_widget_label);
     if(err != RSGE_ERROR_NONE) return err;
     
     return RSGE_ERROR_NONE;
