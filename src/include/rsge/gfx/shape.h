@@ -102,6 +102,11 @@ typedef struct {
 	uint8_t flags;
 
 	/**
+	 * \brief The rotation as a quaternion.
+	 */
+    quat rotation;
+
+	/**
 	 * \brief A 3-tuplet float that defines the position.
 	 */
 	vec3 pos;

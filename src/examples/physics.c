@@ -22,23 +22,23 @@ rsge_error_e rsge_game_init() {
 	
 	vec3 gravity;
 	gravity[0] = 0.0f;
-	gravity[1] = -0.4f;
+	gravity[1] = -0.5f;
 	gravity[2] = 0.0f;
 	err = rsge_physics_world_setgravity(&world,gravity);
 	if(err != RSGE_ERROR_NONE) return err;
 	
 	vec3 boxHalfExtents;
-	boxHalfExtents[0] = 1.0f;
-	boxHalfExtents[1] = 1.0f;
-	boxHalfExtents[2] = 1.0f;
+	boxHalfExtents[0] = 0.5f;
+	boxHalfExtents[1] = 0.5f;
+	boxHalfExtents[2] = 0.5f;
 	err = rsge_physics_box_create(&shape,boxHalfExtents);
 	if(err != RSGE_ERROR_NONE) return err;
 	
 	vec3 localInertia;
 	localInertia[0] = 0.0f;
-	localInertia[1] = 5.0f;
+	localInertia[1] = 999.0f;
 	localInertia[2] = 0.0f;
-	err = rsge_physics_rigid_body_create(&rb,&shape,localInertia,2.0f);
+	err = rsge_physics_rigid_body_create(&rb,&shape,localInertia,1.0f);
 	if(err != RSGE_ERROR_NONE) return err;
 	
 	err = rsge_physics_world_addrb(&world,&rb);
@@ -46,10 +46,6 @@ rsge_error_e rsge_game_init() {
 	
 	err = rsge_model_fromFile(&tri,"rsge@models/simple.xml");
 	if(err != RSGE_ERROR_NONE) return err;
-
-	tri.pos[0] = 0.0f;
-	tri.pos[1] = 0.0f;
-	tri.pos[2] = 0.0f;
 	return RSGE_ERROR_NONE;
 }
 
@@ -63,7 +59,7 @@ rsge_error_e rsge_game_uninit() {
 
 rsge_error_e rsge_game_update(double time,int fps) {
 	rsge_error_e err;
-    err = rsge_physics_world_stepSimulation(&world,60.0f,10);
+    err = rsge_physics_world_stepSimulation(&world,1/60.0f,10);
     if(err != RSGE_ERROR_NONE) return err;
     
     rsge_physics_motion_state_t motionState;
@@ -77,6 +73,13 @@ rsge_error_e rsge_game_update(double time,int fps) {
     tri.pos[0] = worldTransform.origin[0];
     tri.pos[1] = worldTransform.origin[1];
     tri.pos[2] = worldTransform.origin[2];
+    
+    tri.rotation[0] = worldTransform.rotation[0];
+    tri.rotation[1] = worldTransform.rotation[1];
+    tri.rotation[2] = worldTransform.rotation[2];
+    tri.rotation[3] = worldTransform.rotation[3];
+    
+    log_debug("pos: (%f,%f,%f) rot: (%f,%f,%f) %f",tri.pos[0],tri.pos[1],tri.pos[2],tri.rotation[0],tri.rotation[1],tri.rotation[2],tri.rotation[3]);
 	err = rsge_shape_render(&tri);
     if(err != RSGE_ERROR_NONE) return err;
 	return RSGE_ERROR_NONE;

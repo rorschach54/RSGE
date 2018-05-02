@@ -53,6 +53,7 @@ rsge_error_e rsge_shape_render(rsge_shape_t* shape) {
 	glPushMatrix();
 	glTranslatef(0.0f,0.0f,0.0f);
 	glTranslatef(shape->pos[0],shape->pos[1],shape->pos[2]);
+	glRotatef(shape->rotation[3],shape->rotation[0],shape->rotation[1],shape->rotation[2]);
 
 	if(shape->texture != 0) glBindTexture(shape->textureMode,shape->texture);
 	
