@@ -110,7 +110,15 @@ typedef enum {
 	/**
 	 * Bullet physics
 	 */
-	RSGE_ERROR_BULLET_PHYSICS
+	RSGE_ERROR_BULLET_PHYSICS,
+	/**
+	 * OpenCL
+	 */
+	RSGE_ERROR_OPENCL,
+	/**
+	 * Invalid platform for OpenCL.
+	 */
+	RSGE_ERROR_CL_INVALID_PLATFORM
 } rsge_error_e;
 
 #endif

@@ -1,4 +1,5 @@
 #include <curl/curl.h>
+#include <rsge/cl/init.h>
 #include <rsge/gfx/camera.h>
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/lighting.h>
@@ -393,6 +394,20 @@ int main(int argc,char** argv) {
 		return EXIT_FAILURE;
 	}
 	
+	log_debug("OpenCL initializing");
+	err = rsge_cl_init();
+	if(err != RSGE_ERROR_NONE) {
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		rsge_assets_uninit();
+		curl_global_cleanup();
+		config_destroy(&rsge_libconfig_cfg);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
+	
 	log_debug("Input initializing");
 	err = rsge_input_init();
 	if(err != RSGE_ERROR_NONE) {
@@ -400,6 +415,7 @@ int main(int argc,char** argv) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_assets_uninit();
+		rsge_cl_deinit();
 		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
@@ -416,6 +432,7 @@ int main(int argc,char** argv) {
 		config_destroy(&rsge_libconfig_cfg);
 		rsge_assets_uninit();
 		curl_global_cleanup();
+		rsge_cl_deinit();
 		rsge_input_deinit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -433,6 +450,7 @@ int main(int argc,char** argv) {
 		curl_global_cleanup();
 		rsge_input_deinit();
 		rsge_physics_deinit();
+		rsge_cl_deinit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		return EXIT_FAILURE;
@@ -453,6 +471,7 @@ int main(int argc,char** argv) {
 		rsge_ui_deinit();
 		rsge_assets_uninit();
 		rsge_input_deinit();
+		rsge_cl_deinit();
 		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
@@ -472,6 +491,7 @@ int main(int argc,char** argv) {
 		rsge_assets_uninit();
 		rsge_input_deinit();
 		curl_global_cleanup();
+		rsge_cl_deinit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -491,6 +511,7 @@ int main(int argc,char** argv) {
 		rsge_input_deinit();
 		rsge_physics_deinit();
 		curl_global_cleanup();
+		rsge_cl_deinit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -533,6 +554,7 @@ int main(int argc,char** argv) {
 		rsge_physics_deinit();
 		rsge_ui_deinit();
 		curl_global_cleanup();
+		rsge_cl_deinit();
 		rsge_assets_uninit();
 		rsge_input_deinit();
 		config_destroy(&rsge_libconfig_cfg);
@@ -546,6 +568,7 @@ int main(int argc,char** argv) {
 	rsge_assets_uninit();
 	rsge_input_deinit();
 	rsge_physics_deinit();
+	rsge_cl_deinit();
 
 #if CONFIG_USE_FREETYPE == 1
 	FT_Done_FreeType(rsge_freetype_lib);

@@ -31,14 +31,14 @@ EXAMPLES_CFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shel
 EXAMPLES_CXXFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shell curl-config --cflags)
 
 LIBRARY_CFLAGS += $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shell curl-config --cflags)
-LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) $(shell curl-config --libs) -ldl -lm -lopenal -lGLU
+LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) $(shell curl-config --libs) -lOpenCL -ldl -lm -lopenal -lGLU
 
 ifeq ($(CONFIG_LINKMODE),shared)
 LIBRARY_CFLAGS += -fpic
 LIBRARY_LDFLAGS += -shared
 endif
 
-LIBRARY_CXXFLAGS=$(LIBRARY_CFLAGS) -fPIC
+LIBRARY_CXXFLAGS=$(LIBRARY_CFLAGS) -fPIC -std=gnu++11
 
 IDE_CFLAGS += -std=gnu99
 EXAMPLES_CFLAGS += -std=gnu99

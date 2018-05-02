@@ -1,3 +1,4 @@
+LIBRARY_OBJS += $(LIBRARY_BIN)/cl/context.o $(LIBRARY_BIN)/cl/init.o $(LIBRARY_BIN)/cl/program.o
 ifeq ($(CONFIG_USE_FREETYPE),y)
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/font/freetype.o
 endif
