@@ -14,8 +14,8 @@ LIBRARY_OBJS += $(LIBRARY_BIN)/net/ftp.o $(LIBRARY_BIN)/net/http.o $(LIBRARY_BIN
 LIBRARY_OBJS += $(LIBRARY_BIN)/os/$(CONFIG_OS)/callbacks.o $(LIBRARY_BIN)/os/$(CONFIG_OS)/input.o \
 $(LIBRARY_BIN)/os/$(CONFIG_OS)/main.o $(LIBRARY_BIN)/os/$(CONFIG_OS)/settings.o \
 $(LIBRARY_BIN)/os/$(CONFIG_OS)/window.o
-LIBRARY_OBJS += $(LIBRARY_BIN)/physics/collision/box.o $(LIBRARY_BIN)/physics/collision/shape.o \
-$(LIBRARY_BIN)/physics/collision/sphere.o
+LIBRARY_OBJS += $(LIBRARY_BIN)/physics/collision/box.o $(LIBRARY_BIN)/physics/collision/object.o \
+$(LIBRARY_BIN)/physics/collision/shape.o $(LIBRARY_BIN)/physics/collision/sphere.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/physics/init.o $(LIBRARY_BIN)/physics/motion-state.o $(LIBRARY_BIN)/physics/raycasting.o \
 $(LIBRARY_BIN)/physics/rigid-body.o $(LIBRARY_BIN)/physics/transform.o $(LIBRARY_BIN)/physics/world.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/snd/buffer.o $(LIBRARY_BIN)/snd/init.o $(LIBRARY_BIN)/snd/source.o

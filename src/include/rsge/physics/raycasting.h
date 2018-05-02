@@ -6,6 +6,7 @@
  * \author Spaceboy Ross
  */
 
+#include <rsge/physics/collision/object.h>
 #include <rsge/physics/world.h>
 #include <rsge/error.h>
 #ifdef __cplusplus
@@ -20,6 +21,11 @@ typedef struct {
      */
     btCollisionWorld::ClosestRayResultCallback RayCallback;
 #endif
+
+    /**
+     * \brief The object collided.
+     */
+    rsge_physics_collision_object_t collisionObject;
 } rsge_physics_raycast_t;
 
 /**
