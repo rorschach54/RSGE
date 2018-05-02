@@ -13,7 +13,8 @@
 #endif
 #include <linmath.h>
 
-/** \struct rsge_physics_world_t src/include/rsge/physics/world.h rsge/physics/world.h
+/**
+ * \struct rsge_physics_world_t src/include/rsge/physics/world.h rsge/physics/world.h
  * \brief Physics world.
  */
 typedef struct {
@@ -70,5 +71,18 @@ rsge_error_e rsge_physics_world_setgravity(rsge_physics_world_t* world,vec3 grav
 extern "C"
 #endif
 rsge_error_e rsge_physics_world_addrb(rsge_physics_world_t* world,rsge_physics_rigid_body_t* rb);
+
+/**
+ * \fn rsge_error_e rsge_physics_world_stepSimulation(rsge_physics_world_t* world,float timeStep,int maxSubSteps)
+ * \brief stepSimulation proceeds the simulation over 'timeStep', units in preferably in seconds.
+ * \param[out] world The pointer to store the world.
+ * \param[in] timeStep The time step unit.
+ * \param[in] maxSubSteps The max sub steps.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_physics_world_stepSimulation(rsge_physics_world_t* world,float timeStep,int maxSubSteps);
 
 #endif

@@ -7,6 +7,7 @@
  */
 
 #include <rsge/physics/collision/shape.h>
+#include <rsge/physics/motion-state.h>
 #include <rsge/error.h>
 #ifdef __cplusplus
 #include <btBulletDynamicsCommon.h>
@@ -72,5 +73,41 @@ rsge_error_e rsge_physics_rigid_body_setuserpointer(rsge_physics_rigid_body_t* r
 extern "C"
 #endif
 rsge_error_e rsge_physics_rigid_body_getuserpointer(rsge_physics_rigid_body_t* rb,void** userpointer);
+
+/**
+ * \fn rsge_error_e rsge_physics_rigid_body_translate(rsge_physics_rigid_body_t* rb,vec3 pos)
+ * \brief Translates the rigid body.
+ * \param[out] rb The pointer to store the rigid body.
+ * \param[in] pos The position to use.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_physics_rigid_body_translate(rsge_physics_rigid_body_t* rb,vec3 pos);
+
+/**
+ * \fn rsge_error_e rsge_physics_rigid_body_getmotionstate(rsge_physics_rigid_body_t* rb,rsge_physics_motion_state_t* motionState)
+ * \brief Gets the rigid body's motion state.
+ * \param[out] rb The pointer to store the rigid body.
+ * \param[out] motionState The pointer to store the motion state.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_physics_rigid_body_getmotionstate(rsge_physics_rigid_body_t* rb,rsge_physics_motion_state_t* motionState);
+
+/**
+ * \fn rsge_error_e rsge_physics_rigid_body_setmotionstate(rsge_physics_rigid_body_t* rb,rsge_physics_motion_state_t* motionState)
+ * \brief Sets the rigid body's motion state.
+ * \param[out] rb The pointer to store the rigid body.
+ * \param[out] motionState The pointer to store the motion state.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_physics_rigid_body_setmotionstate(rsge_physics_rigid_body_t* rb,rsge_physics_motion_state_t* motionState);
 
 #endif
