@@ -22,7 +22,7 @@ rsge_error_e rsge_ui_init() {
     if(err != RSGE_ERROR_NONE) return err;
     
     /* Register widget: label (rsge.widget.label) */
-    rsge_ui_widget_type_t rsge_widget_label = malloc(sizeof(rsge_ui_widget_type_t));
+    rsge_ui_widget_type_t* rsge_widget_label = malloc(sizeof(rsge_ui_widget_type_t));
     if(rsge_widget_label == NULL) return RSGE_ERROR_MALLOC;
     rsge_widget_label->tag = "rsge.widget.label";
     rsge_widget_label->fromXMLNode = rsge_ui_widget_label_fromXMLNode;
