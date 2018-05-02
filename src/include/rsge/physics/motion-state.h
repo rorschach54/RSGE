@@ -38,4 +38,16 @@ extern "C"
 #endif
 rsge_error_e rsge_physics_motion_state_setworldtransform(rsge_physics_motion_state_t* motionState,rsge_physics_transform_t* transform);
 
+/**
+ * \fn rsge_error_e rsge_physics_motion_state_getworldtransform(rsge_physics_motion_state_t* motionState,rsge_physics_transform_t* transform)
+ * \brief Gets the motion state world transformation.
+ * \param[out] motionState The pointer to store the motion state.
+ * \param[out] transform The pointer to store the transform.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_physics_motion_state_getworldtransform(rsge_physics_motion_state_t* motionState,rsge_physics_transform_t* transform);
+
 #endif

@@ -46,6 +46,14 @@ rsge_error_e rsge_physics_world_addrb(rsge_physics_world_t* world,rsge_physics_r
 #ifdef __cplusplus
 extern "C"
 #endif
+rsge_error_e rsge_physics_world_rmrb(rsge_physics_world_t* world,rsge_physics_rigid_body_t* rb) {
+    world->btWorld->removeRigidBody(rb->btRB);
+    return RSGE_ERROR_NONE;
+}
+
+#ifdef __cplusplus
+extern "C"
+#endif
 rsge_error_e rsge_physics_world_stepSimulation(rsge_physics_world_t* world,float timeStep,int maxSubSteps) {
     world->btWorld->stepSimulation(timeStep,maxSubSteps);
     return RSGE_ERROR_NONE;

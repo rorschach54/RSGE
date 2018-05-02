@@ -73,6 +73,18 @@ extern "C"
 rsge_error_e rsge_physics_world_addrb(rsge_physics_world_t* world,rsge_physics_rigid_body_t* rb);
 
 /**
+ * \fn rsge_error_e rsge_physics_world_rmrb(rsge_physics_world_t* world,rsge_physics_rigid_body_t* rb)
+ * \brief Removes a rigid body to the world.
+ * \param[out] world The pointer to store the world.
+ * \param[in] rb The rigid body to add.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_physics_world_rmrb(rsge_physics_world_t* world,rsge_physics_rigid_body_t* rb);
+
+/**
  * \fn rsge_error_e rsge_physics_world_stepSimulation(rsge_physics_world_t* world,float timeStep,int maxSubSteps)
  * \brief stepSimulation proceeds the simulation over 'timeStep', units in preferably in seconds.
  * \param[out] world The pointer to store the world.

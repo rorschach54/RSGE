@@ -17,7 +17,7 @@ $(LIBRARY_BIN)/os/$(CONFIG_OS)/window.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/physics/collision/box.o $(LIBRARY_BIN)/physics/collision/shape.o \
 $(LIBRARY_BIN)/physics/collision/sphere.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/physics/init.o $(LIBRARY_BIN)/physics/motion-state.o $(LIBRARY_BIN)/physics/raycasting.o \
-$(LIBRARY_BIN)/physics/rigid-body.o $(LIBRARY_BIN)/physics/world.o
+$(LIBRARY_BIN)/physics/rigid-body.o $(LIBRARY_BIN)/physics/transform.o $(LIBRARY_BIN)/physics/world.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/snd/buffer.o $(LIBRARY_BIN)/snd/init.o $(LIBRARY_BIN)/snd/source.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/ui/xml/widget.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/ui/widgets/button.o $(LIBRARY_BIN)/ui/widgets/label.o

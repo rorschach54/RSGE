@@ -25,4 +25,16 @@ typedef struct {
 #endif
 } rsge_physics_transform_t;
 
+/**
+ * \fn rsge_error_e rsge_physics_transform_getorigin(rsge_physics_transform_t* transform,vec3* pos)
+ * \brief Gets the origin of the tranform.
+ * \param[out] transform The transform to use.
+ * \param[out] pos The pointer to the position.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_physics_transform_getorigin(rsge_physics_transform_t* transform,vec3* pos);
+
 #endif
