@@ -10,7 +10,9 @@ LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/model/xml.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/objects/fb.o $(LIBRARY_BIN)/gfx/objects/texbuff.o \
 $(LIBRARY_BIN)/gfx/objects/texture.o $(LIBRARY_BIN)/gfx/objects/unifbuff.o \
 $(LIBRARY_BIN)/gfx/objects/vert.o
-LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/uniforms/camera.o
+LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/uniforms/camera.o $(LIBRARY_BIN)/gfx/uniforms/material.o \
+$(LIBRARY_BIN)/gfx/uniforms/object.o $(LIBRARY_BIN)/gfx/uniforms/point-light.o \
+$(LIBRARY_BIN)/gfx/uniforms/render.o $(LIBRARY_BIN)/gfx/uniforms/scene.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/camera.o $(LIBRARY_BIN)/gfx/elglr.o $(LIBRARY_BIN)/gfx/font.o \
 $(LIBRARY_BIN)/gfx/image.o $(LIBRARY_BIN)/gfx/lighting.o $(LIBRARY_BIN)/gfx/model.o \
 $(LIBRARY_BIN)/gfx/particle-engine.o $(LIBRARY_BIN)/gfx/screenshot.o $(LIBRARY_BIN)/gfx/shader.o \
