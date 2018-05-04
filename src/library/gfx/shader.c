@@ -3,10 +3,32 @@
 #include <stdio.h>
 #include <string.h>
 
-rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,rsge_asset_t* asset) {
-	rsge_error_e err = rsge_shader_create(shader,type);
+rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) {
+	char* source;
+	size_t sourcesz;
+	rsge_error_e err = rsge_asset_read(path,&source,&sourcesz);
 	if(err != RSGE_ERROR_NONE) return err;
-	return rsge_shader_compile(shader,(char*)asset->data);
+	
+	char* header;
+	size_t headersz;
+	err = rsge_asset_read("rsge@shaders/shaderHeader",&header,&headersz);
+	if(err != RSGE_ERROR_NONE) return err;
+	
+	char* data = malloc(headersz+sourcesz);
+	if(data == NULL) {
+		return RSGE_ERROR_MALLOC;
+	}
+	strcpy(data,header);
+	strcat(data,source);
+	
+	err = rsge_shader_create(shader,type);
+	if(err != RSGE_ERROR_NONE) {
+		free(data);
+		return err;
+	}
+	err = rsge_shader_compile(shader,data);
+	free(data);
+	return err;
 }
 
 rsge_error_e rsge_shader_create(rsge_shader_t* shader,GLenum type) {

@@ -33,14 +33,14 @@ typedef struct {
 } rsge_shaderprg_t;
 
 /**
- * \fn rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,rsge_asset_t* asset)
+ * \fn rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path)
  * \brief Creates a new shader and loads the code from the asset.
  * \param[out] shader The pointer to the shader.
  * \param[in] type The type of shader to create.
- * \param[in] asset The asset to load the shader from.
+ * \param[in] path The path to the asset to load the shader from.
  * \return An error code.
  */
-rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,rsge_asset_t* asset);
+rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path);
 
 /**
  * \fn rsge_error_e rsge_shader_create(rsge_shader_t* shader,GLenum type)

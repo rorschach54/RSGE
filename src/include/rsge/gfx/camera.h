@@ -10,6 +10,47 @@
 #include <rsge/error.h>
 #include <linmath.h>
 
+/** \struct rsge_camera_t src/include/rsge/gfx/camera.h rsge/gfx/camera.h
+ * \brief A camera
+ */
+typedef struct {
+    /**
+     * \brief The Field-of-view.
+     */
+    vec2 fov;
+    
+    /**
+     * \brief Clip Planes
+     */
+    vec2 clipPlanes;
+    
+    /**
+     * \brief The camera's rotation.
+     */
+    quat rot;
+    
+    /**
+     * \brief The camera's position.
+     */
+    vec3 pos;
+} rsge_camera_t;
+
+/**
+ * \fn rsge_error_e rsge_camera_getmaincam(rsge_camera_t** cam)
+ * \brief Gets the main camera.
+ * \param[out] cam The pointer to store the camera.
+ * \return An error code.
+ */
+rsge_error_e rsge_camera_getmaincam(rsge_camera_t** cam);
+
+/**
+ * \fn rsge_error_e rsge_camera_create(rsge_camera_t* cam)
+ * \brief Creates a new camera.
+ * \param[out] cam The pointer to store the camera.
+ * \return An error code.
+ */
+rsge_error_e rsge_camera_create(rsge_camera_t* cam);
+
 /**
  * \fn rsge_error_e rsge_camera_setcolor(int color[4])
  * \brief Sets the color used to clear the frame.
@@ -17,30 +58,6 @@
  * \return An error.
  */
 rsge_error_e rsge_camera_setcolor(int color[4]);
-
-/**
- * \fn rsge_error_e rsge_camera_setrot(vec2 rot)
- * \brief Sets the camera's rotation
- * \param[in] rot The rotation position to use.
- * \return An error code.
- */
-rsge_error_e rsge_camera_setrot(vec2 rot);
-
-/**
- * \fn rsge_error_e rsge_camera_setpos(vec3 pos)
- * \brief Sets the camera's position.
- * \param[in] pos The position to use.
- * \return An error code.
- */
-rsge_error_e rsge_camera_setpos(vec3 pos);
-
-/**
- * \fn rsge_error_e rsge_camera_getpos(vec3* pos)
- * \brief Gets the camera's position.
- * \param[out] pos The pointer to store the position.
- * \return An error code.
- */
-rsge_error_e rsge_camera_getpos(vec3* pos);
 
 /**
  * \fn rsge_error_e rsge_camera_update()

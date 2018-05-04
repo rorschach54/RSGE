@@ -1,6 +1,7 @@
 #include <curl/curl.h>
 #include <rsge/cl/init.h>
 #include <rsge/gfx/camera.h>
+#include <rsge/gfx/elglr.h>
 #include <rsge/gfx/gl.h>
 #include <rsge/gfx/lighting.h>
 #include <rsge/physics/init.h>
@@ -348,6 +349,19 @@ int main(int argc,char** argv) {
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	glfwSwapInterval(1);
+	
+	log_debug("Initializing ELGLR");
+	err = rsge_elglr_init();
+	if(err != RSGE_ERROR_NONE) {
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		config_destroy(&rsge_libconfig_cfg);
+		curl_global_cleanup();
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -389,6 +403,7 @@ int main(int argc,char** argv) {
 #endif
 		config_destroy(&rsge_libconfig_cfg);
 		curl_global_cleanup();
+		rsge_elglr_deinit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		return EXIT_FAILURE;
@@ -402,6 +417,7 @@ int main(int argc,char** argv) {
 #endif
 		rsge_assets_uninit();
 		curl_global_cleanup();
+		rsge_elglr_deinit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -417,6 +433,7 @@ int main(int argc,char** argv) {
 		rsge_assets_uninit();
 		rsge_cl_deinit();
 		curl_global_cleanup();
+		rsge_elglr_deinit();
 		config_destroy(&rsge_libconfig_cfg);
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -433,6 +450,7 @@ int main(int argc,char** argv) {
 		rsge_assets_uninit();
 		curl_global_cleanup();
 		rsge_cl_deinit();
+		rsge_elglr_deinit();
 		rsge_input_deinit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -450,6 +468,7 @@ int main(int argc,char** argv) {
 		curl_global_cleanup();
 		rsge_input_deinit();
 		rsge_physics_deinit();
+		rsge_elglr_deinit();
 		rsge_cl_deinit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
@@ -457,46 +476,6 @@ int main(int argc,char** argv) {
 	}
 
 	rsge_callbacks_init();
-	
-	log_debug("Setting up camera");
-	vec3 pos;
-	pos[0] = 0.0f;
-	pos[1] = 0.0f;
-	pos[2] = 0.0f;
-	err = rsge_camera_setpos(pos);
-	if(err != RSGE_ERROR_NONE) {
-#if CONFIG_USE_FREETYPE == 1
-		FT_Done_FreeType(rsge_freetype_lib);
-#endif
-		rsge_ui_deinit();
-		rsge_assets_uninit();
-		rsge_input_deinit();
-		rsge_cl_deinit();
-		curl_global_cleanup();
-		config_destroy(&rsge_libconfig_cfg);
-		glfwDestroyWindow(window);
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
-	
-	vec2 rot;
-	rot[0] = 0.0f;
-	rot[1] = 0.0f;
-	err = rsge_camera_setrot(rot);
-	if(err != RSGE_ERROR_NONE) {
-#if CONFIG_USE_FREETYPE == 1
-		FT_Done_FreeType(rsge_freetype_lib);
-#endif
-		rsge_ui_deinit();
-		rsge_assets_uninit();
-		rsge_input_deinit();
-		curl_global_cleanup();
-		rsge_cl_deinit();
-		config_destroy(&rsge_libconfig_cfg);
-		glfwDestroyWindow(window);
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
 
 	log_info("RSGE: Initializing game");
 	/* Initialize game */
@@ -508,6 +487,7 @@ int main(int argc,char** argv) {
 #endif
 		rsge_ui_deinit();
 		rsge_assets_uninit();
+		rsge_elglr_deinit();
 		rsge_input_deinit();
 		rsge_physics_deinit();
 		curl_global_cleanup();
@@ -554,6 +534,7 @@ int main(int argc,char** argv) {
 		rsge_physics_deinit();
 		rsge_ui_deinit();
 		curl_global_cleanup();
+		rsge_elglr_deinit();
 		rsge_cl_deinit();
 		rsge_assets_uninit();
 		rsge_input_deinit();
@@ -569,6 +550,7 @@ int main(int argc,char** argv) {
 	rsge_input_deinit();
 	rsge_physics_deinit();
 	rsge_cl_deinit();
+	rsge_elglr_deinit();
 
 #if CONFIG_USE_FREETYPE == 1
 	FT_Done_FreeType(rsge_freetype_lib);

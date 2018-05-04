@@ -40,12 +40,40 @@
 		"path": "src/assets/models/simple.xml"
 	},
 	{
-		"name": "shaders/shape/shader.frag",
-		"path": "src/assets/shaders/shape/shader.frag"
+		"name": "shaders/copyTexture.frag",
+		"path": "src/assets/shaders/copyTexture.frag"
 	},
 	{
-		"name": "shaders/shape/shader.vert",
-		"path": "src/assets/shaders/shape/shader.vert"
+		"name": "shaders/depthCube.geom",
+		"path": "src/assets/shaders/depthCube.geom"
+	},
+	{
+		"name": "shaders/depthOnly.frag",
+		"path": "src/assets/shaders/depthOnly.frag"
+	},
+	{
+		"name": "shaders/depthOnly.vert",
+		"path": "src/assets/shaders/depthOnly.vert"
+	},
+	{
+		"name": "shaders/firstPass.frag",
+		"path": "src/assets/shaders/firstPass.frag"
+	},
+	{
+		"name": "shaders/fullScreenQuad.vert",
+		"path": "src/assets/shaders/fullScreenQuad.vert"
+	},
+	{
+		"name": "shaders/lighting.frag",
+		"path": "src/assets/shaders/lighting.frag"
+	},
+	{
+		"name": "shaders/shaderHeader",
+		"path": "src/assets/shaders/shaderHeader"
+	},
+	{
+		"name": "shaders/transforms.vert",
+		"path": "src/assets/shaders/transforms.vert"
 	},
 	{
 		"name": "ui/widgets/button.xml",

@@ -118,7 +118,11 @@ typedef enum {
 	/**
 	 * Invalid platform for OpenCL.
 	 */
-	RSGE_ERROR_CL_INVALID_PLATFORM
+	RSGE_ERROR_CL_INVALID_PLATFORM,
+	/**
+	 * Invalid type.
+	 */
+	RSGE_ERROR_INVALID_TYPE
 } rsge_error_e;
 
 #endif

@@ -7,10 +7,15 @@ ifeq ($(CONFIG_USE_LIBPNG),y)
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/image/libpng.o
 endif
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/model/xml.o
-LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/camera.o $(LIBRARY_BIN)/gfx/font.o $(LIBRARY_BIN)/gfx/image.o \
-$(LIBRARY_BIN)/gfx/lighting.o $(LIBRARY_BIN)/gfx/model.o $(LIBRARY_BIN)/gfx/particle-engine.o \
-$(LIBRARY_BIN)/gfx/screenshot.o $(LIBRARY_BIN)/gfx/shader.o $(LIBRARY_BIN)/gfx/shape.o \
-$(LIBRARY_BIN)/gfx/surface.o $(LIBRARY_BIN)/gfx/terrain.o $(LIBRARY_BIN)/gfx/tiling-engine.o
+LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/objects/fb.o $(LIBRARY_BIN)/gfx/objects/texbuff.o \
+$(LIBRARY_BIN)/gfx/objects/texture.o $(LIBRARY_BIN)/gfx/objects/unifbuff.o \
+$(LIBRARY_BIN)/gfx/objects/vert.o
+LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/uniforms/camera.o
+LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/camera.o $(LIBRARY_BIN)/gfx/elglr.o $(LIBRARY_BIN)/gfx/font.o \
+$(LIBRARY_BIN)/gfx/image.o $(LIBRARY_BIN)/gfx/lighting.o $(LIBRARY_BIN)/gfx/model.o \
+$(LIBRARY_BIN)/gfx/particle-engine.o $(LIBRARY_BIN)/gfx/screenshot.o $(LIBRARY_BIN)/gfx/shader.o \
+$(LIBRARY_BIN)/gfx/shape.o $(LIBRARY_BIN)/gfx/surface.o $(LIBRARY_BIN)/gfx/terrain.o \
+$(LIBRARY_BIN)/gfx/tiling-engine.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/net/ftp.o $(LIBRARY_BIN)/net/http.o $(LIBRARY_BIN)/net/https.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/os/$(CONFIG_OS)/callbacks.o $(LIBRARY_BIN)/os/$(CONFIG_OS)/input.o \
 $(LIBRARY_BIN)/os/$(CONFIG_OS)/main.o $(LIBRARY_BIN)/os/$(CONFIG_OS)/settings.o \
