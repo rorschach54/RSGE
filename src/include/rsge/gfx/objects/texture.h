@@ -37,4 +37,21 @@ typedef struct {
     int id;
 } rsge_obj_texture_t;
 
+/**
+ * \fn rsge_error_e rsge_obj_texture_create(rsge_obj_texture_t* texture)
+ * \brief Creates a new texture.
+ * \param[out] texture The pointer to store the texture.
+ * \return An error code.
+ */
+rsge_error_e rsge_obj_texture_create(rsge_obj_texture_t* texture);
+
+/**
+ * \fn rsge_error_e rsge_obj_texture_getbyid(int id,rsge_obj_texture_t** texture)
+ * \brief Creates a new texture.
+ * \param[in] id The ID of the texture.
+ * \param[out] texture The pointer to store the texture.
+ * \return An error code.
+ */
+rsge_error_e rsge_obj_texture_getbyid(int id,rsge_obj_texture_t** texture);
+
 #endif

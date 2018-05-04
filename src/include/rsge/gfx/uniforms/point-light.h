@@ -6,6 +6,7 @@
  * \author Spaceboy Ross
  */
 
+#include <rsge/gfx/lighting.h>
 #include <rsge/error.h>
 #include <linmath.h>
 
@@ -24,7 +25,7 @@ typedef struct {
 	/**
 	 * \brief The position
 	 */
-	vec4 position;
+	vec4 pos;
 	/**
 	 * \brief The intensity
 	 */
@@ -36,11 +37,12 @@ typedef struct {
 } rsge_unif_point_light_t;
 
 /**
- * \fn rsge_error_e rsge_unif_point_light_create(rsge_unif_point_light_t* unif)
+ * \fn rsge_error_e rsge_unif_point_light_create(rsge_unif_point_light_t* unif,rsge_point_light_t* pointLight)
  * \brief Creates a new uniform point light.
  * \param[out] unif The pointer to store the uniform point light.
+ * \param[in] pointLight The point light to use.
  * \return An error code.
  */
-rsge_error_e rsge_unif_point_light_create(rsge_unif_point_light_t* unif);
+rsge_error_e rsge_unif_point_light_create(rsge_unif_point_light_t* unif,rsge_point_light_t* pointLight);
 
 #endif

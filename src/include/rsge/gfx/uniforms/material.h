@@ -6,6 +6,7 @@
  * \author Spaceboy Ross
  */
 
+#include <rsge/gfx/mesh.h>
 #include <rsge/error.h>
 #include <linmath.h>
 
@@ -25,11 +26,12 @@ typedef struct {
 } rsge_unif_material_t;
 
 /**
- * \fn rsge_error_e rsge_unif_material_create(rsge_unif_material_t* unif)
+ * \fn rsge_error_e rsge_unif_material_create(rsge_unif_material_t* unif,rsge_material_t* mat)
  * \brief Creates a new uniform material.
  * \param[out] unif The pointer to store the uniform material.
+ * \param[in] mat The material to use.
  * \return An error code.
  */
-rsge_error_e rsge_unif_material_create(rsge_unif_material_t* unif);
+rsge_error_e rsge_unif_material_create(rsge_unif_material_t* unif,rsge_material_t* mat);
 
 #endif

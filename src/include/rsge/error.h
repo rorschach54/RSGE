@@ -122,7 +122,11 @@ typedef enum {
 	/**
 	 * Invalid type.
 	 */
-	RSGE_ERROR_INVALID_TYPE
+	RSGE_ERROR_INVALID_TYPE,
+	/**
+	 * Invalid ID.
+	 */
+	RSGE_ERROR_INVALID_ID
 } rsge_error_e;
 
 #endif
