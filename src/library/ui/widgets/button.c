@@ -74,53 +74,46 @@ rsge_error_e rsge_ui_widget_button_update(rsge_ui_widget_t* widget,rsge_ui_surfa
     err = rsge_ui_widget_getstyle(widget,"textColor",(void**)&textColor);
     if(err != RSGE_ERROR_NONE) return err;
     
-    rsge_surface_t textSurface;
-    err = rsge_font_render(&button->font,&textSurface,button->text,textColor);
+    rsge_obj_texture_t textTexture;
+    err = rsge_font_render(&button->font,&textTexture,button->text,textColor);
     if(err != RSGE_ERROR_NONE) return err;
     
     int backgroundColor[4];
     err = rsge_ui_widget_getstyle(widget,"backgroundColor",(void**)&backgroundColor);
     if(err != RSGE_ERROR_NONE) {
-        for(size_t y = 0;y < textSurface.height;y++) {
-            for(size_t x = 0;x < textSurface.width;x++) {
-                size_t off = textSurface.bpp*(x+y*textSurface.width);
-                size_t soff = ui->surface.bpp*((widget->x+x)+(widget->y+y)*ui->surface.width);
-                if(textSurface.buffer[off] == textColor[0]
-                    && textSurface.buffer[off+1] == textColor[1]
-                    && textSurface.buffer[off+2] == textColor[2]
-                    && textSurface.buffer[off+3] == textColor[3]) {
-                    ui->surface.buffer[soff] = textColor[0];
-                    ui->surface.buffer[soff+1] = textColor[1];
-                    ui->surface.buffer[soff+2] = textColor[2];
-                    ui->surface.buffer[soff+3] = textColor[3];
+        for(size_t y = 0;y < textTexture.height;y++) {
+            for(size_t x = 0;x < textTexture.width;x++) {
+                size_t off = (y*textTexture.width+x);
+                size_t soff = ((widget->y+y)*ui->texture.width+(widget->x+x));
+                if(textTexture.pixels[off].red == (float)(textColor[0]/255)
+                    && textTexture.pixels[off].green == (float)(textColor[1]/255)
+                    && textTexture.pixels[off].blue == (float)(textColor[2]/255)
+                    && textTexture.pixels[off].alpha == (float)(textColor[3]/255)) {
+                    ui->texture.pixels[soff].red = (float)(textColor[0]/255);
+                    ui->texture.pixels[soff].green = (float)(textColor[1]/255);
+                    ui->texture.pixels[soff].blue = (float)(textColor[2]/255);
+                    ui->texture.pixels[soff].alpha = (float)(textColor[3]/255);
                 }
             }
         }
     } else {
-        for(size_t y = 0;y < textSurface.height;y++) {
-            for(size_t x = 0;x < textSurface.width;x++) {
-                size_t off = textSurface.bpp*(x+y*textSurface.width);
-                if(textSurface.buffer[off] != textColor[0]
-                    && textSurface.buffer[off+1] != textColor[1]
-                    && textSurface.buffer[off+2] != textColor[2]
-                    && textSurface.buffer[off+3] != textColor[3]) {
-                    textSurface.buffer[off] = backgroundColor[0];
-                    textSurface.buffer[off+1] = backgroundColor[1];
-                    textSurface.buffer[off+2] = backgroundColor[2];
-                    textSurface.buffer[off+3] = backgroundColor[3];
+        for(size_t y = 0;y < textTexture.height;y++) {
+            for(size_t x = 0;x < textTexture.width;x++) {
+                size_t off = (y*textTexture.width+x);
+                if(textTexture.pixels[off].red != (float)(textColor[0]/255)
+                    && textTexture.pixels[off].green != (float)(textColor[1]/255)
+                    && textTexture.pixels[off].blue != (float)(textColor[2]/255)
+                    && textTexture.pixels[off].alpha != (float)(textColor[3]/255)) {
+                    textTexture.pixels[off].red = (float)(backgroundColor[0]/255);
+                    textTexture.pixels[off].green = (float)(backgroundColor[1]/255);
+                    textTexture.pixels[off].blue = (float)(backgroundColor[2]/255);
+                    textTexture.pixels[off].alpha = (float)(backgroundColor[3]/255);
                 }
             }
         }
-        vec2 pos;
-        pos[0] = widget->x;
-        pos[1] = widget->y;
-        err = rsge_surface_blit(&ui->surface,&textSurface,pos);
-        if(err != RSGE_ERROR_NONE) {
-            rsge_surface_destroy(&textSurface);
-            return err;
-        }
+        // TODO: blit the texture.
     }
-    rsge_surface_destroy(&textSurface);
+    free(textTexture.pixels);
     return RSGE_ERROR_NONE;
 }
 
@@ -147,8 +140,8 @@ rsge_error_e rsge_ui_widget_button_create(rsge_ui_widget_t* widget,rsge_ui_surfa
     widget->destroy = rsge_ui_widget_button_destroy;
     widget->update = rsge_ui_widget_button_update;
     
-    widget->width = ui->surface.width/10;
-    widget->height = ui->surface.height/10;
+    widget->width = ui->texture.width/10;
+    widget->height = ui->texture.height/10;
     
     char* fontPath;
     err = rsge_ui_widget_getstyle(widget,"font",(void**)&fontPath);

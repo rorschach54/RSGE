@@ -32,6 +32,10 @@ rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) 
 }
 
 rsge_error_e rsge_shader_create(rsge_shader_t* shader,GLenum type) {
+	if(shader->id > 0) {
+		rsge_error_e err = rsge_shader_destroy(shader);
+		if(err != RSGE_ERROR_NONE) return err;
+	}
 	memset(shader,0,sizeof(rsge_shader_t));
 
 	shader->id = glCreateShader(type);
@@ -67,6 +71,10 @@ rsge_error_e rsge_shader_compile(rsge_shader_t* shader,char* source) {
 }
 
 rsge_error_e rsge_shaderprg_create(rsge_shaderprg_t* prog) {
+	if(prog->id > 0) {
+		rsge_error_e err = rsge_shaderprg_destroy(prog);
+		if(err != RSGE_ERROR_NONE) return err;
+	}
 	memset(prog,0,sizeof(rsge_shaderprg_t));
 
 	prog->id = glCreateProgram();

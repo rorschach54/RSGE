@@ -51,28 +51,4 @@ rsge_error_e rsge_camera_getmaincam(rsge_camera_t** cam);
  */
 rsge_error_e rsge_camera_create(rsge_camera_t* cam);
 
-/**
- * \fn rsge_error_e rsge_camera_setcolor(int color[4])
- * \brief Sets the color used to clear the frame.
- * \param[in] color The color to use in RGBA format.
- * \return An error.
- */
-rsge_error_e rsge_camera_setcolor(int color[4]);
-
-/**
- * \fn rsge_error_e rsge_camera_update()
- * \brief Updates the camera. Do not run this in your code, this is handled automatically.
- * \return An error code.
- */
-rsge_error_e rsge_camera_update();
-
-/**
- * \fn rsge_error_e rsge_camera_reshape(int width,int height)
- * \brief Reshapes the frame and camera to work properly with the screen or window. Do not run this in your code, this is handled automatically.
- * \param[in] width The new width.
- * \param[in] height The new height.
- * \return An error code.
- */
-rsge_error_e rsge_camera_reshape(int width,int height);
-
 #endif

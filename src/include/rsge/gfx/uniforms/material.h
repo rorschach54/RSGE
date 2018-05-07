@@ -1,7 +1,7 @@
 #ifndef __RSGE_GFX_UNIFORMS_MATERIAL_H_
 #define __RSGE_GFX_UNIFORMS_MATERIAL_H_ 1
 
-/** \file src/include/rsge/uniforms/material.h
+/** \file src/include/rsge/gfx/uniforms/material.h
  * \brief Material uniform
  * \author Spaceboy Ross
  */
@@ -10,7 +10,7 @@
 #include <rsge/error.h>
 #include <linmath.h>
 
-/** \struct rsge_unif_material_t src/include/rsge/uniforms/material.h rsge/uniforms/material.h
+/** \struct rsge_unif_material_t src/include/rsge/gfx/uniforms/material.h rsge/gfx/uniforms/material.h
  * \brief Material uniform
  */
 typedef struct {

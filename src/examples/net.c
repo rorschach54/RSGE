@@ -7,7 +7,7 @@
 
 rsge_net_http_client_t client;
 
-rsge_error_e rsge_game_init() {
+rsge_error_e rsge_game_init(rsge_elglr_t* elglr) {
 	rsge_error_e err;
 	err = rsge_net_http_client_create(&client);
 	if(err != RSGE_ERROR_NONE) return err;
@@ -19,7 +19,7 @@ rsge_error_e rsge_game_init() {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_uninit() {
+rsge_error_e rsge_game_uninit(rsge_elglr_t* elglr) {
 	rsge_error_e err = rsge_net_http_client_disconnect(&client);
 	if(err != RSGE_ERROR_NONE) return err;
 	
@@ -28,7 +28,7 @@ rsge_error_e rsge_game_uninit() {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_update(double time,int fps) {
+rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double time,int fps) {
 	return RSGE_ERROR_NONE;
 }
 

@@ -23,6 +23,8 @@ extern void error_callback(int error,const char* description);
 extern void fb_resize(GLFWwindow* window,int width,int height);
 extern void rsge_sigint(int dummy);
 
+extern rsge_elglr_t rsge_elglr;
+
 #if CONFIG_USE_FREETYPE == 1
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -363,36 +365,6 @@ int main(int argc,char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_FOG);
-	glFogi(GL_FOG_MODE,GL_EXP2);
-	glHint(GL_FOG_HINT,GL_NICEST);
-	
-	log_debug("Setting up lighting");
-	rsge_lighting_enableLight(0);
-	rsge_lighting_enableLight(1);
-	vec4 sunpos;
-	sunpos[0] = 0.0f;
-	sunpos[1] = 0.0f;
-	sunpos[2] = 0.0f;
-	sunpos[3] = 1.0f;
-	rsge_lighting_setpos(0,sunpos);
-	
-	float ambient[3];
-	ambient[0] = 1.0f;
-	ambient[1] = 1.0f;
-	ambient[2] = 1.0f;
-	rsge_lighting_setambient(1,ambient);
-	
-	float diffuse[3];
-	diffuse[0] = 1.0f;
-	diffuse[1] = 1.0f;
-	diffuse[2] = 1.0f;
-	rsge_lighting_setdiffuse(0,diffuse);
-
 	fb_resize(window,res_w,res_h);
 	
 	log_debug("Assets initializing");
@@ -479,7 +451,7 @@ int main(int argc,char** argv) {
 
 	log_info("RSGE: Initializing game");
 	/* Initialize game */
-	err = rsge_game_init();
+	err = rsge_game_init(&rsge_elglr);
 	if(err != RSGE_ERROR_NONE) {
 		log_error("rsge_game_init() returned error code %d",err);
 #if CONFIG_USE_FREETYPE == 1
@@ -507,9 +479,7 @@ int main(int argc,char** argv) {
 		frameCount++;
 		int width,height;
 		glfwGetFramebufferSize(window,&width,&height);
-		rsge_camera_reshape(width,height);
-		rsge_camera_update();
-		err = rsge_game_update(currentTime,frameCount);
+		err = rsge_game_update(&rsge_elglr,currentTime,frameCount);
 		if(err != RSGE_ERROR_NONE) {
 			exitStatus = EXIT_FAILURE;
 			break;
@@ -526,7 +496,7 @@ int main(int argc,char** argv) {
 
 	log_info("RSGE: Uninitializing game");
 	/* Uninitialize game */
-	err = rsge_game_uninit();
+	err = rsge_game_uninit(&rsge_elglr);
 	if(err != RSGE_ERROR_NONE) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);

@@ -9,6 +9,6 @@
 #include <rsge/gfx/image.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-rsge_error_e rsge_image_bmp_fromFile(rsge_surface_t* surface,char* path);
+rsge_error_e rsge_image_bmp_fromFile(rsge_obj_texture_t* texture,char* path);
 #endif
 #endif

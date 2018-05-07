@@ -1,7 +1,7 @@
 #ifndef __RSGE_GFX_UNIFORMS_RENDER_H_
 #define __RSGE_GFX_UNIFORMS_RENDER_H_ 1
 
-/** \file src/include/rsge/uniforms/render.h
+/** \file src/include/rsge/gfx/uniforms/render.h
  * \brief Render uniform
  * \author Spaceboy Ross
  */
@@ -9,7 +9,7 @@
 #include <rsge/error.h>
 #include <linmath.h>
 
-/** \struct rsge_unif_render_t src/include/rsge/uniforms/render.h rsge/uniforms/render.h
+/** \struct rsge_unif_render_t src/include/rsge/gfx/uniforms/render.h rsge/gfx/uniforms/render.h
  * \brief Render uniform
  */
 typedef struct {

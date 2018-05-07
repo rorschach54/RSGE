@@ -1,7 +1,7 @@
 #ifndef __RSGE_GFX_UNIFORMS_SCENE_H_
 #define __RSGE_GFX_UNIFORMS_SCENE_H_ 1
 
-/** \file src/include/rsge/uniforms/scene.h
+/** \file src/include/rsge/gfx/uniforms/scene.h
  * \brief Scene uniform
  * \author Spaceboy Ross
  */
@@ -9,7 +9,7 @@
 #include <rsge/error.h>
 #include <linmath.h>
 
-/** \struct rsge_unif_scene_t src/include/rsge/uniforms/scene.h rsge/uniforms/scene.h
+/** \struct rsge_unif_scene_t src/include/rsge/gfx/uniforms/scene.h rsge/gfx/uniforms/scene.h
  * \brief Scene uniform
  */
 typedef struct {

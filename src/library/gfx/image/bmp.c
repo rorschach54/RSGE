@@ -1,5 +1,7 @@
 #include <rsge/gfx/image/bmp.h>
 #include <rsge/assets.h>
+#include <log.h>
+#include <stdlib.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct {
@@ -34,7 +36,7 @@ rsge_error_e rsge_image_bmp_readshort(rsge_image_bmp_t* bmp,unsigned short* val)
     return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_image_bmp_fromFile(rsge_surface_t* surface,char* path) {
+rsge_error_e rsge_image_bmp_fromFile(rsge_obj_texture_t* texture,char* path) {
     rsge_image_bmp_t bmp;
 	rsge_error_e err = rsge_asset_read(path,&bmp.data,&bmp.datasz);
 	if(err != RSGE_ERROR_NONE) return err;
@@ -80,10 +82,28 @@ rsge_error_e rsge_image_bmp_fromFile(rsge_surface_t* surface,char* path) {
 	int bpp = 3;
 	bmp.off = pixelDataOffset;
 	
-	err = rsge_surface_create(surface,res_w,res_h,bpp,0);
+	err = rsge_obj_texture_create(texture);
 	if(err != RSGE_ERROR_NONE) return err;
+	texture->width = res_w;
+	texture->height = res_h;
+	texture->pixels = malloc(((res_w+4-(res_w % 4))*res_h));
+	if(!texture->pixels) {
+		log_error("Failed to allocate %d bytes of memory",((res_w+4-(res_w % 4))*res_h));
+		return RSGE_ERROR_MALLOC;
+	}
+	char* cursor = bmp.data+bmp.off;
 	/* Load the pixel data */
-	memcpy(surface->buffer,bmp.data+bmp.off,(res_w*res_h)*bpp);
+	for(size_t y = res_h-1;y >= 0;y--) {
+		for(size_t x = 0;x < res_w;x++) {
+			rsge_color_rgba_t pixel;
+			pixel.red = (float)((unsigned char)(*(cursor++)))/255;
+			pixel.green = (float)((unsigned char)(*(cursor++)))/255;
+			pixel.blue = (float)((unsigned char)(*(cursor++)))/255;
+			pixel.alpha = 1.0f;
+			texture->pixels[y*res_w+x] = pixel;
+		}
+		cursor += (4-((res_w*3) % 4)) % 4;
+	}
 	return RSGE_ERROR_NONE;
 }
 #endif

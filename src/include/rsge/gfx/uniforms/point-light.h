@@ -1,7 +1,7 @@
 #ifndef __RSGE_GFX_UNIFORMS_POINT_LIGHT_H_
 #define __RSGE_GFX_UNIFORMS_POINT_LIGHT_H_ 1
 
-/** \file src/include/rsge/uniforms/point-light.h
+/** \file src/include/rsge/gfx/uniforms/point-light.h
  * \brief Point light uniform
  * \author Spaceboy Ross
  */
@@ -10,7 +10,7 @@
 #include <rsge/error.h>
 #include <linmath.h>
 
-/** \struct rsge_unif_point_light_t src/include/rsge/uniforms/point-light.h rsge/uniforms/point-light.h
+/** \struct rsge_unif_point_light_t src/include/rsge/gfx/uniforms/point-light.h rsge/gfx/uniforms/point-light.h
  * \brief Point light uniform
  */
 typedef struct {

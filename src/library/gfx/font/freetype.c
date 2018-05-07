@@ -1,5 +1,6 @@
 #include <rsge/gfx/font/freetype.h>
 #include <rsge/settings.h>
+#include <log.h>
 #include <string.h>
 
 extern FT_Library rsge_freetype_lib;
@@ -10,7 +11,7 @@ static rsge_error_e rsge_font_freetype_destroy(rsge_font_t* font) {
 	return RSGE_ERROR_NONE;
 }
 
-static rsge_error_e rsge_font_freetype_render(rsge_font_t* font,rsge_surface_t* surface,char* text,int color[4]) {
+static rsge_error_e rsge_font_freetype_render(rsge_font_t* font,rsge_obj_texture_t* texture,char* text,int color[4]) {
 	/* Get the font implementation structure */
 	rsge_font_freetype_t* ft = (rsge_font_freetype_t*)font->impl;
 
@@ -49,11 +50,27 @@ static rsge_error_e rsge_font_freetype_render(rsge_font_t* font,rsge_surface_t* 
 	}
 
 	/* Create surface */
-	rsge_error_e err = rsge_surface_create(surface,img_w,img_h,4,0);
+	rsge_error_e err = rsge_obj_texture_create(texture);
 	if(err != RSGE_ERROR_NONE) return err;
+	texture->width = img_w;
+	texture->height = img_h;
+	texture->pixels = malloc(((texture->width+4-(texture->width % 4))*texture->height));
+	if(!texture->pixels) {
+		log_error("Failed to allocate %d bytes of memory",((texture->width+4-(texture->width % 4))*texture->height));
+		return RSGE_ERROR_MALLOC;
+	}
 	if(font->invert) {
-		err = rsge_surface_clear(surface,color);
-		if(err != RSGE_ERROR_NONE) return err;
+		size_t off = 0;
+		for(size_t y = 0;y < texture->height-1;y++) {
+			for(size_t x = 0;x < texture->width;x++) {
+				rsge_color_rgba_t pixel;
+				pixel.red = (float)(color[0]/255);
+				pixel.green = (float)(color[1]/255);
+				pixel.blue = (float)(color[2]/255);
+				pixel.alpha = (float)(color[3]/255);
+				texture->pixels[y*texture->width+x] = pixel;
+			}
+		}
 	}
 
 	/* The pen is the cursor */
@@ -90,26 +107,28 @@ static rsge_error_e rsge_font_freetype_render(rsge_font_t* font,rsge_surface_t* 
 		for(a = g->bitmap_left,p = 0;a < glyph_xmax;a++,p++) {
 			for(j = (img_h-g->bitmap_top),q = 0;j < glyph_ymax;j++,q++) {
 				if(a < 0 || j < 0 || a >= img_w || j >= img_h) continue;
-
-				size_t off = surface->bpp*((a+pen_x)+(j+pen_y)*surface->width);
+				size_t x = (a+pen_x);
+				size_t y = (j+pen_y);
+				rsge_color_rgba_t pixel;
 
 				if(font->invert) {
-					surface->buffer[off] = color[0];
-					surface->buffer[off+1] = color[1];
-					surface->buffer[off+2] = color[2];
-					surface->buffer[off+3] = color[3];
+					pixel.red = (float)(color[0]/255);
+					pixel.green = (float)(color[1]/255);
+					pixel.blue = (float)(color[2]/255);
+					pixel.alpha = (float)(color[3]/255);
 					if(glyph_bitmap->buffer[q*glyph_bitmap->width+p] > 0) {
-						surface->buffer[off] = surface->buffer[off+1] = surface->buffer[off+2] = surface->buffer[off+3] = 0;
+						pixel.red = pixel.green = pixel.blue = pixel.alpha = 0.0f;
 					}
 				} else {
-					surface->buffer[off] = surface->buffer[off+1] = surface->buffer[off+2] = surface->buffer[off+3] = 0;
+					pixel.red = pixel.green = pixel.blue = pixel.alpha = 0.0f;
 					if(glyph_bitmap->buffer[q*glyph_bitmap->width+p] > 0) {
-						surface->buffer[off] = color[0];
-						surface->buffer[off+1] = color[1];
-						surface->buffer[off+2] = color[2];
-						surface->buffer[off+3] = color[3];
+						pixel.red = (float)(color[0]/255);
+						pixel.green = (float)(color[1]/255);
+						pixel.blue = (float)(color[2]/255);
+						pixel.alpha = (float)(color[3]/255);
 					}
 				}
+				texture->pixels[y*texture->width+x] = pixel;
 			}
 		}
 

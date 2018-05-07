@@ -160,6 +160,7 @@ typedef struct {
 /**
  * \fn rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount,uint8_t flags)
  * \brief Creates a new shape.
+ * \deprecated Use the vertex object stuff that has been implemented with ELGLR.
  * \param[out] shape The pointer to the shape.
  * \param[in] mode The GL rendering mode to use.
  * \param[in] vertices An array of vertices.
@@ -169,22 +170,24 @@ typedef struct {
  * \param[in] flags The flags to use.
  * \return An error code.
  */
-rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount,uint8_t flags);
+rsge_error_e rsge_shape_create(rsge_shape_t* shape,GLenum mode,rsge_shape_vert_t* vertices,int verticeCount,rsge_shape_mat_t* materials,int materialCount,uint8_t flags) __attribute__ ((deprecated));
 
 /**
  * \fn rsge_error_e rsge_shape_destroy(rsge_shape_t* shape)
  * \brief Destroyes the shape.
+ * \deprecated Use the vertex object stuff that has been implemented with ELGLR.
  * \param[out] shape The pointer to the shape.
  * \return An error code.
  */
-rsge_error_e rsge_shape_destroy(rsge_shape_t* shape);
+rsge_error_e rsge_shape_destroy(rsge_shape_t* shape) __attribute__ ((deprecated));
 
 /**
  * \fn rsge_error_e rsge_shape_render(rsge_shape_t* shape)
  * \brief Renders the shape.
+ * \deprecated Use the vertex object stuff that has been implemented with ELGLR.
  * \param[out] shape The pointer to the shape.
  * \return An error code.
  */
-rsge_error_e rsge_shape_render(rsge_shape_t* shape);
+rsge_error_e rsge_shape_render(rsge_shape_t* shape) __attribute__ ((deprecated));
 
 #endif

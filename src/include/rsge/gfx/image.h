@@ -6,16 +6,16 @@
  * \author Spaceboy Ross
  */
 
-#include <rsge/gfx/surface.h>
+#include <rsge/gfx/objects/texture.h>
 #include <rsge/assets.h>
 
 /**
- * \fn rsge_error_e rsge_image_fromFile(rsge_surface_t* surface,char* path)
+ * \fn rsge_error_e rsge_image_fromFile(rsge_obj_texture_t* texture,char* path)
  * \brief Loads an image onto a surface from an asset file.
- * \param[out] surface The pointer to the surface.
+ * \param[out] texture The pointer to the texture.
  * \param[in] path The path to the asset.
  * \return An error code.
  */
-rsge_error_e rsge_image_fromFile(rsge_surface_t* surface,char* path);
+rsge_error_e rsge_image_fromFile(rsge_obj_texture_t* texture,char* path);
 
 #endif

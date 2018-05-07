@@ -3,6 +3,10 @@
 #include <string.h>
 
 rsge_error_e rsge_obj_unifbuff_create(rsge_obj_unifbuff_t* ub,GLuint binding) {
+    if(ub->ubo > 0) {
+        rsge_error_e err = rsge_obj_unifbuff_destroy(ub);
+        if(err != RSGE_ERROR_NONE) return err;
+    }
     memset(ub,0,sizeof(rsge_obj_unifbuff_t));
     glGenBuffers(1,&ub->ubo);
     if(ub->ubo == 0) {

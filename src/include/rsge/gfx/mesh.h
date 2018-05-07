@@ -93,9 +93,9 @@ typedef struct {
  */
 typedef struct {
     /**
-     * \brief The parent material.
+     * \brief The parent mesh.
      */
-    rsge_material_t parent;
+    rsge_mesh_t parent;
     
     /**
      * \brief Is the triangle textured.

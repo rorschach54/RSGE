@@ -3,6 +3,10 @@
 #include <string.h>
 
 rsge_error_e rsge_obj_fb_create(rsge_obj_fb_t* fb) {
+    if(fb->fbo > 0) {
+        rsge_error_e err = rsge_obj_fb_destroy(fb);
+        if(err != RSGE_ERROR_NONE) return err;
+    }
     memset(fb,0,sizeof(rsge_obj_fb_t));
     
     glGenFramebuffers(1,&fb->fbo);

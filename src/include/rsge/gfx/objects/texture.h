@@ -17,6 +17,11 @@
  */
 typedef struct {
     /**
+     * \brief The name of the texture.
+     */
+    char* name;
+    
+    /**
      * \brief The pixel buffer.
      */
     rsge_color_rgba_t* pixels;

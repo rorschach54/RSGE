@@ -10,8 +10,17 @@
 #include <rsge/gfx/objects/texbuff.h>
 #include <rsge/gfx/objects/unifbuff.h>
 #include <rsge/gfx/objects/vert.h>
+#include <rsge/gfx/uniforms/camera.h>
+#include <rsge/gfx/uniforms/material.h>
+#include <rsge/gfx/uniforms/object.h>
+#include <rsge/gfx/uniforms/point-light.h>
+#include <rsge/gfx/uniforms/render.h>
+#include <rsge/gfx/uniforms/scene.h>
+#include <rsge/gfx/mesh.h>
+#include <rsge/gfx/object.h>
 #include <rsge/gfx/shader.h>
 #include <rsge/error.h>
+#include <list.h>
 #include <stdbool.h>
 
 #define RSGE_ELGLR_NUMBUFFS 4
@@ -140,6 +149,14 @@ typedef struct {
          * \brief The depth texture buffer.
          */
         rsge_obj_texbuff_t depth;
+        /**
+         * \brief Buffered textures
+         */
+        rsge_obj_texbuff_t* bufferedTexs;
+        /**
+         * \brief Buffered texture count
+         */
+        int bufferedTexsCount;
     } texBuffs;
     
     /**
@@ -147,22 +164,19 @@ typedef struct {
      */
     struct {
         /**
-         * \brief Internal Width.
+         * \brief Internal.
          */
-        int internalW;
-        /**
-         * \brief Internal Height.
-         */
-        int internalH;
+        vec2 internal;
         
         /**
-         * \brief Shadow Map Width.
+         * \brief Shadow Map.
          */
-        int shadowMapW;
+        vec2 shadowMap;
+        
         /**
-         * \brief Shadow Map Height.
+         * \brief Output.
          */
-        int shadowMapH;
+        vec2 output;
     } resolutions;
     
     /**
@@ -186,17 +200,144 @@ typedef struct {
          */
         rsge_elglr_state_t lightingPass;
     } states;
+    
+    /**
+     * \brief Vertex Buffers
+     */
+    struct {
+        /**
+         * \brief Primary vertex buffer
+         */
+        rsge_obj_vert_t primary;
+    } vertBuffs;
+    
+    /**
+     * \brief The scale of the resolution.
+     */
+    float resolutionScale;
 } rsge_elglr_t;
+
+/**
+ * \fn rsge_error_e rsge_elglr_bufferverts(rsge_elglr_t* elglr,list_t* verts)
+ * \brief Buffers vertices
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] verts The list of vertices to use.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_bufferverts(rsge_elglr_t* elglr,list_t* verts);
+
+/**
+ * \fn rsge_error_e rsge_elglr_buffertexs(rsge_elglr_t* elglr)
+ * \biref Buffers the textures.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_buffertexs(rsge_elglr_t* elglr);
+
+/**
+ * \fn rsge_error_e rsge_elglr_mkvertarray(rsge_elglr_t* elglr,list_t* objs,list_t** vertData)
+ * \brief Creates a vertex array/list.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] objs The list of objects to use.
+ * \param[out] vertData The list that contains the vertex data.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_mkvertarray(rsge_elglr_t* elglr,list_t* objs,list_t** vertData);
+
+/**
+ * \fn rsge_error_e rsge_elglr_setres(rsge_elglr_t* elglr,vec2 res)
+ * \brief Sets the resolution.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] res The resolution to use.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_setres(rsge_elglr_t* elglr,vec2 res);
+
+/**
+ * \fn rsge_error_e rsge_elglr_updateSceneUniforms(rsge_elglr_t* elglr,vec4 ambientLightIntensity)
+ * \brief Updates the scene uniforms.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] ambientLightIntensity The ambient light intensity.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_updateSceneUniforms(rsge_elglr_t* elglr,vec4 ambientLightIntensity);
+
+/**
+ * \fn rsge_error_e rsge_elglr_updateCameraUniforms(rsge_elglr_t* elglr,rsge_camera_t* cam)
+ * \brief Updates the camera uniforms.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] cam The camera to use. Set to NULL to use the main camera.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_updateCameraUniforms(rsge_elglr_t* elglr,rsge_camera_t* cam);
+
+/**
+ * \fn rsge_error_e rsge_elglr_updateObjectUniforms(rsge_elglr_t* elglr,rsge_object_t* obj)
+ * \brief Updates the object uniforms.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] obj The object to use.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_updateObjectUniforms(rsge_elglr_t* elglr,rsge_object_t* obj);
+
+/**
+ * \fn rsge_error_e rsge_elglr_updateMaterialUniforms(rsge_elglr_t* elglr,rsge_material_t* mat)
+ * \brief Updates the material uniforms.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] mat The material to use.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_updateMaterialUniforms(rsge_elglr_t* elglr,rsge_material_t* mat);
+
+/**
+ * \fn rsge_error_e rsge_elglr_updatePointLightUniforms(rsge_elglr_t* elglr,rsge_point_light_t* pl)
+ * \brief Updates the point light uniforms.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] pl The point light to use.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_updatePointLightUniforms(rsge_elglr_t* elglr,rsge_point_light_t* pl);
+
+/**
+ * \fn rsge_error_e rsge_elglr_applyState(rsge_elglr_t* elglr,rsge_elglr_state_t* state,rsge_obj_fb_t* framebufferOverride)
+ * \brief Applies a state.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] state The state to use.
+ * \param[in] framebufferOverride Overrides the framebuffer that the state uses. Set to NULL to use the state's framebuffer.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_applyState(rsge_elglr_t* elglr,rsge_elglr_state_t* state,rsge_obj_fb_t* framebufferOverride);
+
+/**
+ * \fn rsge_error_e rsge_elglr_bindTextureArray(rsge_elglr_t* elglr,rsge_obj_texbuff_t* textures,size_t textureCount)
+ * \brief Binds an array of textures.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] textures The array of textures to use.
+ * \param[in] textureCount The number of textures.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_bindTextureArray(rsge_elglr_t* elglr,rsge_obj_texbuff_t* textures,size_t textureCount);
+
+/**
+ * \fn rsge_error_e rsge_elglr_bindTextureList(rsge_elglr_t* elglr,list_t* textures)
+ * \brief Binds a list of textures.
+ * \param[out] elglr The instance of ELGLR to use.
+ * \param[in] textures The list of textures to use.
+ * \return An error code.
+ */
+rsge_error_e rsge_elglr_bindTextureList(rsge_elglr_t* elglr,list_t* textures);
 
 /**
  * \fn rsge_error_e rsge_elglr_init()
  * \brief Initializes ELGLR. This is automatically done.
+ * \return An error code.
  */
 rsge_error_e rsge_elglr_init();
 
 /**
  * \fn rsge_error_e rsge_elglr_deinit()
  * \brief Deinitializes ELGLR. This is automatically done.
+ * \return An error code.
  */
 rsge_error_e rsge_elglr_deinit();
 

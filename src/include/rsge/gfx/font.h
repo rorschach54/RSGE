@@ -6,7 +6,7 @@
  * \author Spaceboy Ross
  */
 
-#include <rsge/gfx/surface.h>
+#include <rsge/gfx/objects/texture.h>
 #include <rsge/assets.h>
 #include <rsge/error.h>
 #include <stdbool.h>
@@ -21,7 +21,7 @@ typedef rsge_error_e (*rsge_font_impl_destroy)(struct rsge_font* font);
 /**
  * \brief The prototype typedefine for rendering a font.
  */
-typedef rsge_error_e (*rsge_font_impl_render)(struct rsge_font* font,rsge_surface_t* surface,char* text,int color[4]);
+typedef rsge_error_e (*rsge_font_impl_render)(struct rsge_font* font,rsge_obj_texture_t* texture,char* text,int color[4]);
 
 /**
  * \struct rsge_font_t rsge/gfx/font.h
@@ -57,7 +57,7 @@ typedef struct rsge_font {
 /**
  * \brief Renders a font.
  */
-#define rsge_font_render(font,surface,text,color) ((font)->render == NULL ? RSGE_ERROR_NONE : (font)->render(font,surface,text,color))
+#define rsge_font_render(font,texture,text,color) ((font)->render == NULL ? RSGE_ERROR_NONE : (font)->render(font,texture,text,color))
 
 /**
  * \fn rsge_error_e rsge_font_fromFile(rsge_font_t* font,char* path,size_t sz)

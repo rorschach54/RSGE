@@ -14,7 +14,7 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include <png.h>
 
-rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path);
+rsge_error_e rsge_image_libpng_fromFile(rsge_obj_texture_t* texture,char* path);
 
 #endif
 #endif

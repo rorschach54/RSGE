@@ -2,6 +2,10 @@
 #include <log.h>
 
 rsge_error_e rsge_obj_vert_create(rsge_obj_vert_t* vert,rsge_vertex_t* vertices,size_t vertexCount) {
+    if(vert->vao > 0 || vert->buffer > 0) {
+        rsge_error_e err = rsge_obj_vert_destroy(vert);
+        if(err != RSGE_ERROR_NONE) return err;
+    }
     memset(vert,0,sizeof(rsge_obj_vert_t));
     
     glGenVertexArrays(1,&vert->vao);

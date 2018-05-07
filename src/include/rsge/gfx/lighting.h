@@ -26,6 +26,35 @@ typedef struct {
     rsge_color_rgba_t intensity;
 } rsge_point_light_t;
 
+#endif
+#ifndef __RSGE_GFX_LIGHTING_H_
+#define __RSGE_GFX_LIGHTING_H_ 1
+
+/** \file src/include/rsge/gfx/lighting.h
+ * \brief Lighting stuff
+ * \author Spaceboy Ross
+ */
+
+#include <rsge/gfx/colors.h>
+#include <rsge/gfx/object.h>
+#include <rsge/gfx/gl.h>
+#include <rsge/error.h>
+
+/** \struct rsge_point_light_t src/include/rsge/gfx/lighting.h rsge/gfx/lighting.h
+ * \brief Point light
+ */
+typedef struct {
+    /**
+     * \brief The object that is this light.
+     */
+    rsge_object_t obj;
+    
+    /**
+     * \brief The insensity of the light.
+     */
+    rsge_color_rgba_t intensity;
+} rsge_point_light_t;
+
 /**
  * Enables a light. DEPRECATED
  */

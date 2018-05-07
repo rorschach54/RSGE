@@ -10,12 +10,11 @@
 #include <math.h>
 #include <log.h>
 
-rsge_shape_t tri;
 rsge_physics_world_t world;
 rsge_physics_collision_shape_t shape;
 rsge_physics_rigid_body_t rb;
 
-rsge_error_e rsge_game_init() {
+rsge_error_e rsge_game_init(rsge_elglr_t* elglr) {
 	rsge_error_e err;
 	err = rsge_physics_world_create(&world);
 	if(err != RSGE_ERROR_NONE) return err;
@@ -43,21 +42,17 @@ rsge_error_e rsge_game_init() {
 	
 	err = rsge_physics_world_addrb(&world,&rb);
 	if(err != RSGE_ERROR_NONE) return err;
-	
-	err = rsge_model_fromFile(&tri,"rsge@models/simple.xml");
-	if(err != RSGE_ERROR_NONE) return err;
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_uninit() {
-	rsge_shape_destroy(&tri);
+rsge_error_e rsge_game_uninit(rsge_elglr_t* elglr) {
 	rsge_physics_rigid_body_destroy(&rb);
 	rsge_physics_shape_destroy(&shape);
 	rsge_physics_world_destroy(&world);
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_update(double time,int fps) {
+rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double time,int fps) {
 	rsge_error_e err;
     err = rsge_physics_world_stepSimulation(&world,1/60.0f,10);
     if(err != RSGE_ERROR_NONE) return err;
@@ -68,19 +63,6 @@ rsge_error_e rsge_game_update(double time,int fps) {
     
     rsge_physics_transform_t worldTransform;
     err = rsge_physics_motion_state_getworldtransform(&motionState,&worldTransform);
-    if(err != RSGE_ERROR_NONE) return err;
-    
-    tri.pos[0] = worldTransform.origin[0];
-    tri.pos[1] = worldTransform.origin[1];
-    tri.pos[2] = worldTransform.origin[2];
-    
-    tri.rotation[0] = worldTransform.rotation[0];
-    tri.rotation[1] = worldTransform.rotation[1];
-    tri.rotation[2] = worldTransform.rotation[2];
-    tri.rotation[3] = worldTransform.rotation[3];
-    
-    log_debug("pos: (%f,%f,%f) rot: (%f,%f,%f) %f",tri.pos[0],tri.pos[1],tri.pos[2],tri.rotation[0],tri.rotation[1],tri.rotation[2],tri.rotation[3]);
-	err = rsge_shape_render(&tri);
     if(err != RSGE_ERROR_NONE) return err;
 	return RSGE_ERROR_NONE;
 }

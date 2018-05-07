@@ -6,6 +6,7 @@
  * \author Spaceboy Ross
  */
 
+#include <rsge/gfx/elglr.h>
 #include <rsge/error.h>
 #include <rsge/input.h>
 
@@ -28,32 +29,35 @@ typedef struct {
 /**
  * \fn rsge_error_e rsge_game_getinfo(rsge_game_t* gameinfo)
  * \brief A function implemented by the game, this function is called when the game engine gets the game information.
- * \param gameinfo A pointer to the gameinfo variable.
+ * \param[out] gameinfo A pointer to the gameinfo variable.
  * \return An error code.
  */
 rsge_error_e rsge_game_getinfo(rsge_game_t* gameinfo);
 
 /**
- * \fn rsge_error_e rsge_game_init()
+ * \fn rsge_error_e rsge_game_init(rsge_elglr_t* elglr)
  * \brief A function implemented by the game, this function is called when the game engine initializes or starts.
+ * \param[in] elglr The ELGLR instance used.
  * \return An error code.
  */
-rsge_error_e rsge_game_init();
+rsge_error_e rsge_game_init(rsge_elglr_t* elglr);
 
 /**
- * \fn rsge_error_e rsge_game_update(double time,int fps)
+ * \fn rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double time,int fps)
  * \brief A function implemented by the game, this function is called when the game engine updates.
- * \param time Use this time for animations.
- * \param fps The fps.
+ * \param[in] elglr The ELGLR instance used.
+ * \param[in] time Use this time for animations.
+ * \param[in] fps The fps.
  * \return An error code.
  */
-rsge_error_e rsge_game_update(double time,int fps);
+rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double time,int fps);
 
 /**
- * \fn rsge_error_e rsge_game_uninit()
+ * \fn rsge_error_e rsge_game_uninit(rsge_elglr_t* elglr)
  * \brief A function implemented by the game, this function is called when the game engine uninitializes or quits.
+ * \param[in] elglr The ELGLR instance used.
  * \return An error code.
  */
-rsge_error_e rsge_game_uninit();
+rsge_error_e rsge_game_uninit(rsge_elglr_t* elglr);
 
 #endif

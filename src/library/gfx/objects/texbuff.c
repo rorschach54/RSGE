@@ -3,6 +3,10 @@
 #include <string.h>
 
 rsge_error_e rsge_obj_texbuff_create(rsge_obj_texbuff_t* texbuff,rsge_obj_texbuff_type_e type,size_t res_w,size_t res_h,rsge_obj_texture_t* startingTexture) {
+	if(texbuff->tex > 0) {
+		rsge_error_e err = rsge_obj_texbuff_destroy(texbuff);
+		if(err != RSGE_ERROR_NONE) return err;
+	}
     memset(texbuff,0,sizeof(rsge_obj_texbuff_t));
     
     GLenum target = -1;

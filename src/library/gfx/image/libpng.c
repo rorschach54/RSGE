@@ -23,7 +23,7 @@ void rsge_image_libpng_read(png_structp png_ptr,png_bytep outBytes,png_size_t by
 	}
 }
 
-rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path) {
+rsge_error_e rsge_image_libpng_fromFile(rsge_obj_texture_t* texture,char* path) {
 	rsge_asset_libpng_t libpng_asset;
 	rsge_error_e err = rsge_asset_read(path,&libpng_asset.data,&libpng_asset.size);
 	if(err != RSGE_ERROR_NONE) return err;
@@ -86,20 +86,31 @@ rsge_error_e rsge_image_libpng_fromFile(rsge_surface_t* surface,char* path) {
 		free(row_pointers);
 		return RSGE_ERROR_INVALID_BPP;
 	}
-	err = rsge_surface_create(surface,width,height,bpp,0);
+	err = rsge_obj_texture_create(texture);
 	if(err != RSGE_ERROR_NONE) {
 		free(row_pointers);
 		return err;
+	}
+	
+	texture->width = width;
+	texture->height = height;
+	texture->pixels = malloc(((width*height))*sizeof(rsge_color_rgba_t));
+	if(!texture->pixels) {
+		free(row_pointers);
+		return RSGE_ERROR_MALLOC;
 	}
 
 	for(int y = 0;y < height;y++) {
 		png_byte* row = row_pointers[y];
 		for(int x = 0;x < width;x++) {
 			png_byte* ptr = &(row[x*bpp]);
-			size_t off = surface->bpp*(x+y*surface->width);
-			for(size_t i = 0;i < bpp;i++) {
-				surface->buffer[off+i] = ptr[i];
-			}
+			size_t off = y*width+x;
+			rsge_color_rgba_t pixel;
+			pixel.red = (float)(ptr[0]/255);
+			pixel.green = (float)(ptr[1]/255);
+			pixel.blue = (float)(ptr[2]/255);
+			pixel.alpha = bpp == 4 ? (float)(ptr[3]/255) : 1.0f;
+			texture->pixels[off] = pixel;
 		}
 	}
 

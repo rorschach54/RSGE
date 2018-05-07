@@ -5,12 +5,16 @@
 rsge_error_e rsge_ui_surface_create(rsge_ui_surface_t* ui,size_t width,size_t height) {
     memset(ui,0,sizeof(rsge_ui_surface_t));
     
-    rsge_error_e err = rsge_surface_create(&ui->surface,width,height,4,0);
+    rsge_error_e err = rsge_obj_texture_create(&ui->texture);
     if(err != RSGE_ERROR_NONE) return err;
+    
+    ui->texture.width = width;
+    ui->texture.height = height;
+    ui->texture.pixels = malloc(((ui->texture.width+4-(ui->texture.width % 4))*ui->texture.height));
+    if(!ui->texture.pixels) return RSGE_ERROR_MALLOC;
     
     ui->widgets = list_new();
     if(!ui->widgets) {
-        rsge_surface_destroy(&ui->surface);
         return RSGE_ERROR_MALLOC;
     }
     return RSGE_ERROR_NONE;
@@ -28,7 +32,7 @@ rsge_error_e rsge_ui_surface_destroy(rsge_ui_surface_t* ui) {
         }
     }
     list_iterator_destroy(it);
-    rsge_surface_destroy(&ui->surface);
+    free(ui->texture.pixels);
     list_destroy(ui->widgets);
     memset(ui,0,sizeof(rsge_ui_surface_t));
     return RSGE_ERROR_NONE;

@@ -91,8 +91,6 @@ void fb_resize(GLFWwindow* window,int width,int height) {
 	config_setting_set_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.width"),width);
 	config_setting_set_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.height"),height);
 	rsge_settings_save();
-
-	rsge_camera_reshape(width,height);
 }
 
 void drop_callback(GLFWwindow* window,int count,const char** paths) {

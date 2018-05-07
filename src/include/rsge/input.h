@@ -6,6 +6,7 @@
  * \author Spaceboy Ross
  */
 
+#include <rsge/gfx/objects/texture.h>
 #include <rsge/gfx/surface.h>
 #include <rsge/config.h>
 #include <rsge/error.h>
@@ -316,10 +317,19 @@ rsge_error_e rsge_input_setclipboard(char* str);
 /**
  * \fn rsge_error_e rsge_input_setmousecursor_fromSurface(rsge_surface_t* surface)
  * \brief Sets the mouse cursor to the surface.
+ * \deprecated Use the from texture version of this.
  * \param[in] surface The surface to use as the cursor.
  * \return An error code.
  */
 rsge_error_e rsge_input_setmousecursor_fromSurface(rsge_surface_t* surface);
+
+/**
+ * \fn rsge_error_e rsge_input_setmousecursor_fromTexture(rsge_obj_texture_t* texture)
+ * \brief Sets the mouse cursor to the texture.
+ * \param[in] texture The texture to use as the cursor.
+ * \return An error code.
+ */
+rsge_error_e rsge_input_setmousecursor_fromTexture(rsge_obj_texture_t* texture);
 
 /**
  * \fn rsge_error_e rsge_input_setmousecursor_fromFile(char* path)

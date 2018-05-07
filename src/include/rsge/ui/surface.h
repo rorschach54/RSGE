@@ -6,7 +6,7 @@
  * \author Spaceboy Ross
  */
 
-#include <rsge/gfx/surface.h>
+#include <rsge/gfx/objects/texture.h>
 #include <list.h>
 
 /** \struct rsge_ui_surface_t src/include/rsge/ui/surface.h rsge/ui/surface.h
@@ -14,9 +14,9 @@
  */
 typedef struct {
     /**
-     * \brief The graphics surface.
+     * \brief The graphics texture.
      */
-    rsge_surface_t surface;
+    rsge_obj_texture_t texture;
     
     /**
      * \brief The widgets in the UI.
