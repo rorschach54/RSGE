@@ -52,7 +52,7 @@ rsge_error_e rsge_game_uninit(rsge_elglr_t* elglr) {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double time,int fps) {
+rsge_error_e rsge_game_update(rsge_elglr_t* elglr,float delta,int ticks) {
 	rsge_error_e err;
     err = rsge_physics_world_stepSimulation(&world,1/60.0f,10);
     if(err != RSGE_ERROR_NONE) return err;

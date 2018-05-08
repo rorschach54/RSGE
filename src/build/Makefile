@@ -1,4 +1,4 @@
-CFLAGS=-g -I $(INCLUDE_SRC) -I $(LIST_INCLUDE) -I $(LOGC_INCLUDE)
+CFLAGS=-g -I $(INCLUDE_SRC) -I $(LIST_INCLUDE) -I $(LOGC_INCLUDE) -DGLEW_STATIC
 LIBRARY_CFLAGS=-c $(CFLAGS)
 
 build: build-library build-examples build-ide

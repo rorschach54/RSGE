@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 rsge_error_e rsge_window_seticon_fromSurfaces(rsge_surface_t** surfaces,int surfaceCount) {
-	GLFWwindow* window = glfwGetCurrentContext();
+	/*GLFWwindow* window = glfwGetCurrentContext();
 	GLFWimage* images = malloc(sizeof(GLFWimage)*surfaceCount);
 	if(!images) return RSGE_ERROR_MALLOC;
 	for(int i = 0;i < surfaceCount;i++) {
@@ -14,12 +14,12 @@ rsge_error_e rsge_window_seticon_fromSurfaces(rsge_surface_t** surfaces,int surf
 		images[i].height = surfaces[i]->height;
 		images[i].pixels = surfaces[i]->buffer;
 	}
-	glfwSetWindowIcon(window,surfaceCount,images);
+	glfwSetWindowIcon(window,surfaceCount,images);*/
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_window_seticon_fromTextures(rsge_obj_texture_t** textures,int textureCount) {
-	GLFWwindow* window = glfwGetCurrentContext();
+	/*GLFWwindow* window = glfwGetCurrentContext();
 	GLFWimage* images = malloc(sizeof(GLFWimage)*textureCount);
 	if(!images) return RSGE_ERROR_MALLOC;
 	for(int i = 0;i < textureCount;i++) {
@@ -38,7 +38,7 @@ rsge_error_e rsge_window_seticon_fromTextures(rsge_obj_texture_t** textures,int 
 			}
 		}
 	}
-	glfwSetWindowIcon(window,textureCount,images);
+	glfwSetWindowIcon(window,textureCount,images);*/
 	return RSGE_ERROR_NONE;
 }
 

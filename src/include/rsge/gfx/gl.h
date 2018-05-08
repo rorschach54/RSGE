@@ -14,7 +14,8 @@
 #define GLFW_INCLUDE_VULKAN
 #endif
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <SDL.h>
+#include <SDL_opengl.h>
 #else
 #error "Unknown platform"CONFIG_PLATFORM
 #endif

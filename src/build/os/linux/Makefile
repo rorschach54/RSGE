@@ -4,7 +4,7 @@ CXX=g++
 LD=g++
 PKG_CONFIG=pkg-config
 
-LIBRARY_LIBS=glfw3 libconfig libxml-2.0 bullet
+LIBRARY_LIBS=libconfig libxml-2.0 bullet glew sdl2
 
 ifeq ($(CONFIG_USE_FREETYPE),y)
 LIBRARY_LIBS += freetype2
@@ -37,11 +37,6 @@ ifeq ($(CONFIG_LINKMODE),shared)
 LIBRARY_CFLAGS += -fpic
 LIBRARY_CXXFLAGS += -fpic
 LIBRARY_LDFLAGS += -shared
-else
-EXAMPLE_CFLAGS += -DGLEW_STATIC $(shell $(PKG_CONFIG) --cflags --static glew) 
-LIBRARY_CFLAGS += -fpic $(shell $(PKG_CONFIG) --cflags --static glew) -DGLEW_STATIC
-LIBRARY_CXXFLAGS += -fpic $(shell $(PKG_CONFIG) --cflags --static glew) -DGLEW_STATIC
-LIBRARY_LDFLAGS += -shared $(shell $(PKG_CONFIG) --libs --static glew)
 endif
 
 LIBRARY_CXXFLAGS=$(LIBRARY_CFLAGS) -fPIC -std=gnu++11
