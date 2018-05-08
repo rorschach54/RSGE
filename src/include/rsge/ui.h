@@ -6,8 +6,8 @@
  * \author Spaceboy Ross
  */
 
-#include <rsge/ui/widget.h>
 #include <rsge/error.h>
+#include <AntTweakBar.h>
 
 /**
  * \fn rsge_error_e rsge_ui_init()
@@ -22,22 +22,5 @@ rsge_error_e rsge_ui_init();
  * \return An error code.
  */
 rsge_error_e rsge_ui_deinit();
-
-/**
- * \fn rsge_error_e rsge_ui_registerWidget(rsge_ui_widget_type_t* type)
- * \brief Registers a new widget.
- * \param[in] type The widget type to register.
- * \return An error code.
- */
-rsge_error_e rsge_ui_registerWidget(rsge_ui_widget_type_t* type);
-
-/**
- * \fn rsge_error_e rsge_ui_getregisteredwidget(char* tag,rsge_ui_widget_type_t** type)
- * \brief Gets a registered widget by tag.
- * \param[in] tag The tag to search for.
- * \param[out] type The pointer to the type.
- * \return An error code.
- */
-rsge_error_e rsge_ui_getregisteredwidget(char* tag,rsge_ui_widget_type_t** type);
 
 #endif

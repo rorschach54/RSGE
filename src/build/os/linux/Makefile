@@ -31,7 +31,7 @@ EXAMPLES_CFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shel
 EXAMPLES_CXXFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shell curl-config --cflags)
 
 LIBRARY_CFLAGS += $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shell curl-config --cflags)
-LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) $(shell curl-config --libs) -ldl -lm -lopenal -lGLU -lOpenCL
+LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) $(shell curl-config --libs) -lAntTweakBar -ldl -lm -lopenal -lGLU -lOpenCL
 
 ifeq ($(CONFIG_LINKMODE),shared)
 LIBRARY_CFLAGS += -fpic

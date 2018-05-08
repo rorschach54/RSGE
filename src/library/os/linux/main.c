@@ -440,10 +440,10 @@ int main(int argc,char** argv) {
 		config_destroy(&rsge_libconfig_cfg);
 		rsge_assets_uninit();
 		curl_global_cleanup();
-		rsge_input_deinit();
-		rsge_physics_deinit();
-		rsge_elglr_deinit();
 		rsge_cl_deinit();
+		rsge_elglr_deinit();
+		rsge_physics_deinit();
+		rsge_input_deinit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		return EXIT_FAILURE;
@@ -486,6 +486,7 @@ int main(int argc,char** argv) {
 			exitStatus = EXIT_FAILURE;
 			break;
 		}
+		TwDraw();
 		if(currentTime-prevTime >= 1.0) {
 			log_debug("%f ms/frame (FPS: %d)",1000.0/frameCount,frameCount);
 			frameCount = 0;
@@ -503,8 +504,8 @@ int main(int argc,char** argv) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
-		rsge_physics_deinit();
 		rsge_ui_deinit();
+		rsge_physics_deinit();
 		curl_global_cleanup();
 		rsge_elglr_deinit();
 		rsge_cl_deinit();

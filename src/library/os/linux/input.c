@@ -63,6 +63,12 @@ rsge_error_e rsge_input_setmousecursor_fromFile(char* path) {
 	return rsge_input_setmousecursor_fromTexture(&texture);
 }
 
+rsge_error_e rsge_input_getmousepos(double* x,double* y) {
+	GLFWwindow* window = glfwGetCurrentContext();
+	glfwGetCursorPos(window,&x,&y);
+	return RSGE_ERROR_NONE;
+}
+
 rsge_error_e rsge_input_setmousemode(rsge_input_mouse_mode_e mode) {
 	GLFWwindow* window = glfwGetCurrentContext();
 

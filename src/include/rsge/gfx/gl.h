@@ -16,7 +16,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #else
-#error "Unknown platform"CONFIG_PLATFORM
+#error "Unknown platform" CONFIG_PLATFORM
 #endif
 
 #include <GL/glu.h>

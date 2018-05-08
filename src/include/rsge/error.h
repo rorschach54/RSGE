@@ -126,7 +126,11 @@ typedef enum {
 	/**
 	 * Invalid ID.
 	 */
-	RSGE_ERROR_INVALID_ID
+	RSGE_ERROR_INVALID_ID,
+	/**
+	 * AntTweakBar error.
+	 */
+	RSGE_ERROR_TW
 } rsge_error_e;
 
 #endif

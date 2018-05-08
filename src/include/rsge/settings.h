@@ -17,6 +17,9 @@
  * \param[out] val The pointer to store the value.
  * \return An error code.
  */
+#ifdef __cplusplus
+extern "C"
+#endif
 rsge_error_e rsge_settings_getint(char* key,int* val);
 
 /**
@@ -26,6 +29,9 @@ rsge_error_e rsge_settings_getint(char* key,int* val);
  * \param[in] val The value to write.
  * \return An error code.
  */
+#ifdef __cplusplus
+extern "C"
+#endif
 rsge_error_e rsge_settings_setint(char* key,int val);
 
 /**

@@ -340,6 +340,18 @@ rsge_error_e rsge_input_setmousecursor_fromTexture(rsge_obj_texture_t* texture);
 rsge_error_e rsge_input_setmousecursor_fromFile(char* path);
 
 /**
+ * \fn rsge_error_e rsge_input_getmousepos(double* x,double* y)
+ * \brief Gets the mouse's current position.
+ * \param[out] x The pointer to store the X position.
+ * \param[out] y The pointer to store the Y position.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_input_getmousepos(double* x,double* y);
+
+/**
  * \fn rsge_error_e rsge_input_setmousemode(rsge_input_mouse_mode_e mode)
  * \brief Sets the mouse mode.
  * \param[in] mode The mouse mode to use.

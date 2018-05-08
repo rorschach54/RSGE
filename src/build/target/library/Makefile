@@ -26,9 +26,7 @@ $(LIBRARY_BIN)/physics/collision/shape.o $(LIBRARY_BIN)/physics/collision/sphere
 LIBRARY_OBJS += $(LIBRARY_BIN)/physics/init.o $(LIBRARY_BIN)/physics/motion-state.o $(LIBRARY_BIN)/physics/raycasting.o \
 $(LIBRARY_BIN)/physics/rigid-body.o $(LIBRARY_BIN)/physics/transform.o $(LIBRARY_BIN)/physics/world.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/snd/buffer.o $(LIBRARY_BIN)/snd/init.o $(LIBRARY_BIN)/snd/source.o
-LIBRARY_OBJS += $(LIBRARY_BIN)/ui/xml/widget.o
-LIBRARY_OBJS += $(LIBRARY_BIN)/ui/widgets/button.o $(LIBRARY_BIN)/ui/widgets/label.o
-LIBRARY_OBJS += $(LIBRARY_BIN)/ui/surface.o $(LIBRARY_BIN)/ui/widget.o
+LIBRARY_OBJS += $(LIBRARY_BIN)/ui/widgets/button.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/assets.o $(LIBRARY_BIN)/input.o $(LIBRARY_BIN)/settings.o \
 $(LIBRARY_BIN)/ui.o $(LIBRARY_BIN)/version.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/assets/main.o

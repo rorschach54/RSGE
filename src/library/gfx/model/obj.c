@@ -14,100 +14,12 @@ typedef struct {
     size_t off;
 } rsge_model_obj_t;
 
-static rsge_error_e rsge_model_obj_splitStr(char* a_str,const char a_delim,char*** result,size_t* count) {
-    *count = 0;
-    char* tmp = a_str;
-    char* last_comma = 0;
-    char delim[2];
-    delim[0] = a_delim;
-    delim[1] = 0;
-    /* Count how many elements will be extracted. */
-    while(*tmp) {
-        if(a_delim == *tmp) {
-            *count++;
-            last_comma = tmp;
-        }
-        tmp++;
-    }
-    /* Add space for trailing token. */
-    *count += last_comma < (a_str+strlen(a_str)-1);
-    /* Add space for terminating null string so caller
-       knows where the list of returned strings ends. */
-    *count++;
-    *result = malloc(sizeof(char*)*(*count));
-    if(!result) return RSGE_ERROR_MALLOC;
-    size_t idx  = 0;
-    char* token = strtok(a_str,delim);
-    while(token) {
-        if(!(idx < *count)) return RSGE_ERROR_MALLOC;
-        *(*result+idx++) = strdup(token);
-        token = strtok(0,delim);
-    }
-    if(!(idx == *count-1)) return RSGE_ERROR_MALLOC;
-    *(*result+idx) = 0;
-    return RSGE_ERROR_NONE;
-}
-
-static rsge_error_e rsge_model_obj_readVec(char* line,vec3* vec) {
-    while(line[0] == ' ') line++;
-    char** split;
-    size_t split_count;
-    rsge_error_e err = rsge_model_obj_splitStr(line,' ',&split,&split_count);
-    if(err != RSGE_ERROR_NONE) return err;
-    *vec[0] = atof(split[0]);
-    *vec[1] = atof(split[1]);
-    *vec[2] = 0.0f;
-    if(split_count > 3) *vec[2] = atof(split[2]);
-    return RSGE_ERROR_NONE;
-}
-
-static rsge_error_e rsge_model_obj_readColor(char* line,rsge_color_rgba_t* color) {
-    while(line[0] == ' ') line++;
-    char** split;
-    size_t split_count;
-    rsge_error_e err = rsge_model_obj_splitStr(line,' ',&split,&split_count);
-    if(err != RSGE_ERROR_NONE) return err;
-    color->red = atof(split[0]);
-    color->green = atof(split[1]);
-    color->blue = atof(split[2]);
-    color->alpha = 1.0f;
-    if(split_count > 3) color->alpha = atof(split[3]);
-    return RSGE_ERROR_NONE;
-}
-
-static rsge_error_e rsge_model_obj_readFloat(char* line,float* val) {
-    while(line[0] == ' ') line++;
-    char** split;
-    size_t split_count;
-    rsge_error_e err = rsge_model_obj_splitStr(line,' ',&split,&split_count);
-    if(err != RSGE_ERROR_NONE) return err;
-    *val = atof(split[0]);
-    return RSGE_ERROR_NONE;
-}
-
-static rsge_error_e rsge_model_obj_readMaterials(char* path,char* baseDir,list_t** materials) {
-    return RSGE_ERROR_NONE;
-}
-
-static rsge_error_e rsge_model_obj_readTexture(char* line,char* baseDir,rsge_obj_texture_t* texture) {
-    while(line[0] == ' ') line++;
-    char** split;
-    size_t split_count;
-    rsge_error_e err = rsge_model_obj_splitStr(line,' ',&split,&split_count);
-    if(err != RSGE_ERROR_NONE) return err;
-    int arg = 1;
-    char* filename = split[arg++];
-    // TODO: load texture
-    return RSGE_ERROR_NONE;
-}
-
 rsge_error_e rsge_model_obj_fromFile(list_t** objects,char* path) {
-    *objects = list_new();
-    if(!objects) return RSGE_ERROR_MALLOC;
+    if(objects == NULL) {
+        *objects = list_new();
+        if(!objects) return RSGE_ERROR_MALLOC;
+    }
     
-    list_t* asdf = list_new();
-    if(!asdf) return RSGE_ERROR_MALLOC;
-    char* line = "";
     list_t* verts = list_new();
     if(!verts) return RSGE_ERROR_MALLOC;
     list_t* normals = list_new();
@@ -116,6 +28,12 @@ rsge_error_e rsge_model_obj_fromFile(list_t** objects,char* path) {
     if(!uvs) return RSGE_ERROR_MALLOC;
     list_t* materials = list_new();
     if(!materials) return RSGE_ERROR_MALLOC;
+    list_t* vertexIndices = list_new();
+    if(!vertexIndices) return RSGE_ERROR_MALLOC;
+    list_t* uvIndices = list_new();
+    if(!uvIndices) return RSGE_ERROR_MALLOC;
+    list_t* normalIndices = list_new();
+    if(!normalIndices) return RSGE_ERROR_MALLOC;
     
     char* currentObjectName = "";
     size_t baseDirectorySize = strlen(path);
@@ -125,70 +43,79 @@ rsge_error_e rsge_model_obj_fromFile(list_t** objects,char* path) {
     if(!baseDirectory) return RSGE_ERROR_MALLOC;
     strncpy(baseDirectory,path,baseDirectorySize);
     
-    rsge_material_t currentMaterial;
     char* data;
     size_t datasz;
     rsge_error_e err = rsge_asset_read(path,&data,&datasz);
     if(err != RSGE_ERROR_NONE) return err;
     
-    line = data;
-    while(line) {
-        char* nextLine = strchr(line,'\n');
-        if(nextLine) *nextLine = '\0';
+    while(true) {
+        char lineHeader[128];
+        int res = sscanf(data,"%s",lineHeader);
+        if(res == EOF) break;
         
-        if(strlen(line) > 1) {
-            char** split;
-            size_t split_count;
-            err = rsge_model_obj_splitStr(line,' ',&split,&split_count);
-            if(err != RSGE_ERROR_NONE) return err;
-            char* keyword = split[0];
-            
-            if(!!strcmp(keyword,"#")) {
-                if(!strcmp(keyword,"mtllib")) {
-                    char** split;
-                    size_t split_count;
-                    err = rsge_model_obj_splitStr(line,' ',&split,&split_count);
-                    if(err != RSGE_ERROR_NONE) return err;
-                    size_t matPathSize = strlen(baseDirectory);
-                    if(split[0][0] == '/') split[0]++;
-                    matPathSize += strlen(split[0])+1;
-                    char* matPath = malloc(matPathSize);
-                    if(!matPath) return RSGE_ERROR_MALLOC;
-                    strcpy(matPath,baseDirectory);
-                    strcat(matPath,"/");
-                    strcat(matPath,split[0]);
-                    err = rsge_model_obj_readMaterials(matPath,baseDirectory,&materials);
-                    if(err != RSGE_ERROR_NONE) return err;
-                } else if(!strcmp(keyword,"o")) {
-                    char** split;
-                    size_t split_count;
-                    err = rsge_model_obj_splitStr(line,' ',&split,&split_count);
-                    if(err != RSGE_ERROR_NONE) return err;
-                    currentObjectName = split[0];
-                } else if(!strcmp(keyword,"v")) {
-                    vec3 pos;
-                    err = rsge_model_obj_readVec(line,&pos);
-                    if(err != RSGE_ERROR_NONE) return err;
-                    list_rpush(verts,list_node_new(pos));
-                } else if(!strcmp(keyword,"vn")) {
-                    vec3 pos;
-                    err = rsge_model_obj_readVec(line,&pos);
-                    if(err != RSGE_ERROR_NONE) return err;
-                    list_rpush(normals,list_node_new(pos));
-                } else if(!strcmp(keyword,"vt")) {
-                    vec3 pos;
-                    err = rsge_model_obj_readVec(line,&pos);
-                    if(err != RSGE_ERROR_NONE) return err;
-                    list_rpush(uvs,list_node_new(pos));
-                } else if(!strcmp(keyword,"f")) {
-                } else if(!strcmp(keyword,"usemtl")) {
-                }
-            }
+        if(!strcmp(lineHeader,"v")) {
+            vec3 pos;
+            sscanf(data,"%f %f %f\n",&pos[0],&pos[1],&pos[2]);
+            list_rpush(verts,list_node_new(pos));
+        } else if(!strcmp(lineHeader,"vt")) {
+            vec2 pos;
+            sscanf(data,"%f %f\n",&pos[0],&pos[1]);
+            list_rpush(uvs,list_node_new(pos));
+        } else if(!strcmp(lineHeader,"vn")) {
+            vec3 pos;
+            sscanf(data,"%f %f %f\n",&pos[0],&pos[1],&pos[2]);
+            list_rpush(normals,list_node_new(pos));
+        } else if(!strcmp(lineHeader,"f")) {
+            char* vertex1;
+            char* vertex2;
+            char* vertex3;
+            unsigned int vertexIndex[3];
+            unsigned int uvIndex[3];
+            unsigned int normalIndex[3];
+            int matches = sscanf(data,"%d/%d/%d %d/%d/%d %d/%d/%d\n",&vertexIndex[0],&uvIndex[0],&normalIndex[0],&vertexIndex[1],&uvIndex[1],&normalIndex[1],&vertexIndex[2],&uvIndex[2],&normalIndex[2]);
+            if(matches != 9) return RSGE_ERROR_INVALID_TYPE;
+            list_rpush(vertexIndices,list_node_new(&vertexIndex[0]));
+            list_rpush(vertexIndices,list_node_new(&vertexIndex[1]));
+            list_rpush(vertexIndices,list_node_new(&vertexIndex[2]));
+            list_rpush(uvIndices,list_node_new(&uvIndex[0]));
+            list_rpush(uvIndices,list_node_new(&uvIndex[1]));
+            list_rpush(uvIndices,list_node_new(&uvIndex[2]));
+            list_rpush(normalIndices,list_node_new(&normalIndex[0]));
+            list_rpush(normalIndices,list_node_new(&normalIndex[1]));
+            list_rpush(normalIndices,list_node_new(&normalIndex[2]));
         }
-        
-        if(nextLine) *nextLine = '\n';
-        line = nextLine ? (nextLine+1) : NULL;
     }
+    rsge_object_t* obj = malloc(sizeof(rsge_object_t));
+    if(!obj) return RSGE_ERROR_MALLOC;
+    
+    obj->meshes = list_new();
+    if(!obj->meshes) return RSGE_ERROR_MALLOC;
+    
+    rsge_mesh_t* mesh = malloc(sizeof(rsge_mesh_t));
+    if(!mesh) return RSGE_ERROR_MALLOC;
+    
+    mesh->vertices = list_new();
+    if(!mesh->vertices) return RSGE_ERROR_MALLOC;
+    
+    for(int i = 0;i < vertexIndices->len;i++) {
+        unsigned int vertexIndex = *((unsigned int*)list_at(vertexIndices,i)->val);
+        float* vertexFA = (float*)(list_at(verts,vertexIndex-1)->val);
+        vec3 vertex = { vertexFA[0], vertexFA[1], vertexFA[2] };
+        
+        unsigned int uvIndex = *((unsigned int*)list_at(uvIndices,i)->val);
+        float* uvFA = (float*)(list_at(uvs,uvIndex-1)->val);
+        vec2 uv = { uvFA[0], uvFA[1] };
+        
+        unsigned int normalIndex = *((unsigned int*)list_at(normalIndices,i)->val);
+        float* normalFA = (float*)(list_at(normals,normalIndex-1)->val);
+        vec3 normal = { normalFA[0], normalFA[1], normalFA[2] };
+        
+        list_rpush(mesh->vertices,list_node_new(vertex));
+        list_rpush(mesh->normals,list_node_new(normal));
+    }
+    
+    list_rpush(obj->meshes,list_node_new(mesh));
+    list_rpush(*objects,list_node_new(obj));
     return RSGE_ERROR_NONE;
 }
 #endif

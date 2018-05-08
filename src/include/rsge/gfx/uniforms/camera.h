@@ -57,6 +57,9 @@ typedef struct {
  * \param[in] cam The pointer to the camera. NULL for the default camera.
  * \return An error code.
  */
+#ifdef __cplusplus
+extern "C"
+#endif
 rsge_error_e rsge_unif_cam_create(rsge_unif_cam_t* unif,rsge_camera_t* cam);
 
 #endif

@@ -34,6 +34,18 @@ typedef struct {
 } rsge_physics_raycast_t;
 
 /**
+ * \fn rsge_error_e rsge_physics_raycast_createFromMouse(rsge_physics_raycast_t* ray,rsge_physics_world_t* world)
+ * \brief Raycasts from the mouse's current position.
+ * \param[out] ray The pointer to store the raycast.
+ * \param[in] world The physics world to use.
+ * \return An error code.
+ */
+#ifdef __cplusplus
+extern "C"
+#endif
+rsge_error_e rsge_physics_raycast_createFromMouse(rsge_physics_raycast_t* ray,rsge_physics_world_t* world);
+
+/**
  * \fn rsge_error_e rsge_physics_raycast_create(rsge_physics_raycast_t* ray,rsge_physics_world_t* world,vec3 outOrigin,vec3 outDir)
  * \brief Raycasts on a world.
  * \param[out] ray The pointer to store the raycast.
