@@ -8,9 +8,15 @@
 extern config_t rsge_libconfig_cfg;
 
 void rsge_sigint(int dummy) {
+	GLFWwindow* window = glfwGetCurrentContext();
+	if(window != NULL) glfwSetWindowShouldClose(window,GLFW_TRUE);
 }
 
-/*void key_callback(GLFWwindow* window,int key,int scancode,int action,int mods) {
+void error_callback(int error,const char* description) {
+	log_error("GLFW: %s",description);
+}
+
+void key_callback(GLFWwindow* window,int key,int scancode,int action,int mods) {
 	rsge_input_device_t* device;
 	rsge_error_e err = rsge_input_getdev_byname(&device,"keyboard");
 	if(err == RSGE_ERROR_NONE) {
@@ -79,15 +85,15 @@ void joystick_callback(int joy,int event) {
 
 		rsge_input_emit(device);
 	}
-}*/
+}
 
-void fb_resize(int width,int height) {
+void fb_resize(GLFWwindow* window,int width,int height) {
 	config_setting_set_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.width"),width);
 	config_setting_set_int(config_lookup(&rsge_libconfig_cfg,"gfx.res.height"),height);
 	rsge_settings_save();
 }
 
-/*void drop_callback(GLFWwindow* window,int count,const char** paths) {
+void drop_callback(GLFWwindow* window,int count,const char** paths) {
 	rsge_input_device_t* device;
 	rsge_error_e err = rsge_input_getdev_byname(&device,"pathdrop");
 	if(err == RSGE_ERROR_NONE) {
@@ -95,16 +101,16 @@ void fb_resize(int width,int height) {
 		device->pathdrop.paths = (char**)paths;
 		rsge_input_emit(device);
 	}
-}*/
+}
 
 void rsge_callbacks_init() {
-	/*GLFWwindow* window = glfwGetCurrentContext();
+	GLFWwindow* window = glfwGetCurrentContext();
 	glfwSetFramebufferSizeCallback(window,fb_resize);
 	glfwSetKeyCallback(window,key_callback);
 	glfwSetCursorPosCallback(window,cursor_position_callback);
 	glfwSetMouseButtonCallback(window,mouse_button_callback);
 	glfwSetJoystickCallback(joystick_callback);
 	glfwSetScrollCallback(window,scroll_callback);
-	glfwSetDropCallback(window,drop_callback);*/
+	glfwSetDropCallback(window,drop_callback);
 }
 #endif

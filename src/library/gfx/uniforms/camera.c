@@ -22,7 +22,7 @@ rsge_error_e rsge_unif_cam_create(rsge_unif_cam_t* unif,rsge_camera_t* cam) {
 	unif->fov[0] = cam->fov[0];
 	unif->fov[1] = cam->fov[1];
 	
-	unif->clipPlanes[0] = cam->clipPlanes[0];
-	unif->clipPlanes[1] = cam->clipPlanes[1];
+	unif->zNear = cam->clipPlanes[0];
+	unif->zFar = cam->clipPlanes[1];
     return RSGE_ERROR_NONE;
 }

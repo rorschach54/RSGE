@@ -6,6 +6,11 @@ EXAMPLES_BIN=$(BIN)/examples
 IDE_BIN=$(BIN)/ide
 LIBRARY_BIN=$(BIN)/library
 
+GLAD_PATH=$(DEPS)/glad
+GLAD_BIN=$(GLAD_PATH)/bin
+GLAD_INCLUDE=$(GLAD_PATH)/include
+GLAD_SRC=$(GLAD_PATH)/src
+
 LIST_PATH=$(DEPS)/list
 LIST_BIN=$(LIST_PATH)/bin
 LIST_INCLUDE=$(LIST_PATH)/src
@@ -30,7 +35,7 @@ TOOLS_SRC=$(SRC)/tools
 all: build
 
 clean:
-	@rm -rf $(BIN) $(CONFIG_SRC)/Makefile $(INCLUDE_SRC)/rsge/config.h $(LIST_BIN) $(LOGC_BIN)
+	@rm -rf $(BIN) $(CONFIG_SRC)/Makefile $(INCLUDE_SRC)/rsge/config.h $(GLAD_PATH) $(LIST_BIN) $(LOGC_BIN)
 
 doc:
 	@doxygen $(CONFIG_SRC)/doxygen.cfg

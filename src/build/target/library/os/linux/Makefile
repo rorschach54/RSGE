@@ -1,3 +1,5 @@
+LIBRARY_OBJS += $(GLAD_BIN)/glad.o
+
 ifeq ($(CONFIG_LINKMODE),shared)
 $(BIN)/librsge.so: $(LIBRARY_OBJS) $(INCLUDE_SRC)
 	@echo "Linking librsge.so"

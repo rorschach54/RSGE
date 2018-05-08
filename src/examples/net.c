@@ -28,7 +28,7 @@ rsge_error_e rsge_game_uninit(rsge_elglr_t* elglr) {
 	return RSGE_ERROR_NONE;
 }
 
-rsge_error_e rsge_game_update(rsge_elglr_t* elglr,float delta,int ticks) {
+rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double currentTime,int fps) {
 	return RSGE_ERROR_NONE;
 }
 

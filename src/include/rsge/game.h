@@ -43,14 +43,14 @@ rsge_error_e rsge_game_getinfo(rsge_game_t* gameinfo);
 rsge_error_e rsge_game_init(rsge_elglr_t* elglr);
 
 /**
- * \fn rsge_error_e rsge_game_update(rsge_elglr_t* elglr,float delta,int ticks)
+ * \fn rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double currentTime,int fps)
  * \brief A function implemented by the game, this function is called when the game engine updates.
  * \param[in] elglr The ELGLR instance used.
- * \param[in] delta Use this delta for animations.
- * \param[in] ticks The current ticks.
+ * \param[in] currentTime Use this time for animations.
+ * \param[in] fps The current fps.
  * \return An error code.
  */
-rsge_error_e rsge_game_update(rsge_elglr_t* elglr,float delta,int ticks);
+rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double currentTime,int fps);
 
 /**
  * \fn rsge_error_e rsge_game_uninit(rsge_elglr_t* elglr)

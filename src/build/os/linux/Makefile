@@ -4,7 +4,7 @@ CXX=g++
 LD=g++
 PKG_CONFIG=pkg-config
 
-LIBRARY_LIBS=libconfig libxml-2.0 bullet glew sdl2
+LIBRARY_LIBS=glfw3 libconfig libxml-2.0 bullet
 
 ifeq ($(CONFIG_USE_FREETYPE),y)
 LIBRARY_LIBS += freetype2

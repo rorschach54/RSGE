@@ -4,19 +4,19 @@
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 rsge_error_e rsge_input_getclipboard(char** str) {
-	/*GLFWwindow* window = glfwGetCurrentContext();
-	*str = (char*)glfwGetClipboardString(window);*/
+	GLFWwindow* window = glfwGetCurrentContext();
+	*str = (char*)glfwGetClipboardString(window);
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_input_setclipboard(char* str) {
-	/*GLFWwindow* window = glfwGetCurrentContext();
-	glfwSetClipboardString(window,str);*/
+	GLFWwindow* window = glfwGetCurrentContext();
+	glfwSetClipboardString(window,str);
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_input_setmousecursor_fromSurface(rsge_surface_t* surface) {
-	/*GLFWwindow* window = glfwGetCurrentContext();
+	GLFWwindow* window = glfwGetCurrentContext();
 
 	GLFWimage image;
 	image.width = surface->width;
@@ -26,12 +26,12 @@ rsge_error_e rsge_input_setmousecursor_fromSurface(rsge_surface_t* surface) {
 	GLFWcursor* cursor = glfwCreateCursor(&image,0,0);
 	if(!cursor) return RSGE_ERROR_OPENGL;
 
-	glfwSetCursor(window,cursor);*/
+	glfwSetCursor(window,cursor);
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_input_setmousecursor_fromTexture(rsge_obj_texture_t* texture) {
-	/*GLFWwindow* window = glfwGetCurrentContext();
+	GLFWwindow* window = glfwGetCurrentContext();
 
 	GLFWimage image;
 	image.width = texture->width;
@@ -52,7 +52,7 @@ rsge_error_e rsge_input_setmousecursor_fromTexture(rsge_obj_texture_t* texture) 
 	GLFWcursor* cursor = glfwCreateCursor(&image,0,0);
 	if(!cursor) return RSGE_ERROR_OPENGL;
 
-	glfwSetCursor(window,cursor);*/
+	glfwSetCursor(window,cursor);
 	return RSGE_ERROR_NONE;
 }
 
@@ -64,11 +64,11 @@ rsge_error_e rsge_input_setmousecursor_fromFile(char* path) {
 }
 
 rsge_error_e rsge_input_setmousemode(rsge_input_mouse_mode_e mode) {
-	/*GLFWwindow* window = glfwGetCurrentContext();
+	GLFWwindow* window = glfwGetCurrentContext();
 
 	if(mode == RSGE_INPUT_MOUSE_MODE_NORMAL) glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_NORMAL);
 	else if(mode == RSGE_INPUT_MOUSE_MODE_LOCK) glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
-	else if(mode == RSGE_INPUT_MOUSE_MODE_HIDDEN) glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_HIDDEN);*/
+	else if(mode == RSGE_INPUT_MOUSE_MODE_HIDDEN) glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_HIDDEN);
 	return RSGE_ERROR_NONE;
 }
 #endif

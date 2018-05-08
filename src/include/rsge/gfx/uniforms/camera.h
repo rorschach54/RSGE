@@ -40,9 +40,14 @@ typedef struct {
     vec2 fov;
     
     /**
-     * \brief Clip Planes
+     * \brief Z near.
      */
-    vec2 clipPlanes;
+	float zNear;
+	
+	/**
+	 * \brief Z far.
+	 */
+	float zFar;
 } rsge_unif_cam_t;
 
 /**

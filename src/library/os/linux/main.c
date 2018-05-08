@@ -19,7 +19,8 @@
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern void rsge_callbacks_init();
-extern void fb_resize(int width,int height);
+extern void error_callback(int error,const char* description);
+extern void fb_resize(GLFWwindow* window,int width,int height);
 extern void rsge_sigint(int dummy);
 
 extern rsge_elglr_t rsge_elglr;
@@ -36,8 +37,6 @@ extern rsge_elglr_t rsge_elglr;
 FT_Library rsge_freetype_lib;
 #endif
 
-SDL_Window* sdl_window;
-SDL_GLContext sdl_context;
 config_t rsge_libconfig_cfg;
 
 static struct argp_option rsge_options[] = {
@@ -130,6 +129,8 @@ int main(int argc,char** argv) {
 		#endif
 		log_debug("-- End of RSGE Configuration --");
 	}
+
+	glfwSetErrorCallback(error_callback);
 	
 	config_init(&rsge_libconfig_cfg);
 	err = rsge_settings_load();
@@ -139,9 +140,17 @@ int main(int argc,char** argv) {
 	}
 
 	/* Initialize libraries */
-	if(SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if(!glfwInit()) {
 		config_destroy(&rsge_libconfig_cfg);
 		return EXIT_FAILURE;
+	}
+	
+	for(int i = GLFW_JOYSTICK_1;i < GLFW_JOYSTICK_LAST;i++) {
+		int present = glfwJoystickPresent(i);
+		if(present) {
+			const char* name = glfwGetJoystickName(i);
+			log_debug("Joystick %d (%s) is present",i+1,name);
+		}
 	}
 
 	signal(SIGINT,rsge_sigint);
@@ -149,7 +158,7 @@ int main(int argc,char** argv) {
 #if CONFIG_USE_FREETYPE == 1
 	if(FT_Init_FreeType(&rsge_freetype_lib)) {
 		config_destroy(&rsge_libconfig_cfg);
-		SDL_Quit();
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 #endif
@@ -161,7 +170,7 @@ int main(int argc,char** argv) {
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		config_destroy(&rsge_libconfig_cfg);
-		SDL_Quit();
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 
@@ -177,7 +186,7 @@ int main(int argc,char** argv) {
 		config_destroy(&rsge_libconfig_cfg);
 		rsge_audio_uninit();
 		curl_global_cleanup();
-		SDL_Quit();
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 	
@@ -218,43 +227,132 @@ int main(int argc,char** argv) {
 		free(res_w_str);
 		free(res_h_str);
 	}
-	int sdl_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-	if(config_setting_get_bool(config_lookup(&rsge_libconfig_cfg,"gfx.fullscreen")) || arguments.force_fullscreen) {
-		sdl_flags |= SDL_WINDOW_FULLSCREEN;
-	}
-	log_debug("Setting resolution to %dx%d%s",res_w,res_h,sdl_flags & SDL_WINDOW_FULLSCREEN ? " (Fullscreen)" : "");
-	sdl_window = SDL_CreateWindow(gameinfo.name,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,res_w,res_h,sdl_flags);
-	if(!sdl_window) {
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"Window creation error",SDL_GetError(),NULL);
+	GLFWmonitor* monitor = NULL;
+	if(config_setting_get_bool(config_lookup(&rsge_libconfig_cfg,"gfx.fullscreen"))) monitor = glfwGetPrimaryMonitor();
+	if(arguments.force_fullscreen) monitor = glfwGetPrimaryMonitor();
+	log_debug("Setting resolution to %dx%d%s",res_w,res_h,monitor == NULL ? "" : " (Fullscreen)");
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,0);
+	GLFWwindow* window = glfwCreateWindow(res_w,res_h,gameinfo.name,monitor,NULL);
+	if(!window) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		rsge_audio_uninit();
 		curl_global_cleanup();
 		config_destroy(&rsge_libconfig_cfg);
-		SDL_Quit();
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,SDL_GL_CONTEXT_PROFILE_CORE);
-	sdl_context = SDL_GL_CreateContext(sdl_window);
-
-	log_debug("Setting up OpenGL");
-	/* Set up OpenGL */
-	GLenum glErr = glewInit();
-	if(glErr != GLEW_OK) {
-		log_error("GLEW: %s",glewGetErrorString(glErr));
+	
+	if(!glfwVulkanSupported() && arguments.enable_vulkan) {
+		log_error("Vulkan is not supported");
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		config_destroy(&rsge_libconfig_cfg);
+		rsge_audio_uninit();
 		curl_global_cleanup();
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
+	
+	#ifdef GLFW_INCLUDE_VULKAN
+	if(glfwVulkanSupported() && arguments.enable_vulkan) {
+		log_warn("Experimental Vulkan support is enabled and available.");
+
+		VkResult result;
+		uint32_t extensions_count;
+		const char** extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
+		if(!extensions) {
+			log_error("Failed to get required extensions");
+#if CONFIG_USE_FREETYPE == 1
+			FT_Done_FreeType(rsge_freetype_lib);
+#endif
+			config_destroy(&rsge_libconfig_cfg);
+			rsge_audio_uninit();
+			curl_global_cleanup();
+			glfwTerminate();
+			return EXIT_FAILURE;
+		}
+
+		PFN_vkEnumerateInstanceLayerProperties pfnEnumerateInstanceLayerProperties = (PFN_vkEnumerateInstanceLayerProperties)glfwGetInstanceProcAddress(NULL,"vkEnumerateInstanceLayerProperties");
+
+		const char** instance_validation_layers = NULL;
+		uint32_t instance_layer_count;
+
+		result = pfnEnumerateInstanceLayerProperties(&instance_layer_count,NULL);
+		if(result != VK_SUCCESS) {
+			log_error("vkEnumerateInstanceLayerProperties failed");
+#if CONFIG_USE_FREETYPE == 1
+			FT_Done_FreeType(rsge_freetype_lib);
+#endif
+			config_destroy(&rsge_libconfig_cfg);
+			rsge_audio_uninit();
+			curl_global_cleanup();
+			glfwTerminate();
+			return EXIT_FAILURE;
+		}
+
+		VkApplicationInfo app = {
+			.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+			.pNext = NULL,
+			.pApplicationName = gameinfo.name,
+			.applicationVersion = 0,
+			.pEngineName = "RSGE",
+			.engineVersion = 0,
+			.apiVersion = VK_API_VERSION_1_0
+		};
+		VkInstanceCreateInfo inst_info = {
+			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+			.pNext = NULL,
+			.pApplicationInfo = &app,
+			.enabledLayerCount = 3,
+			.ppEnabledLayerNames = (const char**)instance_validation_layers,
+			.enabledExtensionCount = extensions_count,
+			.ppEnabledExtensionNames = extensions
+		};
+		
+		PFN_vkCreateInstance pfnCreateInstance = (PFN_vkCreateInstance)glfwGetInstanceProcAddress(NULL,"vkCreateInstance");
+		
+		VkInstance instance;
+		result = pfnCreateInstance(&inst_info,NULL,&instance);
+		if(result != VK_SUCCESS) {
+			log_error("vkCreateInstance failed");
+			#if CONFIG_USE_FREETYPE == 1
+			FT_Done_FreeType(rsge_freetype_lib);
+#endif
+			config_destroy(&rsge_libconfig_cfg);
+			rsge_audio_uninit();
+			curl_global_cleanup();
+			glfwTerminate();
+			return EXIT_FAILURE;
+		}
+		
+		PFN_vkGetDeviceProcAddr pfnGetDeviceProcAddr = (PFN_vkGetDeviceProcAddr)glfwGetInstanceProcAddress(instance,"vkGetDeviceProcAddr");
+		PFN_vkCreateDevice pfnCreateDevice = (PFN_vkCreateDevice)glfwGetInstanceProcAddress(instance,"vkCreateDevice");
+		
+		VkSurfaceKHR surface;
+		result = glfwCreateWindowSurface(instance,window,NULL,&surface);
+		if(result != VK_SUCCESS) {
+			log_error("Failed to create a window surface with Vulkan.");
+#if CONFIG_USE_FREETYPE == 1
+			FT_Done_FreeType(rsge_freetype_lib);
+#endif
+			config_destroy(&rsge_libconfig_cfg);
+			rsge_audio_uninit();
+			curl_global_cleanup();
+			glfwTerminate();
+			return EXIT_FAILURE;
+		}
+	}
+	#endif
+
+	log_debug("Setting up OpenGL");
+	/* Set up OpenGL */
+	glfwMakeContextCurrent(window);
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	glfwSwapInterval(1);
 	
 	log_debug("Assets initializing");
 	err = rsge_assets_init();
@@ -264,13 +362,12 @@ int main(int argc,char** argv) {
 #endif
 		config_destroy(&rsge_libconfig_cfg);
 		curl_global_cleanup();
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 
-	fb_resize(res_w,res_h);
+	fb_resize(window,res_w,res_h);
 	
 	log_debug("Initializing ELGLR");
 	err = rsge_elglr_init();
@@ -281,9 +378,8 @@ int main(int argc,char** argv) {
 		config_destroy(&rsge_libconfig_cfg);
 		curl_global_cleanup();
 		rsge_assets_uninit();
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 	
@@ -297,9 +393,8 @@ int main(int argc,char** argv) {
 		curl_global_cleanup();
 		rsge_elglr_deinit();
 		config_destroy(&rsge_libconfig_cfg);
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 	
@@ -314,9 +409,8 @@ int main(int argc,char** argv) {
 		curl_global_cleanup();
 		rsge_elglr_deinit();
 		config_destroy(&rsge_libconfig_cfg);
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 	
@@ -332,9 +426,8 @@ int main(int argc,char** argv) {
 		rsge_cl_deinit();
 		rsge_elglr_deinit();
 		rsge_input_deinit();
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 	
@@ -351,9 +444,8 @@ int main(int argc,char** argv) {
 		rsge_physics_deinit();
 		rsge_elglr_deinit();
 		rsge_cl_deinit();
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 
@@ -375,29 +467,34 @@ int main(int argc,char** argv) {
 		curl_global_cleanup();
 		rsge_cl_deinit();
 		config_destroy(&rsge_libconfig_cfg);
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 
 	/* Update game */
 	int exitStatus = EXIT_SUCCESS;
-	int lastTicks = SDL_GetTicks();
-	int ticks = lastTicks;
+	double prevTime = glfwGetTime();
 	int frameCount = 0;
 	do {
-		ticks = SDL_GetTicks();
-		err = rsge_game_update(&rsge_elglr,ticks-lastTicks,ticks);
+		double currentTime = glfwGetTime();
+		frameCount++;
+		int width,height;
+		glfwGetFramebufferSize(window,&width,&height);
+		err = rsge_game_update(&rsge_elglr,currentTime,frameCount);
 		if(err != RSGE_ERROR_NONE) {
 			exitStatus = EXIT_FAILURE;
 			break;
 		}
-		SDL_GL_SwapWindow(sdl_window);
-		int ticksToWait = fmax(0,(1000 / 60)-(SDL_GetTicks()-ticks));
-		SDL_Delay(ticksToWait);
-		lastTicks = ticks;
-	} while(true);
+		if(currentTime-prevTime >= 1.0) {
+			log_debug("%f ms/frame (FPS: %d)",1000.0/frameCount,frameCount);
+			frameCount = 0;
+			prevTime += 1.0;
+		}
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	} while(!glfwWindowShouldClose(window));
 
 	log_info("RSGE: Uninitializing game");
 	/* Uninitialize game */
@@ -414,9 +511,8 @@ int main(int argc,char** argv) {
 		rsge_assets_uninit();
 		rsge_input_deinit();
 		config_destroy(&rsge_libconfig_cfg);
-		SDL_GL_DeleteContext(sdl_context);
-		SDL_DestroyWindow(sdl_window);
-		SDL_Quit();
+		glfwDestroyWindow(window);
+		glfwTerminate();
 		return EXIT_FAILURE;
 	}
 
@@ -433,9 +529,8 @@ int main(int argc,char** argv) {
 #endif
 	curl_global_cleanup();
 	config_destroy(&rsge_libconfig_cfg);
-	SDL_GL_DeleteContext(sdl_context);
-	SDL_DestroyWindow(sdl_window);
-	SDL_Quit();
+	glfwDestroyWindow(window);
+	glfwTerminate();
 	return exitStatus;
 }
 #endif
