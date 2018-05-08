@@ -1,4 +1,5 @@
 #include <rsge/gfx/shader.h>
+#include <log.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -16,6 +17,7 @@ rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) 
 	
 	char* data = malloc(headersz+sourcesz);
 	if(data == NULL) {
+		log_error("Failed to allocate %d bytes of memory",headersz+sourcesz);
 		return RSGE_ERROR_MALLOC;
 	}
 	strcpy(data,header);
@@ -62,7 +64,7 @@ rsge_error_e rsge_shader_compile(rsge_shader_t* shader,char* source) {
 		if(!errorLog) return RSGE_ERROR_MALLOC;
 		glGetShaderInfoLog(shader->id,logSize,&logSize,&errorLog[0]);
 		
-		fprintf(stderr,"%s\n",errorLog);
+		log_error("%s\n",errorLog);
 		
 		free(errorLog);
 		return RSGE_ERROR_SHADER;

@@ -78,7 +78,11 @@ rsge_error_e rsge_obj_texbuff_create(rsge_obj_texbuff_t* texbuff,rsge_obj_texbuf
 	
 	if(type == RSGE_OBJ_TEXBUFF_TYPE_FIXEDTEXTURE) {
 	    glGenerateMipmap(GL_TEXTURE_2D);
+		#ifndef GL_TEXTURE_MAX_ANISOTROPY
+	    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAX_ANISOTROPY_EXT,16);
+		#else
 	    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAX_ANISOTROPY,16);
+		#endif
 	}
     return RSGE_ERROR_NONE;
 }

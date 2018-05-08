@@ -31,11 +31,17 @@ EXAMPLES_CFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shel
 EXAMPLES_CXXFLAGS=$(CFLAGS) $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shell curl-config --cflags)
 
 LIBRARY_CFLAGS += $(shell $(PKG_CONFIG) --cflags $(LIBRARY_LIBS)) $(shell curl-config --cflags)
-LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) $(shell curl-config --libs) -lOpenCL -ldl -lm -lopenal -lGLU
+LIBRARY_LDFLAGS += $(shell $(PKG_CONFIG) --libs $(LIBRARY_LIBS)) $(shell curl-config --libs) -ldl -lm -lopenal -lGLU -lOpenCL
 
 ifeq ($(CONFIG_LINKMODE),shared)
 LIBRARY_CFLAGS += -fpic
+LIBRARY_CXXFLAGS += -fpic
 LIBRARY_LDFLAGS += -shared
+else
+EXAMPLE_CFLAGS += -DGLEW_STATIC $(shell $(PKG_CONFIG) --cflags --static glew) 
+LIBRARY_CFLAGS += -fpic $(shell $(PKG_CONFIG) --cflags --static glew) -DGLEW_STATIC
+LIBRARY_CXXFLAGS += -fpic $(shell $(PKG_CONFIG) --cflags --static glew) -DGLEW_STATIC
+LIBRARY_LDFLAGS += -shared $(shell $(PKG_CONFIG) --libs --static glew)
 endif
 
 LIBRARY_CXXFLAGS=$(LIBRARY_CFLAGS) -fPIC -std=gnu++11

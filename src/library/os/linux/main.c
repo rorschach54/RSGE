@@ -231,6 +231,9 @@ int main(int argc,char** argv) {
 	if(config_setting_get_bool(config_lookup(&rsge_libconfig_cfg,"gfx.fullscreen"))) monitor = glfwGetPrimaryMonitor();
 	if(arguments.force_fullscreen) monitor = glfwGetPrimaryMonitor();
 	log_debug("Setting resolution to %dx%d%s",res_w,res_h,monitor == NULL ? "" : " (Fullscreen)");
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,0);
+	glfwWindowHint(GLFW_CLIENT_API,GLFW_OPENGL_ES_API);
 	GLFWwindow* window = glfwCreateWindow(res_w,res_h,gameinfo.name,monitor,NULL);
 	if(!window) {
 #if CONFIG_USE_FREETYPE == 1
@@ -349,11 +352,23 @@ int main(int argc,char** argv) {
 	log_debug("Setting up OpenGL");
 	/* Set up OpenGL */
 	glfwMakeContextCurrent(window);
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	glewExperimental = TRUE;
+	GLenum glErr = glewInit();
+	if(glErr != GLEW_OK) {
+		log_error("GLEW: %s",glewGetErrorString(glErr));
+#if CONFIG_USE_FREETYPE == 1
+		FT_Done_FreeType(rsge_freetype_lib);
+#endif
+		config_destroy(&rsge_libconfig_cfg);
+		curl_global_cleanup();
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return EXIT_FAILURE;
+	}
 	glfwSwapInterval(1);
 	
-	log_debug("Initializing ELGLR");
-	err = rsge_elglr_init();
+	log_debug("Assets initializing");
+	err = rsge_assets_init();
 	if(err != RSGE_ERROR_NONE) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
@@ -367,15 +382,15 @@ int main(int argc,char** argv) {
 
 	fb_resize(window,res_w,res_h);
 	
-	log_debug("Assets initializing");
-	err = rsge_assets_init();
+	log_debug("Initializing ELGLR");
+	err = rsge_elglr_init();
 	if(err != RSGE_ERROR_NONE) {
 #if CONFIG_USE_FREETYPE == 1
 		FT_Done_FreeType(rsge_freetype_lib);
 #endif
 		config_destroy(&rsge_libconfig_cfg);
 		curl_global_cleanup();
-		rsge_elglr_deinit();
+		rsge_assets_uninit();
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		return EXIT_FAILURE;

@@ -418,6 +418,10 @@ rsge_error_e rsge_elglr_bindTextureList(rsge_elglr_t* elglr,list_t* textures) {
     return rsge_elglr_bindTextureArray(elglr,textureArr,textureCount);
 }
 
+static void rsge_elglr_glFramebufferTexture_impl(GLenum target,GLenum attachment,GLuint texture,GLint level) {
+	glFramebufferTexture2D(target,attachment,GL_TEXTURE_2D,texture,level);
+}
+
 rsge_error_e rsge_elglr_create(rsge_elglr_t* elglr) {
     memset(elglr,0,sizeof(rsge_elglr_t));
 	elglr->texBuffs.bufferedTexsCount = 0;
@@ -434,6 +438,8 @@ rsge_error_e rsge_elglr_create(rsge_elglr_t* elglr) {
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+
+	if(glFramebufferTexture == NULL) glFramebufferTexture = rsge_elglr_glFramebufferTexture_impl;
 	
 	err = rsge_elglr_initshaders(elglr);
 	if(err != RSGE_ERROR_NONE) return err;

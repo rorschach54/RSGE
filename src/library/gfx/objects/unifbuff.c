@@ -13,7 +13,9 @@ rsge_error_e rsge_obj_unifbuff_create(rsge_obj_unifbuff_t* ub,GLuint binding) {
         log_error("Failed to create a UBO");
         return RSGE_ERROR_OPENGL;
     }
-    glBindBufferBase(GL_UNIFORM_BUFFER,binding,ub->ubo);
+	if(glBindBufferBase == NULL) {
+    	if(glBindBufferRange != NULL) glBindBufferRange(GL_UNIFORM_BUFFER,binding,ub->ubo,sizeof(rsge_obj_unifbuff_t),0);
+	} else glBindBufferBase(GL_UNIFORM_BUFFER,binding,ub->ubo);
     return RSGE_ERROR_NONE;
 }
 

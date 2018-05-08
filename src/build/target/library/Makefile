@@ -49,11 +49,6 @@ $(LIBRARY_BIN)/assets/%.o: $(LIBRARY_SRC)/assets/%.assets.json
 	@mkdir -p $(@D)
 	@$(CC) -o $@ $@.c $(LIBRARY_CFLAGS) -w
 
-$(GLAD_BIN)/%.o: $(GLAD_SRC)/%.c
-	@echo "Compiling $<"
-	@mkdir -p $(@D)
-	@$(CC) -o $@ $< $(LIBRARY_CFLAGS)
-
 $(LIST_BIN)/%.o: $(LIST_SRC)/%.c
 	@echo "Compiling $<"
 	@mkdir -p $(@D)
