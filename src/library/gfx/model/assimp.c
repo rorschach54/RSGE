@@ -23,7 +23,7 @@ rsge_error_e rsge_model_assimp_fromFile(list_t** objects,char* path) {
     rsge_error_e err = rsge_asset_read(path,&data,&datasz);
     if(err != RSGE_ERROR_NONE) return err;
     
-    aiScene* scene = aiImportFileFromMemory(data,datasz,aiProcessPreset_TargetRealtime_MaxQuality,NULL);
+    struct aiScene* scene = aiImportFileFromMemory(data,datasz,aiProcessPreset_TargetRealtime_MaxQuality,NULL);
     if(!scene) return RSGE_ERROR_ASSIMP;
     return RSGE_ERROR_NONE;
 }

@@ -36,3 +36,4 @@ uniform PointLightUniforms {
 	highp vec4 intensity;
 	highp vec2 clipPlanes;
 } pointLight;
+

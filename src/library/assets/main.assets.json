@@ -44,6 +44,10 @@
 		"path": "src/assets/shaders/versions/3.0-es/shaderHeader.glsl"
 	},
 	{
+		"name": "shaders/versions/3.30/shaderHeader.glsl",
+		"path": "src/assets/shaders/versions/3.0-es/shaderHeader.glsl"
+	},
+	{
 		"name": "shaders/versions/3.0-es/shaderHeader.glsl",
 		"path": "src/assets/shaders/versions/3.0-es/shaderHeader.glsl"
 	},

@@ -5,12 +5,10 @@
 #include <string.h>
 
 rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) {
-	rsge_asset_t sourceAsset;
-	rsge_error_e err = rsge_asset_get(&sourceAsset,path);
-	if(err != RSGE_ERROR_NONE) return err;
-	
+	GLchar *sources[2];
+	rsge_error_e err;
 	char headerpathtmp[1];
-	size_t headerpathsz = sprintf(headerpathtmp,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION));
+	size_t headerpathsz = sprintf(headerpathtmp,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION))+1;
 	char* headerpath = malloc(headerpathsz);
 	if(!headerpath) {
 		log_error("Failed to allocate %d bytes of memory",headerpathsz);
@@ -18,13 +16,19 @@ rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) 
 	}
 	memset(headerpath,0,headerpathsz);
 	sprintf(headerpath,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION));
-	rsge_asset_t headerAsset;
-	err = rsge_asset_get(&headerAsset,headerpath);
+	size_t headersz = 0;
+	err = rsge_asset_read(headerpath,(char**)&sources[0],&headersz);
 	free(headerpath);
 	if(err != RSGE_ERROR_NONE) return err;
+	sources[0][headersz] = 0;
+
+	//char* source;
+	size_t sourcesz = 0;
+	err = rsge_asset_read(path,(char**)&sources[1],&sourcesz);
+	if(err != RSGE_ERROR_NONE) return err;
+	sources[1][sourcesz] = 0;
 	
-	char datatmp[1];
-	size_t datasz = strlen(headerAsset.data)+strlen(sourceAsset.data);
+	/*size_t datasz = headersz+sourcesz+1;
 	log_debug("Allocation %d bytes of memory",datasz);
 	char* data = malloc(datasz);
 	if(data == NULL) {
@@ -32,26 +36,27 @@ rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) 
 		return RSGE_ERROR_MALLOC;
 	}
 	memset(data,0,datasz);
-	strcpy(data,headerAsset.data);
-	strcat(data,sourceAsset.data);
+	strcpy(data,header);
+	strcat(data,source);
+	data[headersz+sourcesz] = 0;*/
 	
 	err = rsge_shader_create(shader,type);
 	if(err != RSGE_ERROR_NONE) {
-		free(data);
+		for(int i = 0;i < 2;i++) free((char*)sources[i]);
+		//free(data);
 		return err;
 	}
-	err = rsge_shader_compile(shader,data);
-	free(data);
+	glShaderSource(shader->id,2,(const GLchar**)sources,(GLint[2]){
+		headersz,
+		sourcesz
+	});
+	err = rsge_shader_compile(shader,NULL);
 	return err;
 }
 
 rsge_error_e rsge_shader_create(rsge_shader_t* shader,GLenum type) {
-	if(shader->id > 0) {
-		rsge_error_e err = rsge_shader_destroy(shader);
-		if(err != RSGE_ERROR_NONE) return err;
-	}
 	memset(shader,0,sizeof(rsge_shader_t));
-
+	log_debug("Creating shader");
 	shader->id = glCreateShader(type);
 	if(shader->id == 0) {
 		char* typeStr = "unknown";
@@ -73,13 +78,15 @@ rsge_error_e rsge_shader_destroy(rsge_shader_t* shader) {
 }
 
 rsge_error_e rsge_shader_compile(rsge_shader_t* shader,char* source) {
-	glShaderSource(shader->id,1,(const GLchar**)&source,NULL);
+	log_debug("Compiling shader");
+	if(source != NULL) glShaderSource(shader->id,1,(const GLchar**)&source,NULL);
 	glCompileShader(shader->id);
-	int status;
+	int status = 1;
 	glGetShaderiv(shader->id,GL_COMPILE_STATUS,&status);
 	if(!status) {
 		GLint logSize = 0;
 		glGetShaderiv(shader->id,GL_INFO_LOG_LENGTH,&logSize);
+		if(logSize == 0) return RSGE_ERROR_NONE;
 		
 		char* errorLog = malloc(logSize);
 		if(!errorLog) return RSGE_ERROR_MALLOC;

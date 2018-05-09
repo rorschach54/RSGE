@@ -71,6 +71,7 @@ rsge_error_e rsge_asset_get(rsge_asset_t* file,char* name) {
 			break;
 		}
 	}
+	if(splitter == 0) return RSGE_ERROR_INVALID_ASSET_LOC;
 	char* locname = malloc(splitter);
 	if(!locname) return RSGE_ERROR_MALLOC;
 	strncpy(locname,name,splitter);
@@ -106,9 +107,9 @@ rsge_error_e rsge_asset_read(char* name,char** buffer,size_t* count) {
 	rsge_error_e err = rsge_asset_get(&file,name);
 	if(err != RSGE_ERROR_NONE) return err;
 	*count = file.size;
-	*buffer = malloc(*count);
+	*buffer = malloc(file.size);
 	if(buffer == NULL) return RSGE_ERROR_MALLOC;
-	memset(*buffer,0,*count);
-	strncpy(*buffer,file.data,*count);
+	memset(*buffer,0,file.size);
+	strncpy(*buffer,file.data,file.size);
 	return RSGE_ERROR_NONE;
 }
