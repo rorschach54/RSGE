@@ -130,7 +130,11 @@ typedef enum {
 	/**
 	 * AntTweakBar error.
 	 */
-	RSGE_ERROR_TW
+	RSGE_ERROR_TW,
+	/**
+	 * Assimp error.
+	 */
+	RSGE_ERROR_ASSIMP
 } rsge_error_e;
 
 #endif
