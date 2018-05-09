@@ -6,6 +6,9 @@ LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/image/bmp.o
 ifeq ($(CONFIG_USE_LIBPNG),y)
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/image/libpng.o
 endif
+ifeq ($(CONFIG_USE_ASSIMP),y)
+LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/model/assimp.o
+endif
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/model/obj.o
 LIBRARY_OBJS += $(LIBRARY_BIN)/gfx/objects/fb.o $(LIBRARY_BIN)/gfx/objects/texbuff.o \
 $(LIBRARY_BIN)/gfx/objects/texture.o $(LIBRARY_BIN)/gfx/objects/unifbuff.o \

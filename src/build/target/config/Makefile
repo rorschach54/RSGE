@@ -12,6 +12,10 @@ ifeq ($(CONFIG_USE_LIBPNG),)
 CONFIG_USE_LIBPNG=y
 endif
 
+ifeq ($(CONFIG_USE_ASSIMP),)
+CONFIG_USE_ASSIMP=y
+endif
+
 ifeq ($(CONFIG_AUDIO_BACKEND),)
 CONFIG_AUDIO_BACKEND=libaudio
 endif
@@ -32,6 +36,11 @@ ifeq ($(CONFIG_USE_FREETYPE),y)
 else
 	@printf "#define CONFIG_USE_FREETYPE 0\n" >> $(INCLUDE_SRC)/rsge/config.h
 endif
+ifeq ($(CONFIG_USE_ASSIMP),y)
+	@printf "#define CONFIG_USE_ASSIMP 1\n" >> $(INCLUDE_SRC)/rsge/config.h
+else
+	@printf "#define CONFIG_USE_ASSIMP 0\n" >> $(INCLUDE_SRC)/rsge/config.h
+endif
 ifeq ($(CONFIG_USE_LIBPNG),y)
 	@printf "#define CONFIG_USE_LIBPNG 1\n" >> $(INCLUDE_SRC)/rsge/config.h
 else
@@ -43,6 +52,7 @@ endif
 	@printf "CONFIG_PLATFORM=$(CONFIG_PLATFORM)\n" > $(CONFIG_SRC)/Makefile
 	@printf "CONFIG_USE_FREETYPE=$(CONFIG_USE_FREETYPE)\n" >> $(CONFIG_SRC)/Makefile
 	@printf "CONFIG_USE_LIBPNG=$(CONFIG_USE_LIBPNG)\n" >> $(CONFIG_SRC)/Makefile
+	@printf "CONFIG_USE_ASSIMP=$(CONFIG_USE_ASSIMP)\n" >> $(CONFIG_SRC)/Makefile
 	@printf "CONFIG_AUDIO_BACKEND=$(CONFIG_AUDIO_BACKEND)\n" >> $(CONFIG_SRC)/Makefile
 	@printf "CONFIG_OS=$(CONFIG_OS)\n" >> $(CONFIG_SRC)/Makefile
 ifeq ($(CONFIG_OS),linux)

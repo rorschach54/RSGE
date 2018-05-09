@@ -233,7 +233,7 @@ int main(int argc,char** argv) {
 	if(arguments.force_fullscreen) monitor = glfwGetPrimaryMonitor();
 	log_debug("Setting resolution to %dx%d%s",res_w,res_h,monitor == NULL ? "" : " (Fullscreen)");
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,2);
 	GLFWwindow* window = glfwCreateWindow(res_w,res_h,gameinfo.name,monitor,NULL);
 	if(!window) {
 #if CONFIG_USE_FREETYPE == 1

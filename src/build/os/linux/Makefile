@@ -14,6 +14,10 @@ ifeq ($(CONFIG_USE_LIBPNG),y)
 LIBRARY_LIBS += libpng
 endif
 
+ifeq ($(CONFIG_USE_ASSIMP),y)
+LIBRARY_LIBS += assimp
+endif
+
 ifeq ($(CONFIG_AUDIO_BACKEND),libaudio)
 LIBRARY_LDFLAGS += -laudio
 else
