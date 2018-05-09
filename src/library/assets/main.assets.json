@@ -40,6 +40,18 @@
 		"path": "src/assets/models/simple.xml"
 	},
 	{
+		"name": "shaders/versions/1.30/shaderHeader.glsl",
+		"path": "src/assets/shaders/versions/3.0-es/shaderHeader.glsl"
+	},
+	{
+		"name": "shaders/versions/3.0-es/shaderHeader.glsl",
+		"path": "src/assets/shaders/versions/3.0-es/shaderHeader.glsl"
+	},
+	{
+		"name": "shaders/versions/4.2/shaderHeader.glsl",
+		"path": "src/assets/shaders/versions/4.2/shaderHeader.glsl"
+	},
+	{
 		"name": "shaders/copyTexture.frag",
 		"path": "src/assets/shaders/copyTexture.frag"
 	},
@@ -66,10 +78,6 @@
 	{
 		"name": "shaders/lighting.frag",
 		"path": "src/assets/shaders/lighting.frag"
-	},
-	{
-		"name": "shaders/shaderHeader",
-		"path": "src/assets/shaders/shaderHeader"
 	},
 	{
 		"name": "shaders/transforms.vert",

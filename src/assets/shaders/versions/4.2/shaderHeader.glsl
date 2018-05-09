@@ -1,4 +1,5 @@
 #version 420
+#define GLSL_VERSION_420
 
 layout (binding = 1, std140, row_major) uniform RenderUniforms
 {

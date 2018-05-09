@@ -12,7 +12,15 @@ rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) 
 	
 	char* header;
 	size_t headersz;
-	err = rsge_asset_read("rsge@shaders/shaderHeader",&header,&headersz);
+	size_t headerpathsz = strlen("rsge@shaders/versions//shaderHeader.glsl")+strlen(glGetString(GL_SHADING_LANGUAGE_VERSION));
+	char* headerpath = malloc(headerpathsz);
+	if(!headerpath) {
+		log_error("Failed to allocate %d bytes of memory",headerpathsz);
+		return RSGE_ERROR_MALLOC;
+	}
+	sprintf(headerpath,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION));
+	err = rsge_asset_read(headerpath,&header,&headersz);
+	free(headerpath);
 	if(err != RSGE_ERROR_NONE) return err;
 	
 	char* data = malloc(headersz+sourcesz);

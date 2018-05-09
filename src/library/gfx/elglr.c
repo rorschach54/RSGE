@@ -15,22 +15,6 @@ rsge_error_e rsge_elglr_mkstates(rsge_elglr_t* elglr);
 rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
     log_debug("ELGLR: Initializing shaders");
     
-    rsge_error_e err = rsge_obj_unifbuff_create(&elglr->unifBuffs.render,1);
-    if(err != RSGE_ERROR_NONE) return err;
-    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.scene,2);
-    if(err != RSGE_ERROR_NONE) return err;
-    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.camera,3);
-    if(err != RSGE_ERROR_NONE) return err;
-    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.obj,4);
-    if(err != RSGE_ERROR_NONE) return err;
-    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.mat,5);
-    if(err != RSGE_ERROR_NONE) return err;
-    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.pointLight,6);
-    if(err != RSGE_ERROR_NONE) return err;
-    
-    err = rsge_elglr_buildfbs(elglr);
-    if(err != RSGE_ERROR_NONE) return err;
-    
     /* Create texture to screen shader */
     {
         rsge_shader_t shaderVert;
@@ -103,6 +87,52 @@ rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
         glAttachShader(elglr->shaderProgs.lightingPass.id,shaderVert.id);
         glAttachShader(elglr->shaderProgs.lightingPass.id,shaderFrag.id);
     }
+    
+    rsge_error_e err = rsge_obj_unifbuff_create(&elglr->unifBuffs.render,1,"RenderUniforms",(rsge_shaderprg_t[4]){
+		elglr->shaderProgs.texToScreen,
+		elglr->shaderProgs.makeGBuffs,
+		elglr->shaderProgs.depthPass,
+		elglr->shaderProgs.lightingPass
+	},4,sizeof(rsge_unif_render_t));
+    if(err != RSGE_ERROR_NONE) return err;
+    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.scene,2,"SceneUniforms",(rsge_shaderprg_t[4]){
+		elglr->shaderProgs.texToScreen,
+		elglr->shaderProgs.makeGBuffs,
+		elglr->shaderProgs.depthPass,
+		elglr->shaderProgs.lightingPass
+	},4,sizeof(rsge_unif_scene_t));
+    if(err != RSGE_ERROR_NONE) return err;
+    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.camera,3,"CameraUniforms",(rsge_shaderprg_t[4]){
+		elglr->shaderProgs.texToScreen,
+		elglr->shaderProgs.makeGBuffs,
+		elglr->shaderProgs.depthPass,
+		elglr->shaderProgs.lightingPass
+	},4,sizeof(rsge_unif_cam_t));
+    if(err != RSGE_ERROR_NONE) return err;
+    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.obj,4,"ObjectUniforms",(rsge_shaderprg_t[4]){
+		elglr->shaderProgs.texToScreen,
+		elglr->shaderProgs.makeGBuffs,
+		elglr->shaderProgs.depthPass,
+		elglr->shaderProgs.lightingPass
+	},4,sizeof(rsge_unif_obj_t));
+    if(err != RSGE_ERROR_NONE) return err;
+    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.mat,5,"MaterialUniforms",(rsge_shaderprg_t[4]){
+		elglr->shaderProgs.texToScreen,
+		elglr->shaderProgs.makeGBuffs,
+		elglr->shaderProgs.depthPass,
+		elglr->shaderProgs.lightingPass
+	},4,sizeof(rsge_unif_material_t));
+    if(err != RSGE_ERROR_NONE) return err;
+    err = rsge_obj_unifbuff_create(&elglr->unifBuffs.pointLight,6,"PointLightUniforms",(rsge_shaderprg_t[4]){
+		elglr->shaderProgs.texToScreen,
+		elglr->shaderProgs.makeGBuffs,
+		elglr->shaderProgs.depthPass,
+		elglr->shaderProgs.lightingPass
+	},4,sizeof(rsge_unif_point_light_t));
+    if(err != RSGE_ERROR_NONE) return err;
+    
+    err = rsge_elglr_buildfbs(elglr);
+    if(err != RSGE_ERROR_NONE) return err;
     return rsge_elglr_mkstates(elglr);
 }
 
@@ -447,6 +477,7 @@ rsge_error_e rsge_elglr_create(rsge_elglr_t* elglr) {
 }
 
 rsge_error_e rsge_elglr_init() {
+	log_debug("OpenGL Version: %s",glGetString(GL_VERSION));
     rsge_error_e err;
 	rsge_camera_t* cam;
 	err = rsge_camera_getmaincam(&cam);

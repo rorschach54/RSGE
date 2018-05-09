@@ -41,8 +41,7 @@ rsge_error_e rsge_game_init(rsge_elglr_t* elglr) {
 	if(err != RSGE_ERROR_NONE) return err;
 	
 	err = rsge_physics_world_addrb(&world,&rb);
-	if(err != RSGE_ERROR_NONE) return err;
-	return RSGE_ERROR_NONE;
+	return err;
 }
 
 rsge_error_e rsge_game_uninit(rsge_elglr_t* elglr) {
@@ -63,8 +62,7 @@ rsge_error_e rsge_game_update(rsge_elglr_t* elglr,double currentTime,int fps) {
     
     rsge_physics_transform_t worldTransform;
     err = rsge_physics_motion_state_getworldtransform(&motionState,&worldTransform);
-    if(err != RSGE_ERROR_NONE) return err;
-	return RSGE_ERROR_NONE;
+	return err;
 }
 
 rsge_error_e rsge_game_getinfo(rsge_game_t* gameinfo) {
