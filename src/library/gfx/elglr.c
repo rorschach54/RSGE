@@ -487,7 +487,7 @@ rsge_error_e rsge_elglr_init() {
     glGetIntegerv(GL_MAJOR_VERSION,&glVerMaj);
     int glVerMin;
     glGetIntegerv(GL_MINOR_VERSION,&glVerMin);
-    if(glVerMaj == 3 && glVerMin < 2) {
+    if(glVerMaj < 3 || (glVerMaj == 3 && glVerMin < 2)) {
         log_error("Unsupported OpenGL version, at least OpenGL version 3.2 is required");
         return RSGE_ERROR_OPENGL;
     }
