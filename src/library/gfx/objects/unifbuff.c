@@ -14,7 +14,6 @@ rsge_error_e rsge_obj_unifbuff_create(rsge_obj_unifbuff_t* ub,GLuint binding,cha
         log_error("Failed to create a UBO");
         return RSGE_ERROR_OPENGL;
     }
-	#if GLAD_GL_VERSION_3_0
 	ub->blockIndexCount = shaderProgCount;
 	ub->blockIndexes = malloc(sizeof(GLuint)*ub->blockIndexCount);
 	if(!ub->blockIndexes) {
@@ -26,10 +25,6 @@ rsge_error_e rsge_obj_unifbuff_create(rsge_obj_unifbuff_t* ub,GLuint binding,cha
 	glBindBufferBase(GL_UNIFORM_BUFFER,binding,ub->ubo);
 	glBufferData(GL_UNIFORM_BUFFER,size, NULL,GL_STATIC_DRAW);
 	for(int i = 0;i < ub->blockIndexCount;i++) glUniformBlockBinding(shaderProgs[i].id,ub->blockIndexes[i],binding);
-	#endif
-	#if GLAD_GL_VERSION_4_2
-	glBindBufferBase(GL_UNIFORM_BUFFER,binding,ub->ubo);
-	#endif
     return RSGE_ERROR_NONE;
 }
 
