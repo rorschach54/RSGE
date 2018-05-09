@@ -103,6 +103,10 @@ void drop_callback(GLFWwindow* window,int count,const char** paths) {
 	}
 }
 
+void rsge_gl_debug(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void* userParam) {
+	if(type == GL_DEBUG_TYPE_ERROR) log_error("GL: %s",message);
+}
+
 void rsge_callbacks_init() {
 	GLFWwindow* window = glfwGetCurrentContext();
 	glfwSetFramebufferSizeCallback(window,fb_resize);

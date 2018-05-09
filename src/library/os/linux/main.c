@@ -22,6 +22,7 @@ extern void rsge_callbacks_init();
 extern void error_callback(int error,const char* description);
 extern void fb_resize(GLFWwindow* window,int width,int height);
 extern void rsge_sigint(int dummy);
+extern void rsge_gl_debug(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void* userParam);
 
 extern rsge_elglr_t rsge_elglr;
 
@@ -370,6 +371,10 @@ int main(int argc,char** argv) {
 	fb_resize(window,res_w,res_h);
 	
 	log_debug("Initializing ELGLR");
+	if(!strcmp(arguments.log_level,"debug")) {
+		glEnable(GL_DEBUG_OUTPUT);
+		glDebugMessageCallback((GLDEBUGPROC)rsge_gl_debug,0);
+	}
 	err = rsge_elglr_init();
 	if(err != RSGE_ERROR_NONE) {
 #if CONFIG_USE_FREETYPE == 1

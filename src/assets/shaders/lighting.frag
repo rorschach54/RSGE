@@ -1,5 +1,5 @@
-#if GLSL_VERSION_ES == 0
-#if GLSL_VERSION == 420
+#ifndef GLSL_VERSION_ES
+#ifdef GLSL_VERSION_420
 layout (binding = 0) uniform sampler2D diffuseBuffer;	// R, G, B, unused
 layout (binding = 1) uniform sampler2D specularBuffer;	// R, G, B, exponent / 1000
 layout (binding = 2) uniform sampler2D normalBuffer;	// R, G, B, unused. Also values have to be converted from 0 - 1 to -1 - 1
@@ -107,12 +107,12 @@ float lightAmount() {
 }
 #endif
 #else
-#if GLSL_VERSION == 300
-layout (binding = 0) uniform sampler2D diffuseBuffer;	// R, G, B, unused
-layout (binding = 1) uniform sampler2D specularBuffer;	// R, G, B, exponent / 1000
-layout (binding = 2) uniform sampler2D normalBuffer;	// R, G, B, unused. Also values have to be converted from 0 - 1 to -1 - 1
-layout (binding = 3) uniform sampler2D depthBuffer;
-layout (binding = 4) uniform samplerCube shadowMapBuffer;
+#ifdef GLSL_VERSION_300
+uniform sampler2D diffuseBuffer;	// R, G, B, unused
+uniform sampler2D specularBuffer;	// R, G, B, exponent / 1000
+uniform sampler2D normalBuffer;	// R, G, B, unused. Also values have to be converted from 0 - 1 to -1 - 1
+uniform sampler2D depthBuffer;
+uniform samplerCube shadowMapBuffer;
 
 in vec3 eyeSpaceRay;
 

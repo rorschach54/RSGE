@@ -1,5 +1,5 @@
-#if GLSL_VERSION_ES == 0
-#if GLSL_VERSION == 420
+#ifndef GLSL_VERSION_ES
+#ifdef GLSL_VERSION_420
 layout (triangles) in;
 layout (triangle_strip, max_vertices=18) out;
 
@@ -22,7 +22,7 @@ void main() {
 }
 #endif
 #else
-#if GLSL_VERSION == 300
+#ifdef GLSL_VERSION_300
 layout (triangles) in;
 layout (triangle_strip, max_vertices=18) out;
 

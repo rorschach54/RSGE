@@ -16,6 +16,7 @@ rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
     log_debug("ELGLR: Initializing shaders");
     
     /* Create texture to screen shader */
+    log_debug("ELGLR: Creating texture to screen shader");
     {
         rsge_shader_t shaderVert;
         rsge_error_e err = rsge_shader_fromFile(&shaderVert,GL_VERTEX_SHADER,"rsge@shaders/fullScreenQuad.vert");
@@ -33,6 +34,7 @@ rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
     }
     
     /* Create make g-buffers shader */
+    log_debug("ELGLR: Creating make g-buffers shader");
     {
         rsge_shader_t shaderVert;
         rsge_error_e err = rsge_shader_fromFile(&shaderVert,GL_VERTEX_SHADER,"rsge@shaders/transforms.vert");
@@ -50,6 +52,7 @@ rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
     }
     
     /* Create depth pass shader */
+    log_debug("ELGLR: Creating depth pass shader");
     {
         rsge_shader_t shaderVert;
         rsge_error_e err = rsge_shader_fromFile(&shaderVert,GL_VERTEX_SHADER,"rsge@shaders/depthOnly.vert");
@@ -72,6 +75,7 @@ rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
     }
     
     /* Create lighting pass shader */
+    log_debug("ELGLR: Creating lighting pass shader");
     {
         rsge_shader_t shaderVert;
         rsge_error_e err = rsge_shader_fromFile(&shaderVert,GL_VERTEX_SHADER,"rsge@shaders/fullScreenQuad.vert");
@@ -88,6 +92,7 @@ rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
         glAttachShader(elglr->shaderProgs.lightingPass.id,shaderFrag.id);
     }
     
+    log_debug("ELGLR: Creating uniform buffers");
     rsge_error_e err = rsge_obj_unifbuff_create(&elglr->unifBuffs.render,1,"RenderUniforms",(rsge_shaderprg_t[4]){
 		elglr->shaderProgs.texToScreen,
 		elglr->shaderProgs.makeGBuffs,
@@ -478,6 +483,14 @@ rsge_error_e rsge_elglr_create(rsge_elglr_t* elglr) {
 
 rsge_error_e rsge_elglr_init() {
 	log_debug("OpenGL Version: %s",glGetString(GL_VERSION));
+    int glVerMaj;
+    glGetIntegerv(GL_MAJOR_VERSION,&glVerMaj);
+    int glVerMin;
+    glGetIntegerv(GL_MINOR_VERSION,&glVerMin);
+    if(glVerMaj == 3 && glVerMin < 2) {
+        log_error("Unsupported OpenGL version, at least OpenGL version 3.2 is required");
+        return RSGE_ERROR_OPENGL;
+    }
     rsge_error_e err;
 	rsge_camera_t* cam;
 	err = rsge_camera_getmaincam(&cam);

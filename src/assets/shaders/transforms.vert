@@ -1,5 +1,5 @@
-#if GLSL_VERSION_ES == 0
-#if GLSL_VERSION == 420
+#ifndef GLSL_VERSION_ES
+#ifdef GLSL_VERSION_420
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoord;
@@ -30,7 +30,7 @@ void main() {
 }
 #endif
 #else
-#if GLSL_VERSION == 300
+#ifdef GLSL_VERSION_300
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoord;

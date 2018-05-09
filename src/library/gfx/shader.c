@@ -5,57 +5,42 @@
 #include <string.h>
 
 rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) {
-	char* source;
-	size_t sourcesz;
-	rsge_error_e err = rsge_asset_read(path,&source,&sourcesz);
+	rsge_asset_t sourceAsset;
+	rsge_error_e err = rsge_asset_get(&sourceAsset,path);
 	if(err != RSGE_ERROR_NONE) return err;
 	
-	char* header;
-	size_t headersz;
 	char headerpathtmp[1];
 	size_t headerpathsz = sprintf(headerpathtmp,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION));
 	char* headerpath = malloc(headerpathsz);
 	if(!headerpath) {
-		free(source);
 		log_error("Failed to allocate %d bytes of memory",headerpathsz);
 		return RSGE_ERROR_MALLOC;
 	}
 	memset(headerpath,0,headerpathsz);
 	sprintf(headerpath,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION));
-	err = rsge_asset_read(headerpath,&header,&headersz);
+	rsge_asset_t headerAsset;
+	err = rsge_asset_get(&headerAsset,headerpath);
 	free(headerpath);
-	if(err != RSGE_ERROR_NONE) {
-		free(source);
-		return err;
-	}
+	if(err != RSGE_ERROR_NONE) return err;
 	
-	// There is some sort of bug causing malloc to not work when it was tested on a Raspberry Pi 2 Model B
 	char datatmp[1];
-	size_t datasz = sprintf(datatmp,"%s\n%s",header,source);
+	size_t datasz = strlen(headerAsset.data)+strlen(sourceAsset.data);
 	log_debug("Allocation %d bytes of memory",datasz);
 	char* data = malloc(datasz);
 	if(data == NULL) {
 		log_error("Failed to allocate %d bytes of memory",datasz);
-		free(header);
-		free(source);
 		return RSGE_ERROR_MALLOC;
 	}
 	memset(data,0,datasz);
-	log_debug("header size = %d strlen(header) = %d",headersz,strlen(header));
-	memcpy(data,header,strlen(header));
-	data[strlen(header)+1] = '\n';
-	memcpy(data+1+strlen(header),source,strlen(source));
+	strcpy(data,headerAsset.data);
+	strcat(data,sourceAsset.data);
 	
 	err = rsge_shader_create(shader,type);
 	if(err != RSGE_ERROR_NONE) {
-		free(header);
-		free(source);
 		free(data);
 		return err;
 	}
 	err = rsge_shader_compile(shader,data);
-	free(header);
-	free(source);
 	free(data);
 	return err;
 }
@@ -68,7 +53,16 @@ rsge_error_e rsge_shader_create(rsge_shader_t* shader,GLenum type) {
 	memset(shader,0,sizeof(rsge_shader_t));
 
 	shader->id = glCreateShader(type);
-	if(shader->id == 0) return RSGE_ERROR_SHADER;
+	if(shader->id == 0) {
+		char* typeStr = "unknown";
+		if(type == GL_GEOMETRY_SHADER) typeStr = "GL_GEOMETRY_SHADER";
+		if(type == GL_FRAGMENT_SHADER) typeStr = "GL_FRAGMENT_SHADER";
+		if(type == GL_VERTEX_SHADER) typeStr = "GL_VERTEX_SHADER";
+		log_error("Failed to create shader (type: %s)",typeStr);
+		GLenum glErr = glGetError();
+		if(glErr != GL_NO_ERROR) log_error("GL: %s",gluErrorString(glErr));
+		return RSGE_ERROR_SHADER;
+	}
 	return RSGE_ERROR_NONE;
 }
 
@@ -91,7 +85,7 @@ rsge_error_e rsge_shader_compile(rsge_shader_t* shader,char* source) {
 		if(!errorLog) return RSGE_ERROR_MALLOC;
 		glGetShaderInfoLog(shader->id,logSize,&logSize,&errorLog[0]);
 		
-		log_error("%s\n",errorLog);
+		log_error("Failed to compile shader: \n%s\n",errorLog);
 		
 		free(errorLog);
 		return RSGE_ERROR_SHADER;

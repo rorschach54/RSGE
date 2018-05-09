@@ -15,9 +15,15 @@ void main() {
 out vec3 eyeSpaceRay;
 
 void main() {
-	vec2 corners[4] = { vec2(-1, -1), vec2( 1, -1), vec2( -1, 1), vec2( 1, 1 )};
-	eyeSpaceRay = vec3(tan(camera.fov / 2) * corners[gl_VertexID].xy, -1);
-	gl_Position = vec4(corners[gl_VertexID], -1.0, 1.0);
+	vec2 corners[4];
+	corners[0] = vec2(-1,-1);
+	corners[1] = vec2(1,-1);
+	corners[2] = vec2(-1,1);
+	corners[3] = vec2(1,1);
+	vec2 fov = camera.fov;
+	vec2 corner = corners[gl_VertexID];
+	eyeSpaceRay = vec3(tan(fov)*corner,-1);
+	gl_Position = vec4(corner,-1.0,1.0);
 }
 #endif
 #endif
