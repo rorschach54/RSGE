@@ -12,31 +12,50 @@ rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) 
 	
 	char* header;
 	size_t headersz;
-	size_t headerpathsz = strlen("rsge@shaders/versions//shaderHeader.glsl")+strlen(glGetString(GL_SHADING_LANGUAGE_VERSION));
+	char headerpathtmp[1];
+	size_t headerpathsz = sprintf(headerpathtmp,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION));
 	char* headerpath = malloc(headerpathsz);
 	if(!headerpath) {
+		free(source);
 		log_error("Failed to allocate %d bytes of memory",headerpathsz);
 		return RSGE_ERROR_MALLOC;
 	}
+	memset(headerpath,0,headerpathsz);
 	sprintf(headerpath,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION));
 	err = rsge_asset_read(headerpath,&header,&headersz);
 	free(headerpath);
-	if(err != RSGE_ERROR_NONE) return err;
+	if(err != RSGE_ERROR_NONE) {
+		free(source);
+		return err;
+	}
 	
-	char* data = malloc(headersz+sourcesz);
+	// There is some sort of bug causing malloc to not work when it was tested on a Raspberry Pi 2 Model B
+	char datatmp[1];
+	size_t datasz = sprintf(datatmp,"%s\n%s",header,source);
+	log_debug("Allocation %d bytes of memory",datasz);
+	char* data = malloc(datasz);
 	if(data == NULL) {
-		log_error("Failed to allocate %d bytes of memory",headersz+sourcesz);
+		log_error("Failed to allocate %d bytes of memory",datasz);
+		free(header);
+		free(source);
 		return RSGE_ERROR_MALLOC;
 	}
-	strcpy(data,header);
-	strcat(data,source);
+	memset(data,0,datasz);
+	log_debug("header size = %d strlen(header) = %d",headersz,strlen(header));
+	memcpy(data,header,strlen(header));
+	data[strlen(header)+1] = '\n';
+	memcpy(data+1+strlen(header),source,strlen(source));
 	
 	err = rsge_shader_create(shader,type);
 	if(err != RSGE_ERROR_NONE) {
+		free(header);
+		free(source);
 		free(data);
 		return err;
 	}
 	err = rsge_shader_compile(shader,data);
+	free(header);
+	free(source);
 	free(data);
 	return err;
 }
