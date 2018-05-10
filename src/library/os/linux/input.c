@@ -65,7 +65,7 @@ rsge_error_e rsge_input_setmousecursor_fromFile(char* path) {
 
 rsge_error_e rsge_input_getmousepos(double* x,double* y) {
 	GLFWwindow* window = glfwGetCurrentContext();
-	glfwGetCursorPos(window,&x,&y);
+	glfwGetCursorPos(window,x,y);
 	return RSGE_ERROR_NONE;
 }
 
