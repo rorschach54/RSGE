@@ -107,7 +107,7 @@ rsge_error_e rsge_asset_read(char* name,char** buffer,size_t* count) {
 	rsge_error_e err = rsge_asset_get(&file,name);
 	if(err != RSGE_ERROR_NONE) return err;
 	*count = file.size;
-	*buffer = malloc(file.size);
+	*buffer = calloc(1,file.size);
 	if(buffer == NULL) return RSGE_ERROR_MALLOC;
 	memset(*buffer,0,file.size);
 	strncpy(*buffer,file.data,file.size);

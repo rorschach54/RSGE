@@ -8,33 +8,37 @@ rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) 
 	rsge_error_e err = rsge_shader_create(shader,type);
 	if(err != RSGE_ERROR_NONE) return err;
 
+	size_t sourcesz = 0;
+	size_t headersz = 0;
+	char* sources[2];
+
+	err = rsge_asset_read(path,&sources[1],&sourcesz);
+	if(err != RSGE_ERROR_NONE) return err;
+	sources[1][sourcesz] = 0;
+
 	/* Bug discovered by Spaceboy Ross, patched code by Reddit user u/rorschach54 */
 	size_t headerpathsz = strlen("rsge@shaders/versions//shaderHeader.glsl")+strlen(glGetString(GL_SHADING_LANGUAGE_VERSION))+1;
-	char* headerpath = calloc(0,headerpathsz);
+	char* headerpath = calloc(1,headerpathsz);
 	if(!headerpath) {
 		log_error("Failed to allocate %d bytes of memory",headerpathsz);
 		return RSGE_ERROR_MALLOC;
 	}
 	memset(headerpath,0,headerpathsz);
 	sprintf(headerpath,"rsge@shaders/versions/%s/shaderHeader.glsl",glGetString(GL_SHADING_LANGUAGE_VERSION));
-	char* sources[2];
-
-	size_t sourcesz;
-	size_t headersz;
 
 	err = rsge_asset_read(headerpath,&sources[0],&headersz);
-	//free(headerpath);
 	if(err != RSGE_ERROR_NONE) return err;
+	sources[0][headersz] = 0;
 
-	err = rsge_asset_read(path,&sources[1],&sourcesz);
-	if(err != RSGE_ERROR_NONE) return err;
-
-	glShaderSource(shader->id,2,(const GLchar**)&sources,(const GLint[2]){
-		headersz,
-		sourcesz
-	});
+	char* source = calloc(1,sourcesz+headersz);
+	if(!source) return RSGE_ERROR_MALLOC;
+	memset(source,0,sourcesz+headersz);
+	strcpy(source,sources[0]);
+	strcat(source,sources[1]);
+	source[sourcesz+headersz] = 0;
+	err =  rsge_shader_compile(shader,source);
 	for(int i = 0;i < 2;i++) free(sources[i]);
-	return rsge_shader_compile(shader,NULL);
+	return err;
 }
 
 rsge_error_e rsge_shader_create(rsge_shader_t* shader,GLenum type) {
@@ -68,9 +72,24 @@ rsge_error_e rsge_shader_compile(rsge_shader_t* shader,char* source) {
 	log_debug("Compiling shader");
 	glCompileShader(shader->id);
 	log_debug("Getting shader compile status");
-	GLint status;
+	GLint status = 1;
 	glGetShaderiv(shader->id,GL_COMPILE_STATUS,&status);
-	if(!status) return RSGE_ERROR_SHADER;
+	if(!status) {
+		GLenum glErr = glGetError();
+		if(glErr != GL_NO_ERROR) log_error("GL: %s",gluErrorString(glErr));
+		GLint logSize = 0;
+		glGetShaderiv(shader->id,GL_INFO_LOG_LENGTH,&logSize);
+		
+		char* errorLog = malloc(logSize);
+		if(!errorLog) return RSGE_ERROR_MALLOC;
+		glGetShaderInfoLog(shader->id,logSize,&logSize,&errorLog[0]);
+		
+		log_error("Shader failed to compile:\n%s",errorLog);
+		
+		free(errorLog);
+		//if(source != NULL) log_debug("%s",source);
+		return RSGE_ERROR_SHADER;
+	}
 	log_debug("Shader compiled with no errors");
 	return RSGE_ERROR_NONE;
 }

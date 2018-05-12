@@ -27,6 +27,7 @@ static rsge_error_e rsge_elglr_initshader_texToScreen(rsge_elglr_t* elglr) {
 
 	glAttachShader(elglr->shaderProgs.texToScreen.id,shaderVert.id);
 	glAttachShader(elglr->shaderProgs.texToScreen.id,shaderFrag.id);
+	glLinkProgram(elglr->shaderProgs.texToScreen.id);
 	return RSGE_ERROR_NONE;
 }
 
@@ -45,6 +46,7 @@ static rsge_error_e rsge_elglr_initshader_makeGBuffs(rsge_elglr_t* elglr) {
 
 	glAttachShader(elglr->shaderProgs.makeGBuffs.id,shaderVert.id);
 	glAttachShader(elglr->shaderProgs.makeGBuffs.id,shaderFrag.id);
+	glLinkProgram(elglr->shaderProgs.makeGBuffs.id);
 	return RSGE_ERROR_NONE;
 }
 
@@ -68,17 +70,19 @@ static rsge_error_e rsge_elglr_initshader_depthPass(rsge_elglr_t* elglr) {
 	glAttachShader(elglr->shaderProgs.depthPass.id,shaderVert.id);
 	glAttachShader(elglr->shaderProgs.depthPass.id,shaderGeom.id);
 	glAttachShader(elglr->shaderProgs.depthPass.id,shaderFrag.id);
+	glLinkProgram(elglr->shaderProgs.depthPass.id);
 	return RSGE_ERROR_NONE;
 }
 
 static rsge_error_e rsge_elglr_initshader_lightingPass(rsge_elglr_t* elglr) {
     log_debug("ELGLR: Creating lighting pass shader");
-	rsge_shader_t shaderVert;
-	rsge_error_e err = rsge_shader_fromFile(&shaderVert,GL_VERTEX_SHADER,"rsge@shaders/fullScreenQuad.vert");
-	if(err != RSGE_ERROR_NONE) return err;
-
+	rsge_error_e err;
 	rsge_shader_t shaderFrag;
 	err = rsge_shader_fromFile(&shaderFrag,GL_FRAGMENT_SHADER,"rsge@shaders/lighting.frag");
+	if(err != RSGE_ERROR_NONE) return err;
+
+	rsge_shader_t shaderVert;
+	err = rsge_shader_fromFile(&shaderVert,GL_VERTEX_SHADER,"rsge@shaders/fullScreenQuad.vert");
 	if(err != RSGE_ERROR_NONE) return err;
 
 	err = rsge_shaderprg_create(&elglr->shaderProgs.lightingPass);
@@ -86,26 +90,28 @@ static rsge_error_e rsge_elglr_initshader_lightingPass(rsge_elglr_t* elglr) {
 
 	glAttachShader(elglr->shaderProgs.lightingPass.id,shaderVert.id);
 	glAttachShader(elglr->shaderProgs.lightingPass.id,shaderFrag.id);
+	glLinkProgram(elglr->shaderProgs.lightingPass.id);
 	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
     log_debug("ELGLR: Initializing shaders");
+	rsge_error_e err;
     
-    /* Create texture to screen shader */
-    rsge_error_e err = rsge_elglr_initshader_texToScreen(elglr);
-	if(err != RSGE_ERROR_NONE) return err;
-    
-    /* Create make g-buffers shader */
-    err = rsge_elglr_initshader_makeGBuffs(elglr);
+    /* Create lighting pass shader */
+	err = rsge_elglr_initshader_lightingPass(elglr);
 	if(err != RSGE_ERROR_NONE) return err;
     
     /* Create depth pass shader */
 	err = rsge_elglr_initshader_depthPass(elglr);
 	if(err != RSGE_ERROR_NONE) return err;
     
-    /* Create lighting pass shader */
-	err = rsge_elglr_initshader_lightingPass(elglr);
+    /* Create make g-buffers shader */
+    err = rsge_elglr_initshader_makeGBuffs(elglr);
+	if(err != RSGE_ERROR_NONE) return err;
+    
+    /* Create texture to screen shader */
+    err = rsge_elglr_initshader_texToScreen(elglr);
 	if(err != RSGE_ERROR_NONE) return err;
     
     log_debug("ELGLR: Creating uniform buffers");
