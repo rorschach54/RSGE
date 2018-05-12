@@ -98,16 +98,16 @@ rsge_error_e rsge_elglr_initshaders(rsge_elglr_t* elglr) {
     log_debug("ELGLR: Initializing shaders");
 	rsge_error_e err;
     
-    /* Create lighting pass shader */
-	err = rsge_elglr_initshader_lightingPass(elglr);
+    /* Create make g-buffers shader */
+    err = rsge_elglr_initshader_makeGBuffs(elglr);
 	if(err != RSGE_ERROR_NONE) return err;
     
     /* Create depth pass shader */
 	err = rsge_elglr_initshader_depthPass(elglr);
 	if(err != RSGE_ERROR_NONE) return err;
     
-    /* Create make g-buffers shader */
-    err = rsge_elglr_initshader_makeGBuffs(elglr);
+    /* Create lighting pass shader */
+	err = rsge_elglr_initshader_lightingPass(elglr);
 	if(err != RSGE_ERROR_NONE) return err;
     
     /* Create texture to screen shader */

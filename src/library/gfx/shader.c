@@ -37,8 +37,9 @@ rsge_error_e rsge_shader_fromFile(rsge_shader_t* shader,GLenum type,char* path) 
 	strcat(source,sources[1]);
 	source[sourcesz+headersz] = 0;
 	err =  rsge_shader_compile(shader,source);
-	for(int i = 0;i < 2;i++) free(sources[i]);
-	return err;
+	if(err != RSGE_ERROR_NONE) return err;
+	log_debug("Shader created");
+	return RSGE_ERROR_NONE;
 }
 
 rsge_error_e rsge_shader_create(rsge_shader_t* shader,GLenum type) {
@@ -87,7 +88,6 @@ rsge_error_e rsge_shader_compile(rsge_shader_t* shader,char* source) {
 		log_error("Shader failed to compile:\n%s",errorLog);
 		
 		free(errorLog);
-		//if(source != NULL) log_debug("%s",source);
 		return RSGE_ERROR_SHADER;
 	}
 	log_debug("Shader compiled with no errors");

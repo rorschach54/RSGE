@@ -143,8 +143,8 @@ float attenuation;
 void main() {
 	screenPos = gl_FragCoord.xy/render.viewport;
 	diffuse = texture2D(diffuseBuffer,screenPos);
-	specular = texture2D(specularBuffer,screenPos);	
-	specular.w *= 1000;
+	specular = texture2D(specularBuffer,screenPos);
+	specular.w *= 1000.0;
 	eyeSpaceNormal = vec4(normalize(texture2D(normalBuffer,screenPos).xyz*2.0-1.0),0);
 	eyeSpacePosition = depthToEyeSpace(camera.projection,texture2D(depthBuffer,screenPos).x);
 	eyeSpaceLightPosition = camera.view*pointLight.position;
@@ -180,7 +180,7 @@ float PRNG(vec2 seed) {
 
 float sampleLightMapDepth(vec3 scenePoint,vec3 lightPoint) {
 	vec3 shadowSamplerRay = normalize((camera.inverseView*vec4((lightPoint-scenePoint),0)).xyz);
-	shadowSamplerRay.x *= -1;
+	shadowSamplerRay.x *= -1.0;
 	float mapDepth = textureCube(shadowMapBuffer,shadowSamplerRay).x;	
 	return mapDepth;
 }
@@ -207,7 +207,7 @@ float lightAmount() {
 	for(int i = 0;i < 13;i++) {
 		float mapDepth = sampleLightMapDepth(eyeSpacePosition.xyz+sampleList[i]*0.05f,eyeSpaceLightPosition.xyz);
         float realDepth = lightDistance/pointLight.clipPlanes.y;
-        sampleTotal += (realDepth >= mapDepth ? 0 : 1);
+        sampleTotal += (realDepth >= mapDepth ? 0.0 : 1.0);
     }
 
 	return (sampleTotal/13.0);
